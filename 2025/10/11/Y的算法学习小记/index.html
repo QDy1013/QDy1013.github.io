@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="我（Yhc）学习了一段时间编程算法在这里和想学算法的朋友分享一些经验。（自己走了些弯路） 小白题单 https:&#x2F;&#x2F;vjudge.net&#x2F;article&#x2F;11277codeforces : https:&#x2F;&#x2F;codeforces.com&#x2F;contestsatcoder: https:&#x2F;&#x2F;atcoder.jp&#x2F;以上三个网站都是很好的国内外算法练习网站，对梯子没有硬性要求，小白题单对已经基本掌握c或c+">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Y的算法学习小记">
+<meta property="og:url" content="http://example.com/2025/10/11/Y%E7%9A%84%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E5%B0%8F%E8%AE%B0/index.html">
+<meta property="og:site_name" content="奇点Y的随笔">
+<meta property="og:description" content="我（Yhc）学习了一段时间编程算法在这里和想学算法的朋友分享一些经验。（自己走了些弯路） 小白题单 https:&#x2F;&#x2F;vjudge.net&#x2F;article&#x2F;11277codeforces : https:&#x2F;&#x2F;codeforces.com&#x2F;contestsatcoder: https:&#x2F;&#x2F;atcoder.jp&#x2F;以上三个网站都是很好的国内外算法练习网站，对梯子没有硬性要求，小白题单对已经基本掌握c或c+">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-10-10T20:01:16.000Z">
+<meta property="article:modified_time" content="2025-10-10T21:38:56.971Z">
+<meta property="article:author" content="奇点Y">
+<meta property="article:tag" content="抛砖引玉，欢迎提出不同意见">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2025/10/11/Y%E7%9A%84%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E5%B0%8F%E8%AE%B0/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2025/10/11/Y%E7%9A%84%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E5%B0%8F%E8%AE%B0/","path":"2025/10/11/Y的算法学习小记/","title":"Y的算法学习小记"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Y的算法学习小记 | 奇点Y的随笔</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">奇点Y的随笔</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">感谢支持</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">奇点Y</p>
+  <div class="site-description" itemprop="description">记录个人心得，和大家交流算法及高数相关问题</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/10/11/Y%E7%9A%84%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E5%B0%8F%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="奇点Y">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="奇点Y的随笔">
+      <meta itemprop="description" content="记录个人心得，和大家交流算法及高数相关问题">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Y的算法学习小记 | 奇点Y的随笔">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Y的算法学习小记
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2025-10-11 04:01:16 / 修改时间：05:38:56" itemprop="dateCreated datePublished" datetime="2025-10-11T04:01:16+08:00">2025-10-11</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>我（Yhc）学习了一段时间编程算法在这里和想学算法的朋友分享一些经验。（自己走了些弯路）</p>
+<p>小白题单 <a target="_blank" rel="noopener" href="https://vjudge.net/article/11277">https://vjudge.net/article/11277</a><br>codeforces : <a target="_blank" rel="noopener" href="https://codeforces.com/contests">https://codeforces.com/contests</a><br>atcoder: <a target="_blank" rel="noopener" href="https://atcoder.jp/">https://atcoder.jp/</a><br>以上三个网站都是很好的国内外算法练习网站，对梯子没有硬性要求，小白题单对已经基本掌握c或c++的朋友可以开始接触并完成。</p>
+<p>在此处特地强调：要在算法领域深入研究首推c++！根据以往的数据参加算法竞赛的平均1500多支队伍里有1300多支队伍使用c++，其余使用java或python，几乎没有人使用c语言。</p>
+<p>并不是说c语言不好（我一开始也是学习c语言），而是每种语言都有自己的特点，c语言更注重极致的效率，大部分工作需要程序员自己完成，而c++虽然在效率上略逊于c，但c++的STL库中有许多的常用工具及容器，因此我们选择舍弃一小部分性能换取对参赛选手的减负（实际上程序效率主要看选手实力而不是编程语言）</p>
+<p>我了解大家基本大一要学编程的话基本也都是学习c语言，但c++编译器基本是兼容所有c语法的，大家可以放心学c，学好c后在学c++是添砖加瓦而非推倒重来。</p>
+<p>首先，在网站上打比赛的前提是你基本已经大致掌握一门编程语言（最好是c++，c也可以），打比赛时自备翻译系统（除非你能看懂全英文的题干，或者你精通日语）</p>
+<p>接下来为大家介绍下面两个网站：这两个网站是世界上最著名的两个编程算法爱好者的聚集地，每周都会不定时地举行比赛供全世界的编程算法爱好者们练手。codeforces（下面简称cf）的比赛分四个级别（div1,div.2,div.3,div.4）数字越小难度越高初学者建议打div4，有一定基础和自信的可以打div3，在这里提前告诉大家：这里面的题目都不简单，就算你打最低级的div4两个小时你七道题只写出来一半不到也不用灰心（别问我怎么知道，以前被干破防了）</p>
+<p>atcoder里的比赛建议大家打beginner contest和cf（不是穿越火线）里的div3，4差不多，相对cf而言atcoder的界面更友好（ 但是日本网站 ）。</p>
+<p>在这里再说些我个人感觉蛮重要的，很多人认为算法就是研究高深的计算逻辑，复杂巧妙的数据结构。我告诉你：这些确实重要，但重要的远不止这些！细节决定成败真的太对了，细节习惯有问题可能让你给代码差错一下午都找不出问题在哪，所以我在这里列出我个人认为小白容易出错的点：</p>
+<p>1：数组下标越界，导致访问未知内存</p>
+<p>2：循环变量设置错误，导致死循环</p>
+<p>3：变量忘记初始化，导致输出随机值</p>
+<p>4：时间复杂度把握不当</p>
+<p>第四点小白可能没有接触，我讲讲自己的理解。我们都认为电脑就是用来做重复机械化计算的，确实如此！但这并不代表你可以浪费电脑的算力。对于新手而言，最常见的滥用算力导致时间复杂度爆表的例子就是滥用循环，动辄就嵌套两到三层的循环，写出平方级甚至立方级的代码，我们假设题目所给的数据量一般是2e5（二乘十的五次方）那嵌套两层计算机就要进行4e10次计算，三层就是8e15次计算。正常情况下每秒评测机（跑你代码给你打分的电脑）只能跑1e8组数据（题目的时间限制一般是两秒），所以显然不行，（除非你能搞到神威.太湖之光做你的评测机）这就是算法的重要性，起到用最小的算力跑出结果的作用！</p>
+<p>今天就分享这么多吧，已经凌晨五点半了</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%8A%9B%E7%A0%96%E5%BC%95%E7%8E%89%EF%BC%8C%E6%AC%A2%E8%BF%8E%E6%8F%90%E5%87%BA%E4%B8%8D%E5%90%8C%E6%84%8F%E8%A7%81/" rel="tag"># 抛砖引玉，欢迎提出不同意见</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/10/11/%E5%A5%87%E7%82%B9%E7%9A%84%E6%9C%8B%E5%8F%8B%E4%BB%AC%E5%A4%A7%E5%AE%B6%E5%A5%BD/" rel="prev" title="奇点的朋友们大家好">
+                  <i class="fa fa-angle-left"></i> 奇点的朋友们大家好
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">奇点Y</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
