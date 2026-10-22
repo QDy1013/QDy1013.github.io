@@ -1267,7 +1267,7 @@ pre code {
   vertical-align: middle;
 }
 .links-of-author a::before {
-  background: #f95316;
+  background: #01f1ff;
   display: inline-block;
   margin-right: 3px;
   transform: translateY(-2px);
@@ -2772,7 +2772,7 @@ header.header {
 }
 body {
   background-color: #f7f3ec;
-  background-image: url("/images/bg.jpg?v=2");
+  background-image: url("/images/bg.webp");
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
