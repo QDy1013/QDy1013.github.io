@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
@@ -19,19 +19,19 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"qdy1013.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"atom-one-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":400},"language":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"top_n_per_article":3,"unescape":false,"preload":true}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="记录个人心得，和大家交流算法及高数相关问题">
+    <meta name="description" content="记录算法与编程、语音识别研究，以及一路上的学习心得">
 <meta property="og:type" content="website">
 <meta property="og:title" content="奇点Y的随笔">
-<meta property="og:url" content="http://qdy1013.github.io/index.html">
+<meta property="og:url" content="https://qdy1013.github.io/index.html">
 <meta property="og:site_name" content="奇点Y的随笔">
-<meta property="og:description" content="记录个人心得，和大家交流算法及高数相关问题">
+<meta property="og:description" content="记录算法与编程、语音识别研究，以及一路上的学习心得">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:author" content="奇点Y">
 <meta property="article:tag" content="算法，高等数学，学习笔记，Y">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://qdy1013.github.io/">
+<link rel="canonical" href="https://qdy1013.github.io/">
 
 
 <script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"index.html","title":""}</script>
@@ -53,7 +53,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
 <script src="/js/third-party/search/local-search.js" defer></script>
 
 
@@ -75,14 +74,15 @@
   </noscript>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+<body itemscope itemtype="https://schema.org/WebPage" class="use-motion">
+  <a class="skip-link" href="#main-content">跳到正文</a>
   <div class="headband"></div>
 
   <main class="main">
     <div class="column">
-      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+      <header class="header" itemscope itemtype="https://schema.org/WPHeader"><div class="site-brand-container">
   <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏" role="button">
+    <div class="toggle" aria-label="切换导航栏" aria-expanded="false" aria-controls="site-nav" role="button" tabindex="0">
         <span class="toggle-line"></span>
         <span class="toggle-line"></span>
         <span class="toggle-line"></span>
@@ -96,11 +96,11 @@
       <h1 class="site-title">奇点Y的随笔</h1>
       <i class="logo-line"></i>
     </a>
-      <p class="site-subtitle" itemprop="description">感谢支持</p>
+      <p class="site-subtitle" itemprop="description">算法 · 语音识别 · 学习笔记</p>
   </div>
 
   <div class="site-nav-right">
-    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button" tabindex="0">
         <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
@@ -108,10 +108,11 @@
 
 
 
-<nav class="site-nav">
+<nav id="site-nav" class="site-nav" aria-label="主导航">
   <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+      <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
       <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        <a role="button" tabindex="0" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
       </li>
   </ul>
@@ -120,21 +121,21 @@
 
 
   <div class="search-pop-overlay">
-    <div class="popup search-popup">
+    <div class="popup search-popup" role="dialog" aria-modal="true" aria-label="站内搜索">
       <div class="search-header">
         <span class="search-icon">
           <i class="fa fa-search"></i>
         </span>
         <div class="search-input-container">
-          <input autocomplete="off" autocapitalize="off" maxlength="80"
+          <input aria-label="搜索文章" autocomplete="off" autocapitalize="off" maxlength="80"
                 placeholder="搜索..." spellcheck="false"
                 type="search" class="search-input">
         </div>
-        <span class="popup-btn-close" role="button">
+        <span aria-label="关闭搜索" class="popup-btn-close" role="button" tabindex="0">
           <i class="fa fa-times-circle"></i>
         </span>
       </div>
-      <div class="search-result-container">
+      <div class="search-result-container" aria-live="polite" aria-busy="false">
         <div class="search-result-icon">
           <i class="fa fa-spinner fa-pulse fa-5x"></i>
         </div>
@@ -164,11 +165,11 @@
         <!--/noindex-->
 
         <div class="site-overview-wrap sidebar-panel">
-          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="https://schema.org/Person">
     <img class="site-author-image" itemprop="image" alt="奇点Y"
       src="/images/touxiang.jpg">
   <p class="site-author-name" itemprop="name">奇点Y</p>
-  <div class="site-description" itemprop="description">记录个人心得，和大家交流算法及高数相关问题</div>
+  <div class="site-description" itemprop="description">记录算法与编程、语音识别研究，以及一路上的学习心得</div>
 </div>
 <div class="site-state-wrap animated">
   <nav class="site-state">
@@ -204,7 +205,19 @@
 
     </div>
 
-    <div class="main-inner index posts-expand">
+    <div id="main-content" tabindex="-1" class="main-inner index posts-expand">
+
+<section class="home-intro" aria-label="博客简介">
+  <p class="home-eyebrow">奇点Y的学习记录</p>
+  <h2>把学过的东西，整理清楚。</h2>
+  <p>这里记录算法与编程的积累，也记录语音识别研究中的阅读、实验和思考。</p>
+  <nav class="home-topics" aria-label="按主题阅读">
+    <a href="/categories/算法/">算法与编程 <span aria-hidden="true">↗</span></a>
+    <a href="/categories/语音识别/">语音识别研究 <span aria-hidden="true">↗</span></a>
+    <a href="/archives/">全部文章 <span aria-hidden="true">→</span></a>
+  </nav>
+</section>
+
 
     
 
@@ -213,20 +226,20 @@
   
   
 
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://qdy1013.github.io/2026/10/22/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB%E7%A0%94%E7%A9%B6%E5%91%A8%E6%8A%A5/">
+  <article itemscope itemtype="https://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://qdy1013.github.io/2026/10/22/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB%E7%A0%94%E7%A9%B6%E5%91%A8%E6%8A%A5/">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
       <meta itemprop="image" content="/images/touxiang.jpg">
       <meta itemprop="name" content="奇点Y">
     </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
       <meta itemprop="name" content="奇点Y的随笔">
-      <meta itemprop="description" content="记录个人心得，和大家交流算法及高数相关问题">
+      <meta itemprop="description" content="记录算法与编程、语音识别研究，以及一路上的学习心得">
     </span>
 
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+    <span hidden itemprop="post" itemscope itemtype="https://schema.org/CreativeWork">
       <meta itemprop="name" content=" | 奇点Y的随笔">
       <meta itemprop="description" content="">
     </span>
@@ -251,7 +264,7 @@
         <i class="far fa-folder"></i>
       </span>
       <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+        <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
           <a href="/categories/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/" itemprop="url" rel="index"><span itemprop="name">语音识别</span></a>
         </span>
     </span>
@@ -299,20 +312,20 @@
   
   
 
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://qdy1013.github.io/2026/10/22/ACM%E7%AE%97%E6%B3%95%E6%9D%BF%E5%AD%90%E5%90%88%E9%9B%86/">
+  <article itemscope itemtype="https://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://qdy1013.github.io/2026/10/22/ACM%E7%AE%97%E6%B3%95%E6%9D%BF%E5%AD%90%E5%90%88%E9%9B%86/">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
       <meta itemprop="image" content="/images/touxiang.jpg">
       <meta itemprop="name" content="奇点Y">
     </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
       <meta itemprop="name" content="奇点Y的随笔">
-      <meta itemprop="description" content="记录个人心得，和大家交流算法及高数相关问题">
+      <meta itemprop="description" content="记录算法与编程、语音识别研究，以及一路上的学习心得">
     </span>
 
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+    <span hidden itemprop="post" itemscope itemtype="https://schema.org/CreativeWork">
       <meta itemprop="name" content=" | 奇点Y的随笔">
       <meta itemprop="description" content="">
     </span>
@@ -337,7 +350,7 @@
         <i class="far fa-folder"></i>
       </span>
       <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+        <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
           <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
         </span>
     </span>
@@ -385,20 +398,20 @@
   
   
 
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://qdy1013.github.io/2025/10/11/Y%E7%9A%84%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E5%B0%8F%E8%AE%B0/">
+  <article itemscope itemtype="https://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://qdy1013.github.io/2025/10/11/Y%E7%9A%84%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E5%B0%8F%E8%AE%B0/">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
       <meta itemprop="image" content="/images/touxiang.jpg">
       <meta itemprop="name" content="奇点Y">
     </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
       <meta itemprop="name" content="奇点Y的随笔">
-      <meta itemprop="description" content="记录个人心得，和大家交流算法及高数相关问题">
+      <meta itemprop="description" content="记录算法与编程、语音识别研究，以及一路上的学习心得">
     </span>
 
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+    <span hidden itemprop="post" itemscope itemtype="https://schema.org/CreativeWork">
       <meta itemprop="name" content=" | 奇点Y的随笔">
       <meta itemprop="description" content="">
     </span>
@@ -429,23 +442,9 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>我（Yhc）学习了一段时间编程算法在这里和想学算法的朋友分享一些经验。（自己走了些弯路）</p>
-<p>小白题单 <a target="_blank" rel="noopener" href="https://vjudge.net/article/11277">https://vjudge.net/article/11277</a><br>codeforces : <a target="_blank" rel="noopener" href="https://codeforces.com/contests">https://codeforces.com/contests</a><br>atcoder: <a target="_blank" rel="noopener" href="https://atcoder.jp/">https://atcoder.jp/</a><br>以上三个网站都是很好的国内外算法练习网站，对梯子没有硬性要求，小白题单对已经基本掌握c或c++的朋友可以开始接触并完成。</p>
-<p>在此处特地强调：要在算法领域深入研究首推c++！根据以往的数据参加算法竞赛的平均1500多支队伍里有1300多支队伍使用c++，其余使用java或python，几乎没有人使用c语言。</p>
-<p>并不是说c语言不好（我一开始也是学习c语言），而是每种语言都有自己的特点，c语言更注重极致的效率，大部分工作需要程序员自己完成，而c++虽然在效率上略逊于c，但c++的STL库中有许多的常用工具及容器，因此我们选择舍弃一小部分性能换取对参赛选手的减负（实际上程序效率主要看选手实力而不是编程语言）</p>
-<p>我了解大家基本大一要学编程的话基本也都是学习c语言，但c++编译器基本是兼容所有c语法的，大家可以放心学c，学好c后在学c++是添砖加瓦而非推倒重来。</p>
-<p>首先，在网站上打比赛的前提是你基本已经大致掌握一门编程语言（最好是c++，c也可以），打比赛时自备翻译系统（除非你能看懂全英文的题干，或者你精通日语）</p>
-<p>接下来为大家介绍下面两个网站：这两个网站是世界上最著名的两个编程算法爱好者的聚集地，每周都会不定时地举行比赛供全世界的编程算法爱好者们练手。codeforces（下面简称cf）的比赛分四个级别（div1,div.2,div.3,div.4）数字越小难度越高初学者建议打div4，有一定基础和自信的可以打div3，在这里提前告诉大家：这里面的题目都不简单，就算你打最低级的div4两个小时你七道题只写出来一半不到也不用灰心（别问我怎么知道，以前被干破防了）</p>
-<p>atcoder里的比赛建议大家打beginner contest和cf（不是穿越火线）里的div3，4差不多，相对cf而言atcoder的界面更友好（ 但是日本网站 ）。</p>
-<p>在这里再说些我个人感觉蛮重要的，很多人认为算法就是研究高深的计算逻辑，复杂巧妙的数据结构。我告诉你：这些确实重要，但重要的远不止这些！细节决定成败真的太对了，细节习惯有问题可能让你给代码差错一下午都找不出问题在哪，所以我在这里列出我个人认为小白容易出错的点：</p>
-<p>1：数组下标越界，导致访问未知内存</p>
-<p>2：循环变量设置错误，导致死循环</p>
-<p>3：变量忘记初始化，导致输出随机值</p>
-<p>4：时间复杂度把握不当</p>
-<p>第四点小白可能没有接触，我讲讲自己的理解。我们都认为电脑就是用来做重复机械化计算的，确实如此！但这并不代表你可以浪费电脑的算力。对于新手而言，最常见的滥用算力导致时间复杂度爆表的例子就是滥用循环，动辄就嵌套两到三层的循环，写出平方级甚至立方级的代码，我们假设题目所给的数据量一般是2e5（二乘十的五次方）那嵌套两层计算机就要进行4e10次计算，三层就是8e15次计算。正常情况下每秒评测机（跑你代码给你打分的电脑）只能跑1e8组数据（题目的时间限制一般是两秒），所以显然不行，（除非你能搞到神威.太湖之光做你的评测机）这就是算法的重要性，起到用最小的算力跑出结果的作用！</p>
-<p>今天就分享这么多吧，已经凌晨五点半了</p>
+<p>从算法入门走过的弯路说起，分享练习平台、比赛选择，以及数组越界、变量初始化和时间复杂度这些容易忽略的细节。</p>
+<div class="post-button"><a class="btn" href="/2025/10/11/Y%E7%9A%84%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E5%B0%8F%E8%AE%B0/">阅读全文 »</a></div>
 
-      
     </div>
 
     
@@ -469,20 +468,20 @@
   
   
 
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://qdy1013.github.io/2025/10/11/%E5%A5%87%E7%82%B9%E7%9A%84%E6%9C%8B%E5%8F%8B%E4%BB%AC%E5%A4%A7%E5%AE%B6%E5%A5%BD/">
+  <article itemscope itemtype="https://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://qdy1013.github.io/2025/10/11/%E5%A5%87%E7%82%B9%E7%9A%84%E6%9C%8B%E5%8F%8B%E4%BB%AC%E5%A4%A7%E5%AE%B6%E5%A5%BD/">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
       <meta itemprop="image" content="/images/touxiang.jpg">
       <meta itemprop="name" content="奇点Y">
     </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
       <meta itemprop="name" content="奇点Y的随笔">
-      <meta itemprop="description" content="记录个人心得，和大家交流算法及高数相关问题">
+      <meta itemprop="description" content="记录算法与编程、语音识别研究，以及一路上的学习心得">
     </span>
 
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+    <span hidden itemprop="post" itemscope itemtype="https://schema.org/CreativeWork">
       <meta itemprop="name" content=" | 奇点Y的随笔">
       <meta itemprop="description" content="">
     </span>
@@ -513,12 +512,9 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>大家好，我是 Yhc。</p>
-<p>花了两天时间，我的博客总算是初见眉目了。说实话，从产生搭建个人博客的想法，到付诸实践，再到如今初步完成，一共就花了两天时间。目前在技术上还很生疏，建这样一个博客，也是希望能记录下自己的学习经历。</p>
-<p>同时，我也十分希望朋友们能参与到技术、算法、编程、数学方面的讨论中来。（后面会开放评论区的，我也在研究这方面技术）</p>
-<p>再次感谢大家！</p>
+<p>博客初成的一篇小记：为什么想搭建这个空间，以及对记录学习经历、交流算法与编程的期待。</p>
+<div class="post-button"><a class="btn" href="/2025/10/11/%E5%A5%87%E7%82%B9%E7%9A%84%E6%9C%8B%E5%8F%8B%E4%BB%AC%E5%A4%A7%E5%AE%B6%E5%A5%BD/">阅读全文 »</a></div>
 
-      
     </div>
 
     
@@ -575,13 +571,13 @@
   </footer>
 
   
-  <div class="toggle sidebar-toggle" role="button">
+  <div aria-label="切换侧栏" class="toggle sidebar-toggle" role="button" tabindex="0">
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>
   </div>
   <div class="sidebar-dimmer"></div>
-  <div class="back-to-top" role="button" aria-label="返回顶部">
+  <div class="back-to-top" role="button" tabindex="0" aria-label="返回顶部">
     <i class="fa fa-arrow-up fa-lg"></i>
     <span>0%</span>
   </div>
@@ -593,3 +589,4 @@
 
 </body>
 </html>
+

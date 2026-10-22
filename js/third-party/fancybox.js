@@ -31,5 +31,6 @@ document.addEventListener('page:loaded', () => {
     image.wrap(imageWrapLink);
   });
 
-  Fancybox.bind('[data-fancybox]');
+  if (typeof Fancybox !== 'undefined') Fancybox.bind('[data-fancybox]');
 });
+

@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
@@ -22,7 +22,7 @@
     <meta name="description" content="这是我整理的考场算法代码本：每一份板子都提炼自我在洛谷上已经 AC 的题目，整理成可以直接调用的函数、类和框架，并写明了用途、适用条件、复杂度和调用方式。一共 59 份，分成数论、数据结构、图论、搜索与贪心、动态规划五大类。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ACM 算法板子合集（59 份）">
-<meta property="og:url" content="http://qdy1013.github.io/2026/10/22/ACM%E7%AE%97%E6%B3%95%E6%9D%BF%E5%AD%90%E5%90%88%E9%9B%86/index.html">
+<meta property="og:url" content="https://qdy1013.github.io/2026/10/22/ACM%E7%AE%97%E6%B3%95%E6%9D%BF%E5%AD%90%E5%90%88%E9%9B%86/index.html">
 <meta property="og:site_name" content="奇点Y的随笔">
 <meta property="og:description" content="这是我整理的考场算法代码本：每一份板子都提炼自我在洛谷上已经 AC 的题目，整理成可以直接调用的函数、类和框架，并写明了用途、适用条件、复杂度和调用方式。一共 59 份，分成数论、数据结构、图论、搜索与贪心、动态规划五大类。">
 <meta property="og:locale" content="zh_CN">
@@ -35,10 +35,10 @@
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://qdy1013.github.io/2026/10/22/ACM%E7%AE%97%E6%B3%95%E6%9D%BF%E5%AD%90%E5%90%88%E9%9B%86/">
+<link rel="canonical" href="https://qdy1013.github.io/2026/10/22/ACM%E7%AE%97%E6%B3%95%E6%9D%BF%E5%AD%90%E5%90%88%E9%9B%86/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://qdy1013.github.io/2026/10/22/ACM%E7%AE%97%E6%B3%95%E6%9D%BF%E5%AD%90%E5%90%88%E9%9B%86/","path":"2026/10/22/ACM算法板子合集/","title":"ACM 算法板子合集（59 份）"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://qdy1013.github.io/2026/10/22/ACM%E7%AE%97%E6%B3%95%E6%9D%BF%E5%AD%90%E5%90%88%E9%9B%86/","path":"2026/10/22/ACM算法板子合集/","title":"ACM 算法板子合集（59 份）"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>ACM 算法板子合集（59 份） | 奇点Y的随笔</title>
@@ -57,7 +57,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
 <script src="/js/third-party/search/local-search.js" defer></script>
 
 
@@ -79,14 +78,15 @@
   </noscript>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+<body itemscope itemtype="https://schema.org/WebPage" class="use-motion">
+  <a class="skip-link" href="#main-content">跳到正文</a>
   <div class="headband"></div>
 
   <main class="main">
     <div class="column">
-      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+      <header class="header" itemscope itemtype="https://schema.org/WPHeader"><div class="site-brand-container">
   <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏" role="button">
+    <div class="toggle" aria-label="切换导航栏" aria-expanded="false" aria-controls="site-nav" role="button" tabindex="0">
         <span class="toggle-line"></span>
         <span class="toggle-line"></span>
         <span class="toggle-line"></span>
@@ -100,11 +100,11 @@
       <p class="site-title">奇点Y的随笔</p>
       <i class="logo-line"></i>
     </a>
-      <p class="site-subtitle" itemprop="description">感谢支持</p>
+      <p class="site-subtitle" itemprop="description">算法 · 语音识别 · 学习笔记</p>
   </div>
 
   <div class="site-nav-right">
-    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button" tabindex="0">
         <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
@@ -112,10 +112,11 @@
 
 
 
-<nav class="site-nav">
+<nav id="site-nav" class="site-nav" aria-label="主导航">
   <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+      <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
       <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        <a role="button" tabindex="0" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
       </li>
   </ul>
@@ -124,21 +125,21 @@
 
 
   <div class="search-pop-overlay">
-    <div class="popup search-popup">
+    <div class="popup search-popup" role="dialog" aria-modal="true" aria-label="站内搜索">
       <div class="search-header">
         <span class="search-icon">
           <i class="fa fa-search"></i>
         </span>
         <div class="search-input-container">
-          <input autocomplete="off" autocapitalize="off" maxlength="80"
+          <input aria-label="搜索文章" autocomplete="off" autocapitalize="off" maxlength="80"
                 placeholder="搜索..." spellcheck="false"
                 type="search" class="search-input">
         </div>
-        <span class="popup-btn-close" role="button">
+        <span aria-label="关闭搜索" class="popup-btn-close" role="button" tabindex="0">
           <i class="fa fa-times-circle"></i>
         </span>
       </div>
-      <div class="search-result-container">
+      <div class="search-result-container" aria-live="polite" aria-busy="false">
         <div class="search-result-icon">
           <i class="fa fa-spinner fa-pulse fa-5x"></i>
         </div>
@@ -169,11 +170,11 @@
         <!--/noindex-->
 
         <div class="site-overview-wrap sidebar-panel">
-          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="https://schema.org/Person">
     <img class="site-author-image" itemprop="image" alt="奇点Y"
       src="/images/touxiang.jpg">
   <p class="site-author-name" itemprop="name">奇点Y</p>
-  <div class="site-description" itemprop="description">记录个人心得，和大家交流算法及高数相关问题</div>
+  <div class="site-description" itemprop="description">记录算法与编程、语音识别研究，以及一路上的学习心得</div>
 </div>
 <div class="site-state-wrap animated">
   <nav class="site-state">
@@ -209,7 +210,7 @@
 
     </div>
 
-    <div class="main-inner post posts-expand">
+    <div id="main-content" tabindex="-1" class="main-inner post posts-expand">
 
 
   
@@ -219,20 +220,20 @@
   
   
 
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://qdy1013.github.io/2026/10/22/ACM%E7%AE%97%E6%B3%95%E6%9D%BF%E5%AD%90%E5%90%88%E9%9B%86/">
+  <article itemscope itemtype="https://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://qdy1013.github.io/2026/10/22/ACM%E7%AE%97%E6%B3%95%E6%9D%BF%E5%AD%90%E5%90%88%E9%9B%86/">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
       <meta itemprop="image" content="/images/touxiang.jpg">
       <meta itemprop="name" content="奇点Y">
     </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
       <meta itemprop="name" content="奇点Y的随笔">
-      <meta itemprop="description" content="记录个人心得，和大家交流算法及高数相关问题">
+      <meta itemprop="description" content="记录算法与编程、语音识别研究，以及一路上的学习心得">
     </span>
 
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+    <span hidden itemprop="post" itemscope itemtype="https://schema.org/CreativeWork">
       <meta itemprop="name" content="ACM 算法板子合集（59 份） | 奇点Y的随笔">
       <meta itemprop="description" content="">
     </span>
@@ -257,7 +258,7 @@
         <i class="far fa-folder"></i>
       </span>
       <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+        <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
           <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
         </span>
     </span>
@@ -663,13 +664,13 @@
   </footer>
 
   
-  <div class="toggle sidebar-toggle" role="button">
+  <div aria-label="切换侧栏" class="toggle sidebar-toggle" role="button" tabindex="0">
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>
   </div>
   <div class="sidebar-dimmer"></div>
-  <div class="back-to-top" role="button" aria-label="返回顶部">
+  <div class="back-to-top" role="button" tabindex="0" aria-label="返回顶部">
     <i class="fa fa-arrow-up fa-lg"></i>
     <span>0%</span>
   </div>
@@ -681,3 +682,4 @@
 
 </body>
 </html>
+
