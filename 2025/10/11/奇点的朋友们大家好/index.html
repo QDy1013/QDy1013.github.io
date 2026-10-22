@@ -356,6 +356,106 @@
 <noscript>
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
 </noscript>
+<script>
+// 奇点Y的随笔 · 交互小优化（内联在每页末尾，不额外发请求）
+(() => {
+  // 1. 鼠标悬停或手指按下站内链接时，提前下载那一页，点下去几乎立即打开
+  const prefetched = new Set([location.pathname]);
+  const prefetch = event => {
+    const link = event.target.closest && event.target.closest('a[href]');
+    if (!link || link.origin !== location.origin || link.hash && link.pathname === location.pathname) return;
+    if (navigator.connection && navigator.connection.saveData) return;
+    if (prefetched.has(link.pathname)) return;
+    prefetched.add(link.pathname);
+    const hint = document.createElement('link');
+    hint.rel = 'prefetch';
+    hint.href = link.pathname;
+    document.head.append(hint);
+  };
+  document.addEventListener('mouseover', prefetch, { passive: true });
+  document.addEventListener('touchstart', prefetch, { passive: true });
+
+  // 小提示条，用于“已复制”等反馈
+  const toast = text => {
+    let box = document.querySelector('.y-toast');
+    if (!box) {
+      box = document.createElement('div');
+      box.className = 'y-toast';
+      box.setAttribute('role', 'status');
+      document.body.append(box);
+    }
+    box.textContent = text;
+    box.classList.add('show');
+    clearTimeout(box.timer);
+    box.timer = setTimeout(() => box.classList.remove('show'), 1600);
+  };
+
+  // 2. 点标题旁的链接图标：复制这一节的链接，方便分享
+  document.addEventListener('click', event => {
+    const anchor = event.target.closest('.post-body .headerlink');
+    if (!anchor) return;
+    event.preventDefault();
+    const url = location.origin + location.pathname + anchor.getAttribute('href');
+    history.replaceState(null, '', anchor.getAttribute('href'));
+    anchor.parentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const fallback = () => toast('已定位到本节，可从地址栏复制链接');
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(() => toast('已复制本节链接'), fallback);
+    } else {
+      fallback();
+    }
+  });
+
+  // 液态玻璃：鼠标在卡片上移动时，卡片里的高光跟着鼠标走（只在有鼠标的设备上，且每帧最多更新一次）
+  if (matchMedia('(pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let pending = null;
+    document.addEventListener('pointermove', event => {
+      const card = event.target.closest && event.target.closest('.main-inner .post-block, .board-group');
+      if (!card) return;
+      if (pending) cancelAnimationFrame(pending);
+      pending = requestAnimationFrame(() => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--mx', ((event.clientX - rect.left) / rect.width * 100).toFixed(1) + '%');
+        card.style.setProperty('--my', ((event.clientY - rect.top) / rect.height * 100).toFixed(1) + '%');
+        pending = null;
+      });
+    }, { passive: true });
+  }
+
+  // 3. ACM 板子目录：输入关键词即时筛选 59 份板子
+  const grid = document.querySelector('.board-grid');
+  if (grid) {
+    const box = document.createElement('div');
+    box.className = 'board-filter';
+    box.innerHTML = '<input type="search" placeholder="筛选板子，例如：线段树、背包、LCA" aria-label="筛选板子"><span class="board-filter-count"></span>';
+    grid.before(box);
+    const input = box.querySelector('input');
+    const count = box.querySelector('.board-filter-count');
+    const chips = [...grid.querySelectorAll('.board-chip')];
+    const filter = () => {
+      const words = input.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      let shown = 0;
+      chips.forEach(chip => {
+        const hit = words.every(word => chip.textContent.toLowerCase().includes(word));
+        chip.hidden = !hit;
+        if (hit) shown++;
+      });
+      grid.querySelectorAll('.board-group').forEach(group => {
+        const visible = group.querySelectorAll('.board-chip:not([hidden])').length;
+        const total = group.querySelectorAll('.board-chip').length;
+        group.hidden = !visible;
+        group.querySelector('.board-count').textContent = words.length ? `${visible} / ${total} 份` : `${total} 份`;
+      });
+      count.textContent = words.length ? (shown ? `找到 ${shown} 份` : '没有匹配的板子') : `共 ${chips.length} 份`;
+    };
+    input.addEventListener('input', filter);
+    input.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { input.value = ''; filter(); }
+    });
+    filter();
+  }
+})();
+</script>
 
 </body>
 </html>

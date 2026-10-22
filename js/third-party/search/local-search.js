@@ -15,6 +15,27 @@ document.addEventListener('DOMContentLoaded', () => {
     element.textContent = text;
     container.replaceChildren(element);
   };
+  // 把文字放进元素里，并用 <mark> 标出命中的关键词（只创建文本节点，不拼接 HTML）
+  const highlight = (element, text, words) => {
+    const lower = text.toLocaleLowerCase();
+    const ranges = [];
+    words.forEach(word => {
+      for (let at = lower.indexOf(word); at !== -1 && word; at = lower.indexOf(word, at + word.length)) {
+        ranges.push([at, at + word.length]);
+      }
+    });
+    ranges.sort((a, b) => a[0] - b[0]);
+    let cursor = 0;
+    ranges.forEach(([from, to]) => {
+      if (from < cursor) return;
+      element.append(text.slice(cursor, from));
+      const mark = document.createElement('mark');
+      mark.textContent = text.slice(from, to);
+      element.append(mark);
+      cursor = to;
+    });
+    element.append(text.slice(cursor));
+  };
   const render = () => {
     if (!articles) return;
     const query = input.value.trim();
@@ -42,13 +63,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const link = document.createElement('a');
       link.className = 'search-result-title';
       link.href = article.url;
-      link.textContent = article.title;
+      highlight(link, article.title, words);
       const snippet = document.createElement('p');
       snippet.className = 'search-result';
       const text = String(article.content || '').replace(/\s+/g, ' ');
-      const position = Math.max(0, text.toLocaleLowerCase().indexOf(query.toLocaleLowerCase()));
+      // 摘要从第一个在正文里出现的关键词附近截取（多个关键词时也能定位到命中处）
+      const lowerText = text.toLocaleLowerCase();
+      const hits = words.map(word => lowerText.indexOf(word)).filter(at => at !== -1);
+      const position = hits.length ? Math.min(...hits) : 0;
       const start = Math.max(0, position - 35);
-      snippet.textContent = (start ? '…' : '') + text.slice(start, start + 160) + (text.length > start + 160 ? '…' : '');
+      highlight(snippet, (start ? '…' : '') + text.slice(start, start + 160) + (text.length > start + 160 ? '…' : ''), words);
       item.append(link, snippet);
       list.append(item);
     });
