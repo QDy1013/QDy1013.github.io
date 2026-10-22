@@ -197,6 +197,14 @@
       </span>
   </div>
 
+<div class="sidebar-categories">
+  <div class="sidebar-categories-title">按分类浏览</div>
+  <nav class="home-card-links" aria-label="按分类浏览">
+      <a class="home-card-link" data-category="算法" href="/categories/%E7%AE%97%E6%B3%95/">算法<span>1</span></a>
+      <a class="home-card-link" data-category="语音识别" href="/categories/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/">语音识别<span>1</span></a>
+  </nav>
+</div>
+
         </div>
       </div>
     </div>
@@ -372,6 +380,34 @@
       });
     }, { passive: true });
   }
+
+  // 宽屏左栏的位置：顶栏还看得见时贴在它下面 36px，顶栏滚出屏幕后停在离顶部 24px 处
+  const header = document.querySelector('.header');
+  if (header) {
+    let railFrame = null;
+    const placeRail = () => {
+      railFrame = null;
+      const top = Math.max(24, Math.round(header.getBoundingClientRect().bottom + 36));
+      document.documentElement.style.setProperty('--rail-top', top + 'px');
+    };
+    placeRail();
+    window.addEventListener('scroll', () => { if (!railFrame) railFrame = requestAnimationFrame(placeRail); }, { passive: true });
+    window.addEventListener('resize', placeRail, { passive: true });
+  }
+
+  // 首页上没有写摘要分隔的旧文章会整篇显示：裁成一小段预览，并补一个“阅读全文”按钮
+  document.querySelectorAll('.main-inner.index > .post-block').forEach(card => {
+    const body = card.querySelector('.post-body');
+    const link = card.querySelector('.post-title-link');
+    if (!body || !link || body.querySelector('.post-button')) return;
+    body.classList.add('y-clamped');
+    const button = document.createElement('div');
+    button.className = 'post-button';
+    button.innerHTML = '<a class="btn"></a>';
+    button.firstChild.href = link.href;
+    button.firstChild.textContent = '阅读全文 »';
+    body.after(button);
+  });
 
   // 3. ACM 板子目录：输入关键词即时筛选 59 份板子
   const grid = document.querySelector('.board-grid');
