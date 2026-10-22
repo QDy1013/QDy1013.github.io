@@ -4,6 +4,15 @@ NexT.boot = {};
 
 NexT.boot.registerEvents = function() {
 
+  // Support the theme's existing button-like controls with a keyboard.
+  document.addEventListener('keydown', event => {
+    const control = event.target.closest('[role="button"]');
+    if (control && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      control.click();
+    }
+  });
+
   NexT.utils.registerScrollPercent();
   NexT.utils.registerCanIUseTag();
   NexT.utils.updateFooterPosition();
@@ -15,6 +24,7 @@ NexT.boot.registerEvents = function() {
     if (!siteNav) return;
     siteNav.style.setProperty('--scroll-height', siteNav.scrollHeight + 'px');
     document.body.classList.toggle('site-nav-on');
+    event.currentTarget.setAttribute('aria-expanded', document.body.classList.contains('site-nav-on'));
   });
 
   document.querySelectorAll('.sidebar-nav li').forEach((element, index) => {
@@ -43,7 +53,7 @@ NexT.boot.refresh = function() {
    * Need to add config option in Front-End at 'scripts/helpers/next-config.js' file.
    */
   CONFIG.prism && window.Prism.highlightAll();
-  CONFIG.mediumzoom && window.mediumZoom('.post-body :not(a) > img, .post-body > img', {
+  CONFIG.mediumzoom && typeof window.mediumZoom === 'function' && window.mediumZoom('.post-body :not(a) > img, .post-body > img', {
     background: 'var(--content-bg-color)'
   });
   CONFIG.lazyload && window.lozad('.post-body img').observe();
@@ -72,6 +82,11 @@ NexT.boot.refresh = function() {
 };
 
 NexT.boot.motion = function() {
+  if (typeof window.anime?.timeline !== 'function' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.body.classList.remove('use-motion');
+    NexT.utils.updateSidebarPosition();
+    return;
+  }
   // Define Motion Sequence & Bootstrap Motion.
   if (CONFIG.motion.enable) {
     NexT.motion.integrator
@@ -89,3 +104,4 @@ document.addEventListener('DOMContentLoaded', () => {
   NexT.boot.refresh();
   NexT.boot.motion();
 });
+

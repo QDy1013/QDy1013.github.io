@@ -1,98 +1,132 @@
-/* global CONFIG, NexT, pjax, LocalSearch */
-
+/* global CONFIG, NexT */
+// Read the generated index locally and render article content only as text.
 document.addEventListener('DOMContentLoaded', () => {
-  if (!CONFIG.path) {
-    // Search DB path
-    console.warn('`hexo-generator-searchdb` plugin is not installed!');
-    return;
-  }
-  const localSearch = new LocalSearch({
-    path             : CONFIG.path,
-    top_n_per_article: CONFIG.localsearch.top_n_per_article,
-    unescape         : CONFIG.localsearch.unescape
-  });
-
   const input = document.querySelector('.search-input');
   const container = document.querySelector('.search-result-container');
-
-  const inputEventFunction = () => {
-    if (!localSearch.isfetched) return;
-    const searchText = input.value.trim().toLowerCase();
-    const keywords = searchText.split(/[-\s]+/);
-    let resultItems = [];
-    if (searchText.length > 0) {
-      // Perform local searching
-      resultItems = localSearch.getResultItems(keywords);
-    }
-    if (keywords.length === 1 && keywords[0] === '') {
-      container.innerHTML = '<div class="search-result-icon"><i class="fa fa-search fa-5x"></i></div>';
-    } else if (resultItems.length === 0) {
-      container.innerHTML = '<div class="search-result-icon"><i class="far fa-frown fa-5x"></i></div>';
-    } else {
-      resultItems.sort((left, right) => {
-        if (left.includedCount !== right.includedCount) {
-          return right.includedCount - left.includedCount;
-        } else if (left.hitCount !== right.hitCount) {
-          return right.hitCount - left.hitCount;
-        }
-        return right.id - left.id;
-      });
-      const stats = CONFIG.i18n.hits.replace('${hits}', resultItems.length);
-
-      container.innerHTML = `<div class="search-stats">${stats}</div>
-        <hr>
-        <ul class="search-result-list">${resultItems.map(result => result.item).join('')}</ul>`;
-      if (typeof pjax === 'object') pjax.refresh(container);
-    }
+  const overlay = document.querySelector('.search-pop-overlay');
+  const dialog = document.querySelector('.search-popup');
+  const closeButton = document.querySelector('.popup-btn-close');
+  if (!input || !container || !overlay || !dialog || !closeButton) return;
+  let articles, loading, returnFocus;
+  const normalize = value => String(value || '').normalize('NFKC').toLocaleLowerCase();
+  const message = text => {
+    const element = document.createElement('p');
+    element.className = 'search-message';
+    element.textContent = text;
+    container.replaceChildren(element);
   };
-
-  localSearch.highlightSearchWords(document.querySelector('.post-body'));
-  if (CONFIG.localsearch.preload) {
-    localSearch.fetchData();
-  }
-
-  input.addEventListener('input', inputEventFunction);
-  window.addEventListener('search:loaded', inputEventFunction);
-
-  // Handle and trigger popup window
-  document.querySelectorAll('.popup-trigger').forEach(element => {
-    element.addEventListener('click', () => {
-      NexT.utils.setGutter();
-      document.body.classList.add('search-active');
-      // Wait for search-popup animation to complete
-      setTimeout(() => input.focus(), 500);
-      if (!localSearch.isfetched) localSearch.fetchData();
+  const render = () => {
+    if (!articles) return;
+    const query = input.value.trim();
+    const words = normalize(query).split(/\s+/).filter(Boolean);
+    if (!words.length) {
+      message('输入关键词搜索文章，支持标题和正文。按 Esc 关闭。');
+      return;
+    }
+    const results = articles.map(article => {
+      const title = normalize(article.title), content = normalize(article.content);
+      return { article, title, content, score: words.reduce((score, word) => score + (title.includes(word) ? 10 : 0) + (content.includes(word) ? 1 : 0), 0) };
+    }).filter(result => words.every(word => result.title.includes(word) || result.content.includes(word)))
+      .sort((a, b) => b.score - a.score);
+    if (!results.length) {
+      message('没有找到“' + query + '”相关的文章，试试更短的关键词。');
+      return;
+    }
+    const stats = document.createElement('p');
+    stats.className = 'search-stats';
+    stats.textContent = '找到 ' + results.length + ' 篇文章';
+    const list = document.createElement('ul');
+    list.className = 'search-result-list';
+    results.forEach(({ article }) => {
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.className = 'search-result-title';
+      link.href = article.url;
+      link.textContent = article.title;
+      const snippet = document.createElement('p');
+      snippet.className = 'search-result';
+      const text = String(article.content || '').replace(/\s+/g, ' ');
+      const position = Math.max(0, text.toLocaleLowerCase().indexOf(query.toLocaleLowerCase()));
+      const start = Math.max(0, position - 35);
+      snippet.textContent = (start ? '…' : '') + text.slice(start, start + 160) + (text.length > start + 160 ? '…' : '');
+      item.append(link, snippet);
+      list.append(item);
     });
-  });
-
-  // Monitor main search box
-  const onPopupClose = () => {
-    NexT.utils.setGutter('0');
-    document.body.classList.remove('search-active');
+    container.replaceChildren(stats, list);
   };
-
-  document.querySelector('.search-pop-overlay').addEventListener('click', event => {
-    if (event.target === document.querySelector('.search-pop-overlay')) {
-      onPopupClose();
-    }
-  });
-  document.querySelector('.popup-btn-close').addEventListener('click', onPopupClose);
-  document.addEventListener('pjax:success', () => {
-    localSearch.highlightSearchWords(document.querySelector('.post-body'));
-    onPopupClose();
-  });
-  window.addEventListener('keydown', event => {
-    if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+  const load = () => {
+    if (articles) { render(); return Promise.resolve(); }
+    if (loading) return loading;
+    message('正在加载搜索索引…');
+    container.setAttribute('aria-busy', 'true');
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    loading = fetch(CONFIG.path || '/search.json', { signal: controller.signal })
+      .then(response => {
+        if (!response.ok) throw new Error('Search index unavailable');
+        return response.json();
+      }).then(data => {
+        if (!Array.isArray(data)) throw new Error('Invalid search index');
+        articles = data.filter(article => {
+          if (!article || typeof article.title !== 'string' || typeof article.url !== 'string') return false;
+          try {
+            const url = new URL(article.url, location.origin);
+            return url.origin === location.origin && ['http:', 'https:'].includes(url.protocol);
+          } catch { return false; }
+        });
+        render();
+      }).catch(() => {
+        message('搜索索引暂时加载失败，请重试，或通过归档浏览文章。');
+        const retry = document.createElement('button');
+        retry.type = 'button';
+        retry.className = 'search-retry';
+        retry.textContent = '重新加载';
+        retry.addEventListener('click', () => { load(); input.focus(); });
+        container.append(retry);
+      }).finally(() => {
+        clearTimeout(timeout);
+        container.setAttribute('aria-busy', 'false');
+        loading = null;
+      });
+    return loading;
+  };
+  const open = trigger => {
+    if (!document.body.classList.contains('search-active')) returnFocus = trigger || document.activeElement;
+    NexT.utils.setGutter();
+    document.body.classList.add('search-active');
+    overlay.removeAttribute('inert');
+    overlay.setAttribute('aria-hidden', 'false');
+    input.focus({ preventScroll: true });
+    load();
+  };
+  const close = () => {
+    if (!document.body.classList.contains('search-active')) return;
+    document.body.classList.remove('search-active');
+    NexT.utils.setGutter('0');
+    returnFocus?.focus({ preventScroll: true });
+    overlay.setAttribute('inert', '');
+    overlay.setAttribute('aria-hidden', 'true');
+  };
+  overlay.setAttribute('inert', '');
+  overlay.setAttribute('aria-hidden', 'true');
+  document.querySelectorAll('.popup-trigger').forEach(trigger => trigger.addEventListener('click', () => open(trigger)));
+  closeButton.addEventListener('click', close);
+  overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
+  input.addEventListener('input', render);
+  document.addEventListener('pjax:success', close);
+  document.addEventListener('keydown', event => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
       event.preventDefault();
-      NexT.utils.setGutter();
-      document.body.classList.add('search-active');
-      setTimeout(() => input.focus(), 500);
-      if (!localSearch.isfetched) localSearch.fetchData();
+      open();
     }
-  });
-  window.addEventListener('keyup', event => {
-    if (event.key === 'Escape') {
-      onPopupClose();
+    if (!document.body.classList.contains('search-active')) return;
+    if (event.key === 'Escape') { event.preventDefault(); close(); }
+    if (event.key === 'Tab') {
+      const focusable = [...dialog.querySelectorAll('input, button, a[href], [tabindex="0"]')];
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     }
   });
 });
+

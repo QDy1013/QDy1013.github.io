@@ -19,6 +19,15 @@ HTMLElement.prototype.wrap = function(wrapper) {
 
 NexT.utils = {
 
+  animateScroll(options) {
+    if (typeof window.anime === 'function' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return window.anime(options);
+    }
+    const targets = options.targets instanceof Element ? [options.targets] : Array.from(options.targets || []);
+    targets.forEach(target => target.scrollTo({ top: options.scrollTop, behavior: 'instant' }));
+    options.complete?.();
+  },
+
   registerExtURL() {
     document.querySelectorAll('span.exturl').forEach(element => {
       const link = document.createElement('a');
@@ -37,7 +46,7 @@ NexT.utils = {
 
   registerCopyButton(target, element, code = '') {
     // One-click copy code support.
-    target.insertAdjacentHTML('beforeend', '<div class="copy-btn"><i class="fa fa-copy fa-fw"></i></div>');
+    target.insertAdjacentHTML('beforeend', '<div class="copy-btn" role="button" tabindex="0" aria-label="复制代码"><i class="fa fa-copy fa-fw"></i></div>');
     const button = target.querySelector('.copy-btn');
     button.addEventListener('click', async () => {
       if (!code) {
@@ -193,7 +202,7 @@ NexT.utils = {
     }, { passive: true });
 
     backToTop?.addEventListener('click', () => {
-      window.anime({
+      NexT.utils.animateScroll({
         targets  : document.scrollingElement,
         duration : 500,
         easing   : 'linear',
@@ -258,7 +267,7 @@ NexT.utils = {
         }, 1000);
         if (!CONFIG.stickytabs) return;
         const offset = nav.parentNode.getBoundingClientRect().top + window.scrollY + 10;
-        window.anime({
+        NexT.utils.animateScroll({
           targets  : document.scrollingElement,
           duration : 500,
           easing   : 'linear',
@@ -311,7 +320,7 @@ NexT.utils = {
       element.addEventListener('click', event => {
         event.preventDefault();
         const offset = target.getBoundingClientRect().top + window.scrollY;
-        window.anime({
+        NexT.utils.animateScroll({
           targets  : document.scrollingElement,
           duration : 500,
           easing   : 'linear',
@@ -367,7 +376,7 @@ NexT.utils = {
     // Scrolling to center active TOC element if TOC content is taller then viewport.
     const tocElement = document.querySelector(CONFIG.scheme === 'Pisces' || CONFIG.scheme === 'Gemini' ? '.sidebar-panel-container' : '.sidebar');
     if (!document.querySelector('.sidebar-toc-active')) return;
-    window.anime({
+    NexT.utils.animateScroll({
       targets  : tocElement,
       duration : 200,
       easing   : 'linear',
@@ -522,3 +531,4 @@ NexT.utils = {
     };
   }
 };
+
