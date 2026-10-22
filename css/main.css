@@ -1267,7 +1267,7 @@ pre code {
   vertical-align: middle;
 }
 .links-of-author a::before {
-  background: #ff6285;
+  background: #8c6bbe;
   display: inline-block;
   margin-right: 3px;
   transform: translateY(-2px);
@@ -2850,6 +2850,36 @@ a:hover {
   background: rgba(201,100,66,0.08);
   color: #c96442;
 }
+.column {
+  background: transparent;
+}
+header.header {
+  margin: 16px auto 0;
+  padding: 14px 28px;
+  border-radius: 18px;
+  box-sizing: border-box;
+}
+@media (max-width: 767px) {
+  header.header {
+    margin: 10px 10px 0;
+    padding: 8px 14px;
+    border-radius: 14px;
+  }
+}
+.main-inner .post-block:first-of-type {
+  margin-top: 36px;
+}
+.posts-expand .post-block:not(:first-of-type) {
+  margin-top: 40px;
+}
+@media (max-width: 767px) {
+  .main-inner .post-block:first-of-type {
+    margin-top: 20px;
+  }
+  .posts-expand .post-block:not(:first-of-type) {
+    margin-top: 24px;
+  }
+}
 .main-inner .post-block {
   background: rgba(253,251,247,0.88);
   backdrop-filter: blur(6px);
@@ -2858,7 +2888,7 @@ a:hover {
   border-radius: 14px;
   box-shadow: 0 1px 2px rgba(60,40,20,0.04), 0 8px 28px rgba(60,40,20,0.07);
   padding: 36px 44px;
-  margin-bottom: 32px;
+  margin-bottom: 0;
   transition: box-shadow 0.25s, transform 0.25s;
 }
 .main-inner.index .post-block:hover {
@@ -2983,7 +3013,8 @@ a:hover {
 .post-body .table-container {
   border: 1px solid rgba(120,90,60,0.14);
   border-radius: 10px;
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   margin: 1.4em 0;
 }
 .post-body .table-container table {
@@ -3009,6 +3040,22 @@ a:hover {
   background: rgba(201,100,66,0.08);
 }
 .post-body .table-container tr:last-child td {
+  border-bottom: none;
+}
+.post-body figure.highlight .table-container {
+  border: none;
+  border-radius: 0;
+  margin: 0;
+  overflow-x: auto;
+}
+.post-body figure.highlight .table-container table {
+  font-size: inherit;
+}
+.post-body figure.highlight .table-container tr,
+.post-body figure.highlight .table-container tr:hover {
+  background: none;
+}
+.post-body figure.highlight .table-container td {
   border-bottom: none;
 }
 .post-body hr {
@@ -3414,8 +3461,8 @@ html {
     background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(250,246,239,0.35));
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border-bottom: 1px solid rgba(255,255,255,0.6);
-    box-shadow: 0 1px 0 rgba(120,90,60,0.08), 0 6px 24px rgba(60,40,20,0.05);
+    border: 1px solid rgba(255,255,255,0.6);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.75), inset 0 0 0 1px rgba(255,255,255,0.35), 0 2px 6px rgba(60,40,20,0.04), 0 12px 32px rgba(60,40,20,0.08);
   }
   .main-inner .post-block {
     background: radial-gradient(circle at var(--mx, 85%) var(--my, -10%), rgba(255,255,255,0.55), transparent 45%), linear-gradient(140deg, rgba(255,255,255,0.5), rgba(255,255,255,0.16) 38%, rgba(255,255,255,0.06)), rgba(253,251,247,0.58);
