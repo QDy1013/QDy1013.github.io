@@ -1267,7 +1267,7 @@ pre code {
   vertical-align: middle;
 }
 .links-of-author a::before {
-  background: #7a916e;
+  background: #47ffdf;
   display: inline-block;
   margin-right: 3px;
   transform: translateY(-2px);
@@ -3056,16 +3056,6 @@ a:hover {
 .sidebar {
   box-shadow: 1px 0 0 rgba(120,90,60,0.14);
 }
-.sidebar-nav li {
-  color: #8a7f75;
-}
-.sidebar-nav .sidebar-nav-active {
-  color: #c96442;
-  border-bottom-color: #c96442;
-}
-.sidebar-nav .sidebar-nav-active:hover {
-  color: #c96442;
-}
 .site-author-name {
   font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", serif;
   color: #2b2622;
@@ -3089,19 +3079,155 @@ a:hover {
   color: #c96442;
   background: rgba(201,100,66,0.08);
 }
+.sidebar-nav {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin: 4px auto 18px;
+  background: rgba(120,90,60,0.06);
+  border-radius: 999px;
+}
+.sidebar-nav li {
+  border-bottom: none !important;
+  border-radius: 999px;
+  padding: 4px 16px;
+  font-size: 0.88em;
+  color: #8a7f75;
+  transition: all 0.2s;
+}
+.sidebar-nav li:hover {
+  color: #c96442;
+}
+.sidebar-toc-active .sidebar-nav-toc,
+.sidebar-overview-active .sidebar-nav-overview {
+  background: #fdfbf7;
+  color: #c96442 !important;
+  box-shadow: 0 1px 4px rgba(60,40,20,0.1);
+}
+.post-toc {
+  font-size: 0.92em;
+  text-align: left;
+}
+.post-toc .nav {
+  padding-left: 2px;
+}
+.post-toc .nav .nav-item {
+  line-height: 1.6;
+  margin: 2px 0;
+}
 .post-toc .nav a {
+  display: block;
   color: #4a433d;
   border-bottom: none;
+  border-radius: 8px;
+  padding: 5px 10px;
+  border-left: 3px solid transparent;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 .post-toc .nav a:hover {
   color: #c96442;
+  background: rgba(201,100,66,0.05);
+}
+.post-toc .nav .nav-number {
+  color: #b8ada2;
+  font-size: 0.85em;
+  margin-right: 2px;
+}
+.post-toc .nav .nav-child {
+  margin: 2px 0 6px 14px;
+  padding-left: 8px;
+  border-left: 1px solid rgba(120,90,60,0.14);
+}
+.post-toc .nav .nav-child a {
+  font-size: 0.95em;
+  padding: 3px 10px;
 }
 .post-toc .nav .active > a {
   color: #c96442;
-  border-bottom: 1px solid #c96442;
+  border-bottom: none;
 }
 .post-toc .nav .active-current > a {
   color: #a84f32;
+  background: rgba(201,100,66,0.08);
+  border-left-color: #c96442;
+  font-weight: 700;
+}
+.post-toc .nav .active-current > a .nav-number {
+  color: #c96442;
+}
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  margin: 1.2em 0 2em;
+}
+.board-group {
+  background: rgba(253,251,247,0.7);
+  border: 1px solid rgba(120,90,60,0.14);
+  border-radius: 12px;
+  padding: 16px 18px 14px;
+  box-shadow: 0 1px 6px rgba(60,40,20,0.04);
+  text-align: left;
+}
+.board-group-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed rgba(201,100,66,0.3);
+}
+.board-emoji {
+  font-size: 1.2em;
+}
+.board-name {
+  font-weight: 700;
+  color: #2b2622;
+  font-size: 1.05em;
+}
+.board-count {
+  margin-left: auto;
+  white-space: nowrap;
+  font-size: 0.78em;
+  color: #c96442;
+  background: rgba(201,100,66,0.08);
+  border-radius: 999px;
+  padding: 1px 10px;
+}
+.board-chips {
+  display: flex;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
+.post-body a.board-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85em;
+  line-height: 1.5;
+  color: #4a433d;
+  background: #fdfbf7;
+  border: 1px solid rgba(120,90,60,0.14);
+  border-radius: 999px;
+  padding: 3px 12px 3px 4px;
+  transition: all 0.2s;
+}
+.post-body a.board-chip:hover {
+  color: #a84f32;
+  border-color: rgba(201,100,66,0.5);
+  background: rgba(201,100,66,0.08);
+  transform: translateY(-1px);
+}
+.board-no {
+  font-family: "JetBrains Mono", Consolas, "Courier New", monospace;
+  font-size: 0.82em;
+  color: #fdfbf7;
+  background: #c96442;
+  border-radius: 999px;
+  padding: 0 7px;
 }
 .toggle .toggle-line {
   background: #4a433d;
