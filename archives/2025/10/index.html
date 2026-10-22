@@ -302,6 +302,13 @@
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
   </div>
+<div class="footer-sign">记录个人心得，和大家交流算法及高数相关问题</div>
+<div class="footer-links">
+  <a href="https://github.com/QDy1013" target="_blank" rel="noopener"><i class="fab fa-github"></i> GitHub</a>
+  <a href="/archives/"><i class="fa fa-archive"></i> 归档</a>
+  <a href="/about/"><i class="fa fa-user"></i> 关于</a>
+</div>
+
 
     </div>
   </footer>
@@ -376,7 +383,7 @@
   if (matchMedia('(pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     let pending = null;
     document.addEventListener('pointermove', event => {
-      const card = event.target.closest && event.target.closest('.main-inner .post-block, .board-group');
+      const card = event.target.closest && event.target.closest('.main-inner .post-block, .board-group, .home-card');
       if (!card) return;
       if (pending) cancelAnimationFrame(pending);
       pending = requestAnimationFrame(() => {
