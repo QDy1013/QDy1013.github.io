@@ -7,7 +7,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const dialog = document.querySelector('.search-popup');
   const closeButton = document.querySelector('.popup-btn-close');
   if (!input || !container || !overlay || !dialog || !closeButton) return;
+  // 顶栏的 backdrop-filter 会成为 fixed 定位的包含块；弹窗需要覆盖整个视口。
+  document.body.append(overlay);
   let articles, loading, returnFocus;
+  // search.json 已去掉标签，但保留 HTML 实体。只解码实体，结果仍按文本渲染。
+  const entityDecoder = document.createElement('textarea');
+  const decodeEntities = value => String(value || '').replace(
+    /&(?:#x[0-9a-f]+|#[0-9]+|[a-z][a-z0-9]+);/gi,
+    entity => {
+      entityDecoder.innerHTML = entity;
+      return entityDecoder.value;
+    }
+  );
   const normalize = value => String(value || '').normalize('NFKC').toLocaleLowerCase();
   const message = text => {
     const element = document.createElement('p');
@@ -97,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const url = new URL(article.url, location.origin);
             return url.origin === location.origin && ['http:', 'https:'].includes(url.protocol);
           } catch { return false; }
-        });
+        }).map(article => ({ ...article, content: decodeEntities(article.content) }));
         render();
       }).catch(() => {
         message('搜索索引暂时加载失败，请重试，或通过归档浏览文章。');
