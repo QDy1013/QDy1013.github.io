@@ -1,6 +1,7 @@
 ---
 title: ACM 算法板子合集（59 份）
 date: 2026-10-22 20:00:00
+featured: true
 categories:
   - 算法
 tags:

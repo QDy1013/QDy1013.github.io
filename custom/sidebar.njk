@@ -1,4 +1,4 @@
-{#- 左栏底部：按分类浏览的入口，颜色与首页卡片的分类色一致 #}
+{#- 左栏底部：按分类浏览的入口 + 精选常驻入口 #}
 <div class="sidebar-categories">
   <div class="sidebar-categories-title">按分类浏览</div>
   <nav class="home-card-links" aria-label="按分类浏览">
@@ -6,4 +6,9 @@
       <a class="home-card-link" data-category="{{ cat.name }}" href="{{ url_for(cat.path) }}">{{ cat.name }}<span>{{ cat.length }}</span></a>
     {%- endfor %}
   </nav>
+  <div class="sidebar-featured">
+    <a class="sidebar-featured-link" href="{{ url_for('2026/10/22/ACM算法板子合集/') }}">
+      <span>📌</span> 59 份 ACM 板子速查
+    </a>
+  </div>
 </div>
