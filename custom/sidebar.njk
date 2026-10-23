@@ -1,0 +1,9 @@
+{#- 左栏底部：按分类浏览的入口，颜色与首页卡片的分类色一致 #}
+<div class="sidebar-categories">
+  <div class="sidebar-categories-title">按分类浏览</div>
+  <nav class="home-card-links" aria-label="按分类浏览">
+    {%- for cat in site.categories.toArray() %}
+      <a class="home-card-link" data-category="{{ cat.name }}" href="{{ url_for(cat.path) }}">{{ cat.name }}<span>{{ cat.length }}</span></a>
+    {%- endfor %}
+  </nav>
+</div>

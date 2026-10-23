@@ -1,0 +1,164 @@
+<script>
+// 奇点Y的随笔 · 交互小优化（内联在每页末尾，不额外发请求）
+(() => {
+  // 1. 鼠标悬停或手指按下站内链接时，提前下载那一页，点下去几乎立即打开
+  const prefetched = new Set([location.pathname]);
+  const prefetch = event => {
+    const link = event.target.closest && event.target.closest('a[href]');
+    if (!link || link.origin !== location.origin || link.hash && link.pathname === location.pathname) return;
+    if (navigator.connection && navigator.connection.saveData) return;
+    if (prefetched.has(link.pathname)) return;
+    prefetched.add(link.pathname);
+    const hint = document.createElement('link');
+    hint.rel = 'prefetch';
+    hint.href = link.pathname;
+    document.head.append(hint);
+  };
+  document.addEventListener('mouseover', prefetch, { passive: true });
+  document.addEventListener('touchstart', prefetch, { passive: true });
+
+  // 小提示条，用于“已复制”等反馈
+  const toast = text => {
+    let box = document.querySelector('.y-toast');
+    if (!box) {
+      box = document.createElement('div');
+      box.className = 'y-toast';
+      box.setAttribute('role', 'status');
+      document.body.append(box);
+    }
+    box.textContent = text;
+    box.classList.add('show');
+    clearTimeout(box.timer);
+    box.timer = setTimeout(() => box.classList.remove('show'), 1600);
+  };
+
+  // 2. 点标题旁的链接图标：复制这一节的链接，方便分享
+  document.addEventListener('click', event => {
+    const anchor = event.target.closest('.post-body .headerlink');
+    if (!anchor) return;
+    event.preventDefault();
+    const url = location.origin + location.pathname + anchor.getAttribute('href');
+    history.replaceState(null, '', anchor.getAttribute('href'));
+    anchor.parentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const fallback = () => toast('已定位到本节，可从地址栏复制链接');
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(() => toast('已复制本节链接'), fallback);
+    } else {
+      fallback();
+    }
+  });
+
+  // 液态玻璃：鼠标在卡片上移动时，卡片里的高光跟着鼠标走（只在有鼠标的设备上，且每帧最多更新一次）
+  if (matchMedia('(pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let pending = null;
+    document.addEventListener('pointermove', event => {
+      const card = event.target.closest && event.target.closest('.main-inner .post-block, .board-group, .home-card');
+      if (!card) return;
+      if (pending) cancelAnimationFrame(pending);
+      pending = requestAnimationFrame(() => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--mx', ((event.clientX - rect.left) / rect.width * 100).toFixed(1) + '%');
+        card.style.setProperty('--my', ((event.clientY - rect.top) / rect.height * 100).toFixed(1) + '%');
+        pending = null;
+      });
+    }, { passive: true });
+  }
+
+  // 宽屏左栏的位置：顶栏还看得见时贴在它下面 36px，顶栏滚出屏幕后停在离顶部 24px 处
+  const header = document.querySelector('.header');
+  if (header) {
+    let railFrame = null;
+    const placeRail = () => {
+      railFrame = null;
+      const top = Math.max(24, Math.round(header.getBoundingClientRect().bottom + 36));
+      document.documentElement.style.setProperty('--rail-top', top + 'px');
+    };
+    placeRail();
+    window.addEventListener('scroll', () => { if (!railFrame) railFrame = requestAnimationFrame(placeRail); }, { passive: true });
+    window.addEventListener('resize', placeRail, { passive: true });
+  }
+
+  // 首页上没有写摘要分隔的旧文章会整篇显示：裁成一小段预览，并补一个“阅读全文”按钮
+  document.querySelectorAll('.main-inner.index > .post-block').forEach(card => {
+    const body = card.querySelector('.post-body');
+    const link = card.querySelector('.post-title-link');
+    if (!body || !link || body.querySelector('.post-button')) return;
+    body.classList.add('y-clamped');
+    const button = document.createElement('div');
+    button.className = 'post-button';
+    button.innerHTML = '<a class="btn"></a>';
+    button.firstChild.href = link.href;
+    button.firstChild.textContent = '阅读全文 »';
+    body.after(button);
+  });
+
+  // 3. ACM 板子目录：输入关键词即时筛选 59 份板子 + 洛谷题号直达链接 + 快捷回顶筛选
+  const grid = document.querySelector('.board-grid');
+  if (grid) {
+    // 自动将“来源：Pxxxx”里的洛谷题号变成可点击链接
+    document.querySelectorAll('.post-body p').forEach(p => {
+      if (!p.textContent.trim().startsWith('来源：')) return;
+      p.innerHTML = p.innerHTML.replace(/\b(P\d{4,5})\b/g,
+        '<a class="luogu-link" href="https://www.luogu.com.cn/problem/$1" target="_blank" rel="noopener" title="在洛谷查看 $1 原题">$1</a>');
+    });
+
+    const box = document.createElement('div');
+    box.className = 'board-filter';
+    box.innerHTML = '<input type="search" placeholder="筛选板子（按 / 键快速聚焦），例如：线段树、背包、LCA" aria-label="筛选板子"><span class="board-filter-count"></span>';
+    grid.before(box);
+    const input = box.querySelector('input');
+    const count = box.querySelector('.board-filter-count');
+    const chips = [...grid.querySelectorAll('.board-chip')];
+    const filter = () => {
+      const words = input.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      let shown = 0;
+      chips.forEach(chip => {
+        const hit = words.every(word => chip.textContent.toLowerCase().includes(word));
+        chip.hidden = !hit;
+        if (hit) shown++;
+      });
+      grid.querySelectorAll('.board-group').forEach(group => {
+        const visible = group.querySelectorAll('.board-chip:not([hidden])').length;
+        const total = group.querySelectorAll('.board-chip').length;
+        group.hidden = !visible;
+        group.querySelector('.board-count').textContent = words.length ? `${visible} / ${total} 份` : `${total} 份`;
+      });
+      count.textContent = words.length ? (shown ? `找到 ${shown} 份` : '没有匹配的板子') : `共 ${chips.length} 份`;
+    };
+    input.addEventListener('input', filter);
+    input.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { input.value = ''; filter(); input.blur(); }
+    });
+    filter();
+
+    // 往下翻看板子时，右下角浮出“筛选板子”胶囊，或按 / 键直接跳回搜索框
+    const jumpBtn = document.createElement('button');
+    jumpBtn.type = 'button';
+    jumpBtn.className = 'board-jump-btn';
+    jumpBtn.setAttribute('aria-label', '回到板子筛选框');
+    jumpBtn.innerHTML = '<i class="fa fa-search"></i> <span>筛选板子</span>';
+    document.body.append(jumpBtn);
+
+    const jumpToFilter = () => {
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => { input.focus({ preventScroll: true }); input.select(); }, 260);
+    };
+    jumpBtn.addEventListener('click', jumpToFilter);
+
+    const toggleJumpBtn = () => {
+      const rect = grid.getBoundingClientRect();
+      jumpBtn.classList.toggle('show', rect.bottom < 0);
+    };
+    window.addEventListener('scroll', toggleJumpBtn, { passive: true });
+    toggleJumpBtn();
+
+    document.addEventListener('keydown', event => {
+      if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return;
+      const tag = document.activeElement && document.activeElement.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable) return;
+      event.preventDefault();
+      jumpToFilter();
+    });
+  }
+})();
+</script>

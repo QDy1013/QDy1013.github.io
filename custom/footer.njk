@@ -1,0 +1,7 @@
+{#- 页脚追加：站点描述作为签名，再放几个常用入口 #}
+<div class="footer-sign">{{ config.description }}</div>
+<div class="footer-links">
+  <a href="https://github.com/QDy1013" target="_blank" rel="noopener"><i class="fab fa-github"></i> GitHub</a>
+  <a href="{{ url_for(config.archive_dir) }}/"><i class="fa fa-archive"></i> 归档</a>
+  <a href="{{ url_for('about/') }}"><i class="fa fa-user"></i> 关于</a>
+</div>
