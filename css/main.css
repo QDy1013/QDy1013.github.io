@@ -1267,7 +1267,7 @@ pre code {
   vertical-align: middle;
 }
 .links-of-author a::before {
-  background: #e57409;
+  background: #30ff9f;
   display: inline-block;
   margin-right: 3px;
   transform: translateY(-2px);
@@ -2421,6 +2421,9 @@ ul.breadcrumb li:last-child {
   border-bottom-color: #111;
   color: #111;
 }
+.utterances {
+  max-width: unset;
+}
 .search-active {
   overflow: hidden;
   margin-right: var(--dialog-scrollgutter, 0);
@@ -3559,6 +3562,11 @@ html {
   --cat-deep: #3b6e70;
   --cat-tint: rgba(79,138,139,0.12);
 }
+[data-category="随笔"] {
+  --cat: #8c6d46;
+  --cat-deep: #6e5434;
+  --cat-tint: rgba(140,109,70,0.12);
+}
 .main-inner .post-block {
   position: relative;
 }
@@ -4017,6 +4025,133 @@ html {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+.post-body a.luogu-link {
+  display: inline-block;
+  font-family: "JetBrains Mono", Consolas, "Courier New", monospace;
+  font-size: 0.88em;
+  color: #a84f32;
+  background: rgba(201,100,66,0.08);
+  border: 1px solid rgba(201,100,66,0.28);
+  border-radius: 6px;
+  padding: 0 7px;
+  margin: 0 2px;
+  line-height: 1.55;
+  transition: all 0.2s;
+}
+.post-body a.luogu-link:hover {
+  color: #fdfbf7;
+  background: #c96442;
+  border-color: #c96442;
+  transform: translateY(-1px);
+}
+.board-jump-btn {
+  position: fixed;
+  right: 30px;
+  bottom: 72px;
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 15px;
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", serif;
+  font-size: 0.85em;
+  color: #2b2622;
+  background: rgba(253,251,247,0.85);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(201,100,66,0.45);
+  border-radius: 999px;
+  box-shadow: 0 6px 20px rgba(60,40,20,0.12);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: all 0.22s;
+}
+.board-jump-btn.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.board-jump-btn:hover {
+  color: #fdfbf7;
+  background: #c96442;
+  border-color: #c96442;
+}
+.tag-cloud-tags {
+  display: flex;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+.tag-cloud a {
+  display: inline-block;
+  margin: 0 !important;
+  padding: 5px 16px;
+  border-radius: 999px;
+  background: rgba(201,100,66,0.08);
+  border: 1px solid rgba(201,100,66,0.22);
+  transition: all 0.2s;
+}
+.tag-cloud a:hover {
+  background: #c96442 !important;
+  color: #fdfbf7 !important;
+  border-color: #c96442;
+  transform: translateY(-2px);
+}
+.category-all-page .category-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 18px;
+}
+.category-all-page .category-list-item {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255,255,255,0.65);
+  border: 1px solid rgba(120,90,60,0.14);
+  border-radius: 999px;
+  padding: 6px 16px;
+  box-shadow: 0 2px 8px rgba(60,40,20,0.05);
+  transition: all 0.2s;
+}
+.category-all-page .category-list-item:hover {
+  border-color: #c96442;
+  transform: translateY(-2px);
+}
+.category-all-page .category-list-count {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 8px;
+  font-size: 0.82em;
+  color: #fdfbf7;
+  background: #c96442;
+  border-radius: 999px;
+}
+.category-all-page .category-list-count::before,
+.category-all-page .category-list-count::after {
+  content: none;
+}
+.comments {
+  margin-top: 32px;
+  padding: 28px 36px;
+  border-radius: 14px;
+  background: rgba(253,251,247,0.88);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.55);
+  box-shadow: 0 1px 2px rgba(60,40,20,0.04), 0 8px 28px rgba(60,40,20,0.07);
 }
 @keyframes y-glow-breathe {
   from {
