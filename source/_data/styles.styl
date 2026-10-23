@@ -303,9 +303,21 @@ header.header {
   border: none;
   border-bottom: 1px solid rgba(120, 90, 60, 0.08);
 }
-.post-body .table-container tr:nth-of-type(even) { background: rgba(120, 90, 60, 0.035); }
-.post-body .table-container tr:hover { background: $accent-tint; }
+.post-body .table-container tbody tr:nth-of-type(odd) { background: transparent; }
+.post-body .table-container tbody tr:nth-of-type(even) { background: rgba(120, 90, 60, 0.04); }
+.post-body .table-container tbody tr:hover { background: $accent-tint; }
 .post-body .table-container tr:last-child td { border-bottom: none; }
+
+// 代码块语法着色（兼容 Hexo highlight 的无前缀类名与 hljs-*）
+.post-body figure.highlight {
+  .comment, .quote { color: #8C8277; font-style: italic; }
+  .keyword, .selector-tag, .doctag { color: #B84B39; font-weight: 600; }
+  .type, .built_in, .class .title { color: #9A6700; }
+  .string, .regexp, .addition { color: #3B7D4F; }
+  .number, .literal { color: #2E6B9E; }
+  .title, .function .title, .section { color: #6F42C1; font-weight: 600; }
+  .meta, .meta .keyword { color: #4A6FA5; }
+}
 
 // 代码块内部也包了一层 .table-container（行号和代码是一张表），把上面给数据表格加的边框、圆角、悬停底色都还原，只保留横向滚动
 .post-body figure.highlight .table-container {
@@ -1490,6 +1502,23 @@ $glass-blur  = blur(18px) saturate(170%)
 html[data-theme="dark"] {
   background: #171513 linear-gradient(180deg, #171513, #12100E) fixed;
   color-scheme: dark;
+  // 覆盖 NexT 默认挂在 :root 上的浅色 CSS 变量（尤其是表格奇数行 #f9f9f9 白底！）
+  --body-bg-color: #171513;
+  --content-bg-color: #24201D;
+  --card-bg-color: #282420;
+  --text-color: #E6DED4;
+  --blockquote-color: #D8CFC3;
+  --link-color: #E8876B;
+  --link-hover-color: #F5A48C;
+  --brand-color: #F6F1EA;
+  --brand-hover-color: #F6F1EA;
+  --table-row-odd-bg-color: transparent;
+  --table-row-hover-bg-color: rgba(201, 100, 66, 0.16);
+  --menu-item-bg-color: rgba(255, 255, 255, 0.08);
+  --highlight-background: #1D1A17;
+  --highlight-foreground: #EAE2D8;
+  --highlight-gutter-background: #171412;
+  --highlight-gutter-foreground: #8A7F74;
 }
 html[data-theme="dark"]::before {
   background:
@@ -1498,12 +1527,34 @@ html[data-theme="dark"]::before {
     radial-gradient(ellipse 65% 65% at 55% 55%, rgba(90, 70, 50, 0.10), transparent 70%);
 }
 html[data-theme="dark"] body {
-  color: #D8D0C5;
+  color: #E6DED4;
 }
 html[data-theme="dark"] body::before {
   opacity: 0.22;
 }
 html[data-theme="dark"] {
+  // 夜间模式下把分类色提亮，避免深蓝/深青/深棕文字在暗色底上发暗看不清
+  .post-block, .home-card-link, .about-card, .archive-cat-seg, .archive-cat-legend-item {
+    --cat: #E07A56;
+    --cat-deep: #F4A68A;
+    --cat-tint: rgba(224, 122, 86, 0.18);
+  }
+  [data-category="语音识别"] {
+    --cat: #5FA8AA;
+    --cat-deep: #8FD4D6;
+    --cat-tint: rgba(95, 168, 170, 0.20);
+  }
+  [data-category="数学"] {
+    --cat: #6894CE;
+    --cat-deep: #9EC2F2;
+    --cat-tint: rgba(104, 148, 206, 0.20);
+  }
+  [data-category="随笔"] {
+    --cat: #C49A64;
+    --cat-deep: #E5BF8E;
+    --cat-tint: rgba(196, 154, 100, 0.20);
+  }
+
   .site-title,
   .post-title,
   .posts-expand .post-title,
@@ -1519,20 +1570,39 @@ html[data-theme="dark"] {
   .about-card-title,
   .archive-stat-num,
   .posts-collapse .collection-title .collection-header {
-    color: #F2ECE4;
+    color: #F6F1EA;
   }
-  .posts-expand .post-title-link:hover { color: #E07A5F; }
+  .posts-expand .post-title-link:hover { color: #F08A6C; }
 
-  .post-body, .post-body p, .links-of-author a, .menu .menu-item a,
+  .post-body, .post-body p, .post-body li, .links-of-author a, .menu .menu-item a,
   .post-toc .nav a, .footer-sign, .about-tagline, .about-tl-body,
-  .archive-cat-legend-item, .posts-collapse .post-title a {
-    color: #CEC5B9;
+  .archive-cat-legend-item, .posts-collapse .post-title a, .katex {
+    color: #E6DED4;
+  }
+
+  // 次要元信息、小字、页脚在夜间模式下适度提亮，保证清晰可读
+  .post-meta-container, .post-meta, .post-meta a, .post-meta-tags a,
+  .site-subtitle, .site-description, .site-state-item-name,
+  .home-card-desc, .home-card-stats a, .sidebar-categories-title,
+  .archive-stat-label, .archive-stat-num small, .archive-cat-count,
+  .board-filter-count, .footer, .footer a {
+    color: #B5ABA0;
+  }
+
+  .post-body blockquote {
+    color: #DFD6CA;
+    background: rgba(201, 100, 66, 0.12);
+    box-shadow: none;
   }
 
   .header {
-    background: linear-gradient(180deg, rgba(36, 32, 29, 0.78), rgba(28, 25, 22, 0.65));
-    border-color: rgba(255, 240, 220, 0.1);
+    background: linear-gradient(180deg, rgba(36, 32, 29, 0.82), rgba(28, 25, 22, 0.70));
+    border-color: rgba(255, 240, 220, 0.12);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 12px 32px rgba(0, 0, 0, 0.35);
+  }
+  .menu-item .badge {
+    background: rgba(201, 100, 66, 0.25);
+    color: #F6F1EA;
   }
 
   .main-inner .post-block,
@@ -1541,37 +1611,42 @@ html[data-theme="dark"] {
   .comments {
     background:
       radial-gradient(circle at var(--mx, 85%) var(--my, -10%), rgba(255, 230, 200, 0.07), transparent 45%),
-      linear-gradient(140deg, rgba(40, 36, 32, 0.82), rgba(28, 25, 22, 0.72));
-    border-color: rgba(255, 240, 220, 0.1);
+      linear-gradient(140deg, rgba(40, 36, 32, 0.86), rgba(28, 25, 22, 0.78));
+    border-color: rgba(255, 240, 220, 0.12);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 18px 48px rgba(0, 0, 0, 0.38);
   }
   .main-inner.index > .post-block:first-of-type {
     background:
       radial-gradient(circle at var(--mx, 92%) var(--my, 0%), rgba(255, 230, 200, 0.09), transparent 45%),
       radial-gradient(ellipse 60% 90% at 100% 100%, var(--cat-tint), transparent 70%),
-      linear-gradient(140deg, rgba(42, 37, 33, 0.86), rgba(28, 25, 22, 0.76));
+      linear-gradient(140deg, rgba(42, 37, 33, 0.88), rgba(28, 25, 22, 0.80));
   }
 
   .sidebar, .sidebar-active .sidebar {
-    background: linear-gradient(160deg, rgba(38, 34, 30, 0.84), rgba(26, 23, 20, 0.74));
-    border-color: rgba(255, 240, 220, 0.1);
+    background: linear-gradient(160deg, rgba(38, 34, 30, 0.86), rgba(26, 23, 20, 0.78));
+    border-color: rgba(255, 240, 220, 0.12);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 18px 48px rgba(0, 0, 0, 0.38);
   }
   .sidebar-nav { background: rgba(255, 255, 255, 0.06); }
   .sidebar-toc-active .sidebar-nav-toc,
   .sidebar-overview-active .sidebar-nav-overview {
-    background: rgba(255, 255, 255, 0.12);
-    color: #E5856B !important;
+    background: rgba(255, 255, 255, 0.14);
+    color: #F2967A !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   }
   .post-toc .nav .active-current > a {
-    color: #F0937A;
-    background: rgba(201, 100, 66, 0.18);
+    color: #F49D82;
+    background: rgba(201, 100, 66, 0.20);
+  }
+  .sidebar-featured-link {
+    color: #F4A68A;
+    background: linear-gradient(135deg, rgba(224, 122, 86, 0.22), rgba(224, 122, 86, 0.10));
+    border-color: rgba(224, 122, 86, 0.40);
   }
 
   .board-group, .about-card {
-    background: linear-gradient(150deg, rgba(48, 43, 38, 0.75), rgba(34, 30, 27, 0.6));
-    border-color: rgba(255, 240, 220, 0.1);
+    background: linear-gradient(150deg, rgba(48, 43, 38, 0.78), rgba(34, 30, 27, 0.65));
+    border-color: rgba(255, 240, 220, 0.12);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 4px 14px rgba(0, 0, 0, 0.25);
   }
   .post-body a.board-chip,
@@ -1581,39 +1656,79 @@ html[data-theme="dark"] {
   .category-all-page .category-list-item,
   .post-body a.about-link-pill,
   .board-jump-btn {
-    color: #E2DAD0;
-    background: rgba(48, 43, 38, 0.82);
-    border-color: rgba(255, 240, 220, 0.12);
+    color: #EAE2D8;
+    background: rgba(48, 43, 38, 0.85);
+    border-color: rgba(255, 240, 220, 0.14);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   }
-
-  .post-body .table-container { border-color: rgba(255, 240, 220, 0.12); }
-  .post-body .table-container th {
-    background: rgba(201, 100, 66, 0.18);
-    color: #F2ECE4;
-    border-bottom-color: rgba(255, 240, 220, 0.12);
+  .post-body a.luogu-link {
+    color: #F4A68A;
+    background: rgba(224, 122, 86, 0.16);
+    border-color: rgba(224, 122, 86, 0.35);
   }
-  .post-body .table-container td { border-bottom-color: rgba(255, 240, 220, 0.07); }
-  .post-body .table-container tr:nth-of-type(even) { background: rgba(255, 255, 255, 0.025); }
 
+  // 表格：彻底清除奇数行白底，统一深色斑马纹与高对比文字
+  .post-body .table-container {
+    border-color: rgba(255, 240, 220, 0.15);
+    background: rgba(24, 21, 18, 0.45);
+  }
+  .post-body .table-container th, .post-body table th {
+    background: rgba(201, 100, 66, 0.24);
+    color: #F7F2EC;
+    border-bottom-color: rgba(255, 240, 220, 0.16);
+  }
+  .post-body .table-container td, .post-body table td {
+    color: #EAE2D8;
+    border-bottom-color: rgba(255, 240, 220, 0.08);
+  }
+  .post-body .table-container tbody tr:nth-of-type(odd),
+  .post-body table tbody tr:nth-of-type(odd) {
+    background: transparent !important;
+  }
+  .post-body .table-container tbody tr:nth-of-type(even),
+  .post-body table tbody tr:nth-of-type(even) {
+    background: rgba(255, 255, 255, 0.045) !important;
+  }
+  .post-body .table-container tbody tr:hover,
+  .post-body table tbody tr:hover {
+    background: rgba(201, 100, 66, 0.16) !important;
+  }
+
+  // 代码块与夜间语法高亮
   .post-body figure.highlight {
-    background: #1E1B18;
-    border-color: rgba(255, 240, 220, 0.12);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    background: #1C1917;
+    border-color: rgba(255, 240, 220, 0.14);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    .comment, .quote { color: #92877B; font-style: italic; }
+    .keyword, .selector-tag, .doctag { color: #F08A6C; font-weight: 600; }
+    .type, .built_in, .class .title { color: #E8B86D; }
+    .string, .regexp, .addition { color: #8EC07C; }
+    .number, .literal { color: #83A598; }
+    .title, .function .title, .section { color: #D3869B; font-weight: 600; }
+    .meta, .meta .keyword { color: #8FB4D8; }
   }
-  .post-body figure.highlight .code pre { background: #1E1B18; color: #E2DAD0; }
-  .post-body figure.highlight .gutter pre { background: #191614; color: #786E65; }
+  .post-body figure.highlight .code pre { background: #1C1917; color: #EAE2D8; }
+  .post-body figure.highlight .gutter pre { background: #161412; color: #8A7F74; }
+  .copy-btn { color: #C8BEB2; }
   .post-body code {
-    color: #F0937A;
-    background: rgba(201, 100, 66, 0.16);
+    color: #F49D82;
+    background: rgba(201, 100, 66, 0.18);
   }
   .post-body figure.highlight code { color: inherit; background: none; }
 
-  .search-popup {
-    background: linear-gradient(150deg, rgba(38, 34, 30, 0.92), rgba(26, 23, 20, 0.88));
-    border-color: rgba(255, 240, 220, 0.14);
-    color: #E2DAD0;
+  // 归档页时间轴线条与年份计数徽章
+  .posts-collapse .post-content::before { background: rgba(201, 100, 66, 0.28); }
+  .posts-collapse .post-content .collection-year .collection-year-count {
+    background: rgba(201, 100, 66, 0.22);
+    color: #F6F1EA;
   }
-  .search-input { color: #F2ECE4; }
-  .toggle .toggle-line { background: #D8D0C5; }
+  .posts-collapse .post-content .post-header { border-bottom-color: rgba(255, 240, 220, 0.14); }
+
+  .search-popup {
+    background: linear-gradient(150deg, rgba(38, 34, 30, 0.94), rgba(26, 23, 20, 0.90));
+    border-color: rgba(255, 240, 220, 0.16);
+    color: #EAE2D8;
+  }
+  .search-input { color: #F6F1EA; }
+  .toggle .toggle-line { background: #E6DED4; }
 }
