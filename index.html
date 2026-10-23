@@ -3,6 +3,18 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+(() => {
+  try {
+    const saved = localStorage.getItem('y-theme');
+    if (saved === 'dark' || saved === 'light') {
+      document.documentElement.setAttribute('data-theme', saved);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  } catch (e) {}
+})();
+</script>
 <meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
@@ -110,6 +122,9 @@
   </div>
 
   <div class="site-nav-right">
+    <div class="toggle theme-toggle" aria-label="切换深浅色模式" role="button" tabindex="0" title="切换深色 / 浅色模式">
+      <i class="fa fa-moon fa-fw fa-lg theme-icon"></i>
+    </div>
     <div class="toggle popup-trigger" aria-label="搜索" role="button" tabindex="0">
         <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
@@ -124,6 +139,11 @@
         <a role="button" tabindex="0" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
       </li>
+    <li class="menu-item menu-item-theme">
+      <a role="button" tabindex="0" class="theme-toggle" aria-label="切换深浅色模式" title="切换深色 / 浅色模式">
+        <i class="fa fa-moon fa-fw theme-icon"></i><span class="theme-label">夜间</span>
+      </a>
+    </li>
   </ul>
 </nav>
 
@@ -184,18 +204,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-count">22</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -209,10 +229,16 @@
 <div class="sidebar-categories">
   <div class="sidebar-categories-title">按分类浏览</div>
   <nav class="home-card-links" aria-label="按分类浏览">
+      <a class="home-card-link" data-category="数学" href="/categories/%E6%95%B0%E5%AD%A6/">数学<span>2</span></a>
       <a class="home-card-link" data-category="算法" href="/categories/%E7%AE%97%E6%B3%95/">算法<span>2</span></a>
+      <a class="home-card-link" data-category="语音识别" href="/categories/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/">语音识别<span>3</span></a>
       <a class="home-card-link" data-category="随笔" href="/categories/%E9%9A%8F%E7%AC%94/">随笔<span>1</span></a>
-      <a class="home-card-link" data-category="语音识别" href="/categories/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/">语音识别<span>1</span></a>
   </nav>
+  <div class="sidebar-featured">
+    <a class="sidebar-featured-link" href="/2026/10/22/ACM%E7%AE%97%E6%B3%95%E6%9D%BF%E5%AD%90%E5%90%88%E9%9B%86/">
+      <span>📌</span> 59 份 ACM 板子速查
+    </a>
+  </div>
 </div>
 
         </div>
@@ -233,14 +259,15 @@
       <p class="home-card-name">奇点Y</p>
       <p class="home-card-desc">记录个人心得，和大家交流算法及高数相关问题</p>
       <div class="home-card-stats">
-        <a href="/archives/"><b>4</b>文章</a>
-        <a href="/categories/"><b>3</b>分类</a>
-        <a href="/tags/"><b>12</b>标签</a>
+        <a href="/archives/"><b>8</b>文章</a>
+        <a href="/categories/"><b>4</b>分类</a>
+        <a href="/tags/"><b>22</b>标签</a>
       </div>
       <nav class="home-card-links" aria-label="按分类浏览">
+          <a class="home-card-link" data-category="数学" href="/categories/%E6%95%B0%E5%AD%A6/">数学<span>2</span></a>
           <a class="home-card-link" data-category="算法" href="/categories/%E7%AE%97%E6%B3%95/">算法<span>2</span></a>
+          <a class="home-card-link" data-category="语音识别" href="/categories/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/">语音识别<span>3</span></a>
           <a class="home-card-link" data-category="随笔" href="/categories/%E9%9A%8F%E7%AC%94/">随笔<span>1</span></a>
-          <a class="home-card-link" data-category="语音识别" href="/categories/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/">语音识别<span>1</span></a>
       </nav>
     </div>
   </section>
@@ -288,7 +315,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-23 13:52:20" itemprop="dateModified" datetime="2026-10-23T13:52:20+08:00">2026-10-23</time>
+      <time title="修改时间：2026-10-23 14:19:40" itemprop="dateModified" datetime="2026-10-23T14:19:40+08:00">2026-10-23</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -303,7 +330,7 @@
   
 <span class="post-meta-item" title="正文字数（不含代码）">
   <span class="post-meta-item-icon"><i class="far fa-file-lines"></i></span>
-  <span>3564 字</span>
+  <span>3570 字</span>
 </span>
 <span class="post-meta-item" title="预计阅读时间">
   <span class="post-meta-item-icon"><i class="far fa-clock"></i></span>
@@ -313,8 +340,8 @@
     <a href="/tags/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/" rel="tag">#语音识别</a>
     <a href="/tags/ASR/" rel="tag">#ASR</a>
     <a href="/tags/WeNet/" rel="tag">#WeNet</a>
-    <a href="/tags/Transformer/" rel="tag">#Transformer</a>
     <a href="/tags/CTC/" rel="tag">#CTC</a>
+    <a href="/tags/Transformer/" rel="tag">#Transformer</a>
     <a href="/tags/%E7%A7%91%E7%A0%94%E5%91%A8%E6%8A%A5/" rel="tag">#科研周报</a>
 </span>
 
@@ -356,7 +383,7 @@
     
 
 
-<div class="post-block" data-category="算法">
+<div class="post-block" data-category="算法" data-featured="true">
   
   
 
@@ -397,7 +424,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-23 13:53:06" itemprop="dateModified" datetime="2026-10-23T13:53:06+08:00">2026-10-23</time>
+      <time title="修改时间：2026-10-23 14:19:59" itemprop="dateModified" datetime="2026-10-23T14:19:59+08:00">2026-10-23</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -419,9 +446,9 @@
   <span>约 24 分钟</span>
 </span>
 <span class="post-meta-item post-meta-tags">
-    <a href="/tags/cpp/" rel="tag">#C++</a>
     <a href="/tags/ACM/" rel="tag">#ACM</a>
     <a href="/tags/%E7%AE%97%E6%B3%95%E6%A8%A1%E6%9D%BF/" rel="tag">#算法模板</a>
+    <a href="/tags/cpp/" rel="tag">#C++</a>
 </span>
 
 </div>
@@ -437,6 +464,444 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2026/10/22/ACM%E7%AE%97%E6%B3%95%E6%9D%BF%E5%AD%90%E5%90%88%E9%9B%86/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block" data-category="数学">
+  
+  
+
+  <article itemscope itemtype="https://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://qdy1013.github.io/2026/10/20/%E4%BA%8C%E9%A1%B9%E5%BC%8F%E7%B3%BB%E6%95%B0%E5%8D%81%E5%A4%A7%E6%81%92%E7%AD%89%E5%BC%8F%E4%B8%8E%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0%E6%8E%A8%E5%AF%BC/">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.webp">
+      <meta itemprop="name" content="奇点Y">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="奇点Y的随笔">
+      <meta itemprop="description" content="记录个人心得，和大家交流算法及高数相关问题">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="https://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 奇点Y的随笔">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/10/20/%E4%BA%8C%E9%A1%B9%E5%BC%8F%E7%B3%BB%E6%95%B0%E5%8D%81%E5%A4%A7%E6%81%92%E7%AD%89%E5%BC%8F%E4%B8%8E%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0%E6%8E%A8%E5%AF%BC/" class="post-title-link" itemprop="url">二项式系数十大恒等式与生成函数推导</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-10-20 16:00:00" itemprop="dateCreated datePublished" datetime="2026-10-20T16:00:00+08:00">2026-10-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-23 14:18:23" itemprop="dateModified" datetime="2026-10-23T14:18:23+08:00">2026-10-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E5%AD%A6/" itemprop="url" rel="index"><span itemprop="name">数学</span></a>
+        </span>
+    </span>
+
+  
+<span class="post-meta-item" title="正文字数（不含代码）">
+  <span class="post-meta-item-icon"><i class="far fa-file-lines"></i></span>
+  <span>7674 字</span>
+</span>
+<span class="post-meta-item" title="预计阅读时间">
+  <span class="post-meta-item-icon"><i class="far fa-clock"></i></span>
+  <span>约 20 分钟</span>
+</span>
+<span class="post-meta-item post-meta-tags">
+    <a href="/tags/%E7%BB%84%E5%90%88%E6%95%B0%E5%AD%A6/" rel="tag">#组合数学</a>
+    <a href="/tags/%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0/" rel="tag">#生成函数</a>
+    <a href="/tags/ACM/" rel="tag">#ACM</a>
+    <a href="/tags/%E5%85%B7%E4%BD%93%E6%95%B0%E5%AD%A6/" rel="tag">#具体数学</a>
+    <a href="/tags/%E4%BA%8C%E9%A1%B9%E5%BC%8F%E7%B3%BB%E6%95%B0/" rel="tag">#二项式系数</a>
+</span>
+
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p><strong>出处</strong>：R. Graham, D. Knuth, O. Patashnik, <em>Concrete Mathematics</em>（《具体数学》）第 2 版，第 5 章 “Binomial Coefficients”，<strong>Table 174 — The top ten binomial coefficient identities</strong>（第 174 页）。书中原话：<em>“Table 174 collects ten of the most useful formulas, all in one place; these are the best identities to know.”</em></p>
+</blockquote>
+<p>本文抄录这十条最重要的二项式系数恒等式，并给出用**生成函数（母函数）**推导的完整过程。少数几条是“生成函数的输入”（如二项式定理本身），改用求导或组合双计数，但核心思路完全一致：<strong>把恒等式翻译成母函数的代数恒等式，再比较系数</strong>。文中所有公式均已用程序对 $n \le 9$ 等小参数做过全量数值验证（8757 组检查全部通过）。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2026/10/20/%E4%BA%8C%E9%A1%B9%E5%BC%8F%E7%B3%BB%E6%95%B0%E5%8D%81%E5%A4%A7%E6%81%92%E7%AD%89%E5%BC%8F%E4%B8%8E%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0%E6%8E%A8%E5%AF%BC/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block" data-category="数学">
+  
+  
+
+  <article itemscope itemtype="https://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://qdy1013.github.io/2026/10/19/ACM%E5%B8%B8%E7%94%A8%E6%95%B0%E5%AD%A6%E7%BB%93%E8%AE%BA%E7%A0%94%E7%A9%B6%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.webp">
+      <meta itemprop="name" content="奇点Y">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="奇点Y的随笔">
+      <meta itemprop="description" content="记录个人心得，和大家交流算法及高数相关问题">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="https://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 奇点Y的随笔">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/10/19/ACM%E5%B8%B8%E7%94%A8%E6%95%B0%E5%AD%A6%E7%BB%93%E8%AE%BA%E7%A0%94%E7%A9%B6%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">ACM 常用数学结论研究笔记：组合、数论、图计数与博弈速查</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-10-19 20:00:00" itemprop="dateCreated datePublished" datetime="2026-10-19T20:00:00+08:00">2026-10-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-23 14:18:25" itemprop="dateModified" datetime="2026-10-23T14:18:25+08:00">2026-10-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E5%AD%A6/" itemprop="url" rel="index"><span itemprop="name">数学</span></a>
+        </span>
+    </span>
+
+  
+<span class="post-meta-item" title="正文字数（不含代码）">
+  <span class="post-meta-item-icon"><i class="far fa-file-lines"></i></span>
+  <span>5364 字</span>
+</span>
+<span class="post-meta-item" title="预计阅读时间">
+  <span class="post-meta-item-icon"><i class="far fa-clock"></i></span>
+  <span>约 14 分钟</span>
+</span>
+<span class="post-meta-item post-meta-tags">
+    <a href="/tags/%E6%95%B0%E8%AE%BA/" rel="tag">#数论</a>
+    <a href="/tags/%E7%BB%84%E5%90%88%E6%95%B0%E5%AD%A6/" rel="tag">#组合数学</a>
+    <a href="/tags/%E5%8D%9A%E5%BC%88%E8%AE%BA/" rel="tag">#博弈论</a>
+    <a href="/tags/%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0/" rel="tag">#生成函数</a>
+    <a href="/tags/ACM/" rel="tag">#ACM</a>
+    <a href="/tags/%E7%AE%97%E6%B3%95%E6%A8%A1%E6%9D%BF/" rel="tag">#算法模板</a>
+</span>
+
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>这是一份面向算法竞赛（ACM &#x2F; ICPC &#x2F; 蓝桥杯 &#x2F; 考研机试）的<strong>常用数学结论与模型触发速查手册</strong>，涵盖<strong>组合计数、数论、图论计数、博弈论、线性代数、多项式与卷积、几何与平面图、概率与期望</strong>八大板块，并在文末附带「题面信号 $\to$ 优先联想」的考场识别清单。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2026/10/19/ACM%E5%B8%B8%E7%94%A8%E6%95%B0%E5%AD%A6%E7%BB%93%E8%AE%BA%E7%A0%94%E7%A9%B6%E7%AC%94%E8%AE%B0/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block" data-category="语音识别">
+  
+  
+
+  <article itemscope itemtype="https://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://qdy1013.github.io/2026/10/18/%E6%AD%A3%E5%88%99%E5%8C%96%E4%B8%8E%E5%AD%A6%E4%B9%A0%E7%8E%87%E8%B0%83%E5%BA%A6%E5%AD%A6%E4%B9%A0%E8%AE%B2%E4%B9%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.webp">
+      <meta itemprop="name" content="奇点Y">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="奇点Y的随笔">
+      <meta itemprop="description" content="记录个人心得，和大家交流算法及高数相关问题">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="https://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 奇点Y的随笔">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/10/18/%E6%AD%A3%E5%88%99%E5%8C%96%E4%B8%8E%E5%AD%A6%E4%B9%A0%E7%8E%87%E8%B0%83%E5%BA%A6%E5%AD%A6%E4%B9%A0%E8%AE%B2%E4%B9%89/" class="post-title-link" itemprop="url">语音识别中的正则化与学习率调度：SpecAugment、Dropout、Label Smoothing 与重打分解码</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-10-18 21:00:00" itemprop="dateCreated datePublished" datetime="2026-10-18T21:00:00+08:00">2026-10-18</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-23 14:18:28" itemprop="dateModified" datetime="2026-10-23T14:18:28+08:00">2026-10-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+          <a href="/categories/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/" itemprop="url" rel="index"><span itemprop="name">语音识别</span></a>
+        </span>
+    </span>
+
+  
+<span class="post-meta-item" title="正文字数（不含代码）">
+  <span class="post-meta-item-icon"><i class="far fa-file-lines"></i></span>
+  <span>3472 字</span>
+</span>
+<span class="post-meta-item" title="预计阅读时间">
+  <span class="post-meta-item-icon"><i class="far fa-clock"></i></span>
+  <span>约 9 分钟</span>
+</span>
+<span class="post-meta-item post-meta-tags">
+    <a href="/tags/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/" rel="tag">#语音识别</a>
+    <a href="/tags/ASR/" rel="tag">#ASR</a>
+    <a href="/tags/Transformer/" rel="tag">#Transformer</a>
+    <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">#深度学习</a>
+    <a href="/tags/%E6%AD%A3%E5%88%99%E5%8C%96/" rel="tag">#正则化</a>
+    <a href="/tags/SpecAugment/" rel="tag">#SpecAugment</a>
+</span>
+
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>在做端到端语音识别（ASR）实验时，从基线模型走向高准确率模型必须跨越两道坎：<strong>过拟合抑制（正则化）<strong>与</strong>训练稳定性（学习率调度）</strong>。本文结合我在 AISHELL-1（120,098 条训练语音）上的真实训练记录，系统梳理 <strong>SpecAugment、Dropout、Label Smoothing、Noam 学习率 Warmup 与衰减</strong>，以及 <strong>CTC 前缀束搜索 + Attention 重打分解码</strong>的原理、PyTorch 代码实现与常见踩坑点。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2026/10/18/%E6%AD%A3%E5%88%99%E5%8C%96%E4%B8%8E%E5%AD%A6%E4%B9%A0%E7%8E%87%E8%B0%83%E5%BA%A6%E5%AD%A6%E4%B9%A0%E8%AE%B2%E4%B9%89/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block" data-category="语音识别">
+  
+  
+
+  <article itemscope itemtype="https://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://qdy1013.github.io/2026/10/17/WeNet%E8%AE%BA%E6%96%87%E5%85%A5%E9%97%A8%E5%AF%BC%E8%AF%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.webp">
+      <meta itemprop="name" content="奇点Y">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="奇点Y的随笔">
+      <meta itemprop="description" content="记录个人心得，和大家交流算法及高数相关问题">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="https://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 奇点Y的随笔">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/10/17/WeNet%E8%AE%BA%E6%96%87%E5%85%A5%E9%97%A8%E5%AF%BC%E8%AF%BB/" class="post-title-link" itemprop="url">WeNet 论文入门导读：从 Fbank 到 U2 两遍识别与流式统一</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-10-17 19:00:00" itemprop="dateCreated datePublished" datetime="2026-10-17T19:00:00+08:00">2026-10-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-23 14:18:26" itemprop="dateModified" datetime="2026-10-23T14:18:26+08:00">2026-10-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+          <a href="/categories/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/" itemprop="url" rel="index"><span itemprop="name">语音识别</span></a>
+        </span>
+    </span>
+
+  
+<span class="post-meta-item" title="正文字数（不含代码）">
+  <span class="post-meta-item-icon"><i class="far fa-file-lines"></i></span>
+  <span>3829 字</span>
+</span>
+<span class="post-meta-item" title="预计阅读时间">
+  <span class="post-meta-item-icon"><i class="far fa-clock"></i></span>
+  <span>约 10 分钟</span>
+</span>
+<span class="post-meta-item post-meta-tags">
+    <a href="/tags/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/" rel="tag">#语音识别</a>
+    <a href="/tags/ASR/" rel="tag">#ASR</a>
+    <a href="/tags/WeNet/" rel="tag">#WeNet</a>
+    <a href="/tags/CTC/" rel="tag">#CTC</a>
+    <a href="/tags/Transformer/" rel="tag">#Transformer</a>
+    <a href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" rel="tag">#论文阅读</a>
+</span>
+
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>这是一份面向入门读者的 <strong>WeNet（Interspeech 2021）论文全景导读</strong>。读完这篇笔记，你将彻底理清：<strong>声音如何变成 Fbank 矩阵</strong>、<strong>共享编码器与两个解码支路（CTC &#x2F; Attention）如何分工</strong>、<strong>U2 架构如何用两遍识别（Two-pass Rescoring）兼顾速度与准确率</strong>，以及<strong>动态分块（Dynamic Chunk）如何在同一套参数下统一流式与非流式识别</strong>。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2026/10/17/WeNet%E8%AE%BA%E6%96%87%E5%85%A5%E9%97%A8%E5%AF%BC%E8%AF%BB/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -525,9 +990,9 @@
   <span>约 4 分钟</span>
 </span>
 <span class="post-meta-item post-meta-tags">
+    <a href="/tags/cpp/" rel="tag">#C++</a>
     <a href="/tags/%E7%AE%97%E6%B3%95%E5%85%A5%E9%97%A8/" rel="tag">#算法入门</a>
     <a href="/tags/%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C/" rel="tag">#竞赛经验</a>
-    <a href="/tags/cpp/" rel="tag">#C++</a>
 </span>
 
 </div>
@@ -902,6 +1367,30 @@
       jumpToFilter();
     });
   }
+
+  // 4. 暖调夜间模式（Dark Mode）一键切换与图标同步
+  const root = document.documentElement;
+  const syncThemeUI = () => {
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    document.querySelectorAll('.theme-icon').forEach(icon => {
+      icon.classList.toggle('fa-moon', !isDark);
+      icon.classList.toggle('fa-sun', isDark);
+    });
+    document.querySelectorAll('.theme-label').forEach(label => {
+      label.textContent = isDark ? '日间' : '夜间';
+    });
+  };
+  syncThemeUI();
+
+  document.querySelectorAll('.theme-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('y-theme', next); } catch (e) {}
+      syncThemeUI();
+      toast(next === 'dark' ? '已切换为夜间护眼模式 🌙' : '已切换为日间纸张模式 ☀️');
+    });
+  });
 })();
 </script>
 

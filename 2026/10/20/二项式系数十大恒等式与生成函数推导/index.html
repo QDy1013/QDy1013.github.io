@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+(() => {
+  try {
+    const saved = localStorage.getItem('y-theme');
+    if (saved === 'dark' || saved === 'light') {
+      document.documentElement.setAttribute('data-theme', saved);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  } catch (e) {}
+})();
+</script>
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="preconnect" href="https://fonts.loli.net">
+<link rel="preconnect" href="https://gstatic.loli.net" crossorigin>
+<link rel="stylesheet" href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap"></noscript>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"qdy1013.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"atom-one-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":400},"language":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"top_n_per_article":3,"unescape":false,"preload":true}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="出处：R. Graham, D. Knuth, O. Patashnik, Concrete Mathematics（《具体数学》）第 2 版，第 5 章 “Binomial Coefficients”，Table 174 — The top ten binomial coefficient identities（第 174 页）。书中原话：“Table 174 collects ten of">
+<meta property="og:type" content="article">
+<meta property="og:title" content="二项式系数十大恒等式与生成函数推导">
+<meta property="og:url" content="https://qdy1013.github.io/2026/10/20/%E4%BA%8C%E9%A1%B9%E5%BC%8F%E7%B3%BB%E6%95%B0%E5%8D%81%E5%A4%A7%E6%81%92%E7%AD%89%E5%BC%8F%E4%B8%8E%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0%E6%8E%A8%E5%AF%BC/index.html">
+<meta property="og:site_name" content="奇点Y的随笔">
+<meta property="og:description" content="出处：R. Graham, D. Knuth, O. Patashnik, Concrete Mathematics（《具体数学》）第 2 版，第 5 章 “Binomial Coefficients”，Table 174 — The top ten binomial coefficient identities（第 174 页）。书中原话：“Table 174 collects ten of">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-10-20T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-23T06:18:23.851Z">
+<meta property="article:author" content="奇点Y">
+<meta property="article:tag" content="ACM">
+<meta property="article:tag" content="二项式系数">
+<meta property="article:tag" content="具体数学">
+<meta property="article:tag" content="生成函数">
+<meta property="article:tag" content="组合数学">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://qdy1013.github.io/2026/10/20/%E4%BA%8C%E9%A1%B9%E5%BC%8F%E7%B3%BB%E6%95%B0%E5%8D%81%E5%A4%A7%E6%81%92%E7%AD%89%E5%BC%8F%E4%B8%8E%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0%E6%8E%A8%E5%AF%BC/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://qdy1013.github.io/2026/10/20/%E4%BA%8C%E9%A1%B9%E5%BC%8F%E7%B3%BB%E6%95%B0%E5%8D%81%E5%A4%A7%E6%81%92%E7%AD%89%E5%BC%8F%E4%B8%8E%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0%E6%8E%A8%E5%AF%BC/","path":"2026/10/20/二项式系数十大恒等式与生成函数推导/","title":"二项式系数十大恒等式与生成函数推导"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>二项式系数十大恒等式与生成函数推导 | 奇点Y的随笔</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<script class="next-config" data-name="katex" type="application/json">{"copy_tex_js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/copy-tex.min.js","integrity":"sha256-Us54+rSGDSTvIhKKUs4kygE2ipA0RXpWWh0/zLqw3bs="}}</script>
+<script src="/js/third-party/math/katex.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="https://schema.org/WebPage">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="https://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" aria-expanded="false" aria-controls="site-nav" role="button" tabindex="0">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">奇点Y的随笔</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">感谢支持</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle theme-toggle" aria-label="切换深浅色模式" role="button" tabindex="0" title="切换深色 / 浅色模式">
+      <i class="fa fa-moon fa-fw fa-lg theme-icon"></i>
+    </div>
+    <div class="toggle popup-trigger" aria-label="搜索" role="button" tabindex="0">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav id="site-nav" class="site-nav" aria-label="主导航">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" tabindex="0" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+    <li class="menu-item menu-item-theme">
+      <a role="button" tabindex="0" class="theme-toggle" aria-label="切换深浅色模式" title="切换深色 / 浅色模式">
+        <i class="fa fa-moon fa-fw theme-icon"></i><span class="theme-label">夜间</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup" role="dialog" aria-modal="true" aria-label="站内搜索">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input aria-label="搜索文章" autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span aria-label="关闭搜索" class="popup-btn-close" role="button" tabindex="0">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container" aria-live="polite" aria-busy="false">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-%E8%AE%B0%E5%8F%B7%E4%B8%8E%E4%B8%A4%E4%B8%AA%E6%A0%B8%E5%BF%83%E5%8A%A8%E4%BD%9C"><span class="nav-number">1.</span> <span class="nav-text">0. 记号与两个核心动作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E9%80%9F%E6%9F%A5%E8%A1%A8%EF%BC%9ATable-174-%E5%8D%81%E6%9D%A1%E6%81%92%E7%AD%89%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">1. 速查表：Table 174 十条恒等式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0%E5%B7%A5%E5%85%B7%E7%AE%B1"><span class="nav-number">3.</span> <span class="nav-text">2. 生成函数工具箱</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E6%AD%A6%E5%99%A8-A%EF%BC%9A%E4%BA%8C%E9%A1%B9%E5%BC%8F%E5%AE%9A%E7%90%86%EF%BC%88%E6%AF%8D%E5%87%BD%E6%95%B0%E6%9C%AC%E4%BD%93%EF%BC%89%E2%80%94%E2%80%94%E5%8D%B3%E7%AC%AC-7-%E6%9D%A1"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 武器 A：二项式定理（母函数本体）——即第 7 条</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E6%AD%A6%E5%99%A8-B%EF%BC%9A%E5%8D%B7%E7%A7%AF-%E4%B9%98%E6%B3%95"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 武器 B：卷积 &#x3D; 乘法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E6%AD%A6%E5%99%A8-C%EF%BC%9A%E5%B8%B8%E6%95%B0%E9%A1%B9%E6%8A%80%E5%B7%A7%EF%BC%88%E5%A4%84%E7%90%86%E2%80%9C%E4%B8%8B%E6%A0%87%E7%9B%B8%E7%AD%89%E2%80%9D%EF%BC%89"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 武器 C：常数项技巧（处理“下标相等”）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E6%AD%A6%E5%99%A8-D%EF%BC%9A%E8%B4%9F%E6%8C%87%E6%95%B0%E4%B8%8E-HEXOMATH-45-%E5%AE%B6%E6%97%8F"><span class="nav-number">3.4.</span> <span class="nav-text">2.4 武器 D：负指数与 $\frac{1}{(1-z)}$ 家族</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-%E6%AD%A6%E5%99%A8-E%EF%BC%9A%E6%B1%82%E5%AF%BC%EF%BC%88%E9%80%A0%E5%87%BA%E5%9B%A0%E5%AD%90-HEXOMATH-49-%EF%BC%89"><span class="nav-number">3.5.</span> <span class="nav-text">2.5 武器 E：求导（造出因子 $k$）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E9%80%90%E6%9D%A1%E6%8E%A8%E5%AF%BC"><span class="nav-number">4.</span> <span class="nav-text">3. 逐条推导</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E9%98%B6%E4%B9%98%E5%B1%95%E5%BC%80%EF%BC%88factorial-expansion%EF%BC%89%E2%80%94%E2%80%94%E5%AE%9A%E4%B9%89"><span class="nav-number">4.1.</span> <span class="nav-text">(1) 阶乘展开（factorial expansion）——定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%AF%B9%E7%A7%B0%E6%80%A7%EF%BC%88symmetry%EF%BC%89%E2%80%94%E2%80%94%E7%AC%AC-2-%E6%9D%A1"><span class="nav-number">4.2.</span> <span class="nav-text">(2) 对称性（symmetry）——第 2 条</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%90%B8%E6%94%B6-%E6%8F%90%E5%8F%96%EF%BC%88absorption-extraction%EF%BC%89%E2%80%94%E2%80%94%E7%AC%AC-3-%E6%9D%A1"><span class="nav-number">4.3.</span> <span class="nav-text">(3) 吸收&#x2F;提取（absorption &#x2F; extraction）——第 3 条</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%8A%A0%E6%B3%95-%E5%BD%92%E7%BA%B3%EF%BC%88addition-induction%EF%BC%89%E2%80%94%E2%80%94%E7%AC%AC-4-%E6%9D%A1"><span class="nav-number">4.4.</span> <span class="nav-text">(4) 加法&#x2F;归纳（addition &#x2F; induction）——第 4 条</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E4%B8%8A%E6%8C%87%E6%A0%87%E5%8F%96%E8%B4%9F%EF%BC%88upper-negation%EF%BC%89%E2%80%94%E2%80%94%E7%AC%AC-5-%E6%9D%A1"><span class="nav-number">4.5.</span> <span class="nav-text">(5) 上指标取负（upper negation）——第 5 条</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E4%B8%89%E9%A1%B9%E5%BC%8F%E6%94%B9%E5%86%99%EF%BC%88trinomial-revision%EF%BC%89%E2%80%94%E2%80%94%E7%AC%AC-6-%E6%9D%A1"><span class="nav-number">4.6.</span> <span class="nav-text">(6) 三项式改写（trinomial revision）——第 6 条</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E4%BA%8C%E9%A1%B9%E5%BC%8F%E5%AE%9A%E7%90%86%EF%BC%88binomial-theorem%EF%BC%89%E2%80%94%E2%80%94%E7%AC%AC-7-%E6%9D%A1"><span class="nav-number">4.7.</span> <span class="nav-text">(7) 二项式定理（binomial theorem）——第 7 条</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E5%B9%B3%E8%A1%8C%E6%B1%82%E5%92%8C%EF%BC%88parallel-summation%EF%BC%89%E2%80%94%E2%80%94%E7%AC%AC-8-%E6%9D%A1"><span class="nav-number">4.8.</span> <span class="nav-text">(8) 平行求和（parallel summation）——第 8 条</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-%E4%B8%8A%E6%8C%87%E6%A0%87%E6%B1%82%E5%92%8C%EF%BC%88upper-summation%EF%BC%89%E2%80%94%E2%80%94%E7%AC%AC-9-%E6%9D%A1"><span class="nav-number">4.9.</span> <span class="nav-text">(9) 上指标求和（upper summation）——第 9 条</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-%E8%8C%83%E5%BE%B7%E8%92%99%E5%BE%B7%E5%8D%B7%E7%A7%AF%EF%BC%88Vandermonde-convolution%EF%BC%89%E2%80%94%E2%80%94%E7%AC%AC-10-%E6%9D%A1%EF%BC%88%E9%87%8D%E7%82%B9%EF%BC%89"><span class="nav-number">4.10.</span> <span class="nav-text">(10) 范德蒙德卷积（Vandermonde convolution）——第 10 条（重点）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E4%B8%89%E4%B8%AA%E5%AE%9E%E6%88%98%E8%8C%83%E4%BE%8B"><span class="nav-number">5.</span> <span class="nav-text">4. 三个实战范例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E4%B8%A4%E4%B8%AA%E4%B8%8B%E6%8C%87%E6%A0%87%E7%9B%B8%E5%90%8C%E7%9A%84%E6%B1%82%E5%92%8C%EF%BC%88%E7%82%B9%E7%A7%AF%E5%9E%8B%EF%BC%89"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 两个下指标相同的求和（点积型）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E5%88%86%E7%95%8C%E7%82%B9%E6%9E%9A%E4%B8%BE%EF%BC%88Table-169-%E7%9A%84-5-26-%EF%BC%89"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 分界点枚举（Table 169 的 (5.26)）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-Catalan-%E6%95%B0%EF%BC%88%E4%BB%8E%E9%80%92%E6%8E%A8%E5%88%B0%E9%80%9A%E9%A1%B9%EF%BC%89"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 Catalan 数（从递推到通项）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%80%BB%E7%BB%93%EF%BC%9A%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0%E5%81%9A%E6%81%92%E7%AD%89%E5%BC%8F%E7%9A%84%E4%B8%89%E6%AD%A5"><span class="nav-number">6.</span> <span class="nav-text">5. 总结：生成函数做恒等式的三步</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="https://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="奇点Y"
+      src="/images/avatar.webp">
+  <p class="site-author-name" itemprop="name">奇点Y</p>
+  <div class="site-description" itemprop="description">记录个人心得，和大家交流算法及高数相关问题</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/QDy1013" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;QDy1013" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+<div class="sidebar-categories">
+  <div class="sidebar-categories-title">按分类浏览</div>
+  <nav class="home-card-links" aria-label="按分类浏览">
+      <a class="home-card-link" data-category="数学" href="/categories/%E6%95%B0%E5%AD%A6/">数学<span>2</span></a>
+      <a class="home-card-link" data-category="算法" href="/categories/%E7%AE%97%E6%B3%95/">算法<span>2</span></a>
+      <a class="home-card-link" data-category="语音识别" href="/categories/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/">语音识别<span>3</span></a>
+      <a class="home-card-link" data-category="随笔" href="/categories/%E9%9A%8F%E7%AC%94/">随笔<span>1</span></a>
+  </nav>
+  <div class="sidebar-featured">
+    <a class="sidebar-featured-link" href="/2026/10/22/ACM%E7%AE%97%E6%B3%95%E6%9D%BF%E5%AD%90%E5%90%88%E9%9B%86/">
+      <span>📌</span> 59 份 ACM 板子速查
+    </a>
+  </div>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div id="main-content" tabindex="-1" class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block" data-category="数学">
+  
+  
+
+  <article itemscope itemtype="https://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://qdy1013.github.io/2026/10/20/%E4%BA%8C%E9%A1%B9%E5%BC%8F%E7%B3%BB%E6%95%B0%E5%8D%81%E5%A4%A7%E6%81%92%E7%AD%89%E5%BC%8F%E4%B8%8E%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0%E6%8E%A8%E5%AF%BC/">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.webp">
+      <meta itemprop="name" content="奇点Y">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="奇点Y的随笔">
+      <meta itemprop="description" content="记录个人心得，和大家交流算法及高数相关问题">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="https://schema.org/CreativeWork">
+      <meta itemprop="name" content="二项式系数十大恒等式与生成函数推导 | 奇点Y的随笔">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          二项式系数十大恒等式与生成函数推导
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-10-20 16:00:00" itemprop="dateCreated datePublished" datetime="2026-10-20T16:00:00+08:00">2026-10-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-23 14:18:23" itemprop="dateModified" datetime="2026-10-23T14:18:23+08:00">2026-10-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E5%AD%A6/" itemprop="url" rel="index"><span itemprop="name">数学</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+<span class="post-meta-item" title="正文字数（不含代码）">
+  <span class="post-meta-item-icon"><i class="far fa-file-lines"></i></span>
+  <span>7674 字</span>
+</span>
+<span class="post-meta-item" title="预计阅读时间">
+  <span class="post-meta-item-icon"><i class="far fa-clock"></i></span>
+  <span>约 20 分钟</span>
+</span>
+
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p><strong>出处</strong>：R. Graham, D. Knuth, O. Patashnik, <em>Concrete Mathematics</em>（《具体数学》）第 2 版，第 5 章 “Binomial Coefficients”，<strong>Table 174 — The top ten binomial coefficient identities</strong>（第 174 页）。书中原话：<em>“Table 174 collects ten of the most useful formulas, all in one place; these are the best identities to know.”</em></p>
+</blockquote>
+<p>本文抄录这十条最重要的二项式系数恒等式，并给出用**生成函数（母函数）**推导的完整过程。少数几条是“生成函数的输入”（如二项式定理本身），改用求导或组合双计数，但核心思路完全一致：<strong>把恒等式翻译成母函数的代数恒等式，再比较系数</strong>。文中所有公式均已用程序对 $n \le 9$ 等小参数做过全量数值验证（8757 组检查全部通过）。</p>
+<span id="more"></span>
+
+<hr>
+<h2 id="0-记号与两个核心动作"><a href="#0-记号与两个核心动作" class="headerlink" title="0. 记号与两个核心动作"></a>0. 记号与两个核心动作</h2><table>
+<thead>
+<tr>
+<th align="left">记号</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">$\binom{n}{k}$</td>
+<td align="left">二项式系数；$n$ 可为任意实数&#x2F;复数，$k$ 为非负整数</td>
+</tr>
+<tr>
+<td align="left">$A(x) = \sum a_n x^n$</td>
+<td align="left">数列 $(a_n)$ 的普通生成函数（OGF）</td>
+</tr>
+<tr>
+<td align="left">$[x^n]A(x)$</td>
+<td align="left">提取幂级数 $A(x)$ 中 $x^n$ 的系数</td>
+</tr>
+<tr>
+<td align="left">$\mathrm{CT}_z\,F(z)$</td>
+<td align="left">常数项（Constant Term），即 $[z^0]F(z)$</td>
+</tr>
+</tbody></table>
+<p><strong>两个核心动作（下文反复使用）：</strong></p>
+<ul>
+<li><strong>下标之和为定值</strong> $\implies$ 母函数 <strong>【相乘】</strong>（卷积）</li>
+<li><strong>下标【相等】</strong> $\implies$ 取 <strong>【常数项】</strong> $\mathrm{CT}_z$</li>
+</ul>
+<p>记住这两条，一大半的组合恒等式都能机械地推出来。</p>
+<hr>
+<h2 id="1-速查表：Table-174-十条恒等式"><a href="#1-速查表：Table-174-十条恒等式" class="headerlink" title="1. 速查表：Table 174 十条恒等式"></a>1. 速查表：Table 174 十条恒等式</h2><table>
+<thead>
+<tr>
+<th align="center">#</th>
+<th align="left">恒等式</th>
+<th align="left">条件</th>
+<th align="left">名称</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>1</strong></td>
+<td align="left">$\displaystyle\binom{n}{k} = \frac{n!}{k!\,(n-k)!}$</td>
+<td align="left">整数 $n \ge k \ge 0$</td>
+<td align="left">阶乘展开（factorial expansion）</td>
+</tr>
+<tr>
+<td align="center"><strong>2</strong></td>
+<td align="left">$\displaystyle\binom{n}{k} = \binom{n}{n-k}$</td>
+<td align="left">$n \ge 0$，$k$ 为整数</td>
+<td align="left">对称性（symmetry）</td>
+</tr>
+<tr>
+<td align="center"><strong>3</strong></td>
+<td align="left">$\displaystyle\binom{r}{k} = \frac{r}{k}\binom{r-1}{k-1}$</td>
+<td align="left">$k \ne 0$ 为整数</td>
+<td align="left">吸收&#x2F;提取（absorption &#x2F; extraction）</td>
+</tr>
+<tr>
+<td align="center"><strong>4</strong></td>
+<td align="left">$\displaystyle\binom{r}{k} = \binom{r-1}{k} + \binom{r-1}{k-1}$</td>
+<td align="left">$k$ 为整数</td>
+<td align="left">加法&#x2F;归纳（addition &#x2F; induction）</td>
+</tr>
+<tr>
+<td align="center"><strong>5</strong></td>
+<td align="left">$\displaystyle\binom{r}{k} = (-1)^k\binom{k-r-1}{k}$</td>
+<td align="left">$k$ 为整数</td>
+<td align="left">上指标取负（upper negation）</td>
+</tr>
+<tr>
+<td align="center"><strong>6</strong></td>
+<td align="left">$\displaystyle\binom{r}{m}\binom{m}{k} = \binom{r}{k}\binom{r-k}{m-k}$</td>
+<td align="left">$m, k$ 为整数</td>
+<td align="left">三项式改写（trinomial revision）</td>
+</tr>
+<tr>
+<td align="center"><strong>7</strong></td>
+<td align="left">$\displaystyle\sum_k \binom{r}{k} x^k y^{r-k} = (x+y)^r$</td>
+<td align="left">$r \ge 0$ 整数，或 $\lvert x/y\rvert &lt; 1$</td>
+<td align="left">二项式定理（binomial theorem）</td>
+</tr>
+<tr>
+<td align="center"><strong>8</strong></td>
+<td align="left">$\displaystyle\sum_{k \le n} \binom{r+k}{k} = \binom{r+n+1}{n}$</td>
+<td align="left">$n$ 为整数</td>
+<td align="left">平行求和（parallel summation）</td>
+</tr>
+<tr>
+<td align="center"><strong>9</strong></td>
+<td align="left">$\displaystyle\sum_{0 \le k \le n} \binom{k}{m} = \binom{n+1}{m+1}$</td>
+<td align="left">$m, n \ge 0$ 为整数</td>
+<td align="left">上指标求和（upper summation）</td>
+</tr>
+<tr>
+<td align="center"><strong>10</strong></td>
+<td align="left">$\displaystyle\sum_k \binom{r}{k}\binom{s}{n-k} = \binom{r+s}{n}$</td>
+<td align="left">$n$ 为整数</td>
+<td align="left"><strong>范德蒙德卷积</strong>（Vandermonde convolution）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>结构总结</strong>：第 1–6 条是“改写单个二项式系数”的工具（<strong>刀</strong>），第 7–10 条是“求和公式”（<strong>模子</strong>）。实战流程永远是：<strong>先用 1–6 把式子整形成 7–10 能套的样子，再套公式。</strong></p>
+</blockquote>
+<hr>
+<h2 id="2-生成函数工具箱"><a href="#2-生成函数工具箱" class="headerlink" title="2. 生成函数工具箱"></a>2. 生成函数工具箱</h2><h3 id="2-1-武器-A：二项式定理（母函数本体）——即第-7-条"><a href="#2-1-武器-A：二项式定理（母函数本体）——即第-7-条" class="headerlink" title="2.1 武器 A：二项式定理（母函数本体）——即第 7 条"></a>2.1 武器 A：二项式定理（母函数本体）——即第 7 条</h3><p>$$(1 + z)^r = \sum_k \binom{r}{k} z^k$$</p>
+<p>这是一切推导的出发点：所有的二项式系数，就是 $(1+z)^r$ 展开后的系数。允许 $r$ 为任意实数&#x2F;复数（形式幂级数意义下，不需要收敛性）。</p>
+<h3 id="2-2-武器-B：卷积-乘法"><a href="#2-2-武器-B：卷积-乘法" class="headerlink" title="2.2 武器 B：卷积 &#x3D; 乘法"></a>2.2 武器 B：卷积 &#x3D; 乘法</h3><p>$$\sum_k a_k b_{n-k} = [z^n]\,A(z)B(z)$$</p>
+<p>这是“下标和为定值”型求和的万能钥匙：只要看到指标形如 $k$ 与 $n-k$ 配对，就写成两个母函数相乘。</p>
+<h3 id="2-3-武器-C：常数项技巧（处理“下标相等”）"><a href="#2-3-武器-C：常数项技巧（处理“下标相等”）" class="headerlink" title="2.3 武器 C：常数项技巧（处理“下标相等”）"></a>2.3 武器 C：常数项技巧（处理“下标相等”）</h3><p>$$\sum_k a_k b_k = \mathrm{CT}_z\,A(z)\,B\!\left(\frac{1}{z}\right)$$</p>
+<p>这是“下标相同”型求和的钥匙。因为 $\mathrm{CT}_z\,z^j = [j = 0]$：</p>
+<p>$$\mathrm{CT}_z\,A(z)B(1/z) = \mathrm{CT}_z \left(\sum_j a_j z^j\right)\left(\sum_i b_i z^{-i}\right) = \sum_{j-i=0} a_j b_i = \sum_k a_k b_k.$$</p>
+<h3 id="2-4-武器-D：负指数与-HEXOMATH-45-家族"><a href="#2-4-武器-D：负指数与-HEXOMATH-45-家族" class="headerlink" title="2.4 武器 D：负指数与 $\frac{1}{(1-z)}$ 家族"></a>2.4 武器 D：负指数与 $\frac{1}{(1-z)}$ 家族</h3><p>$$\frac{1}{(1-z)^{m+1}} = \sum_{k \ge 0} \binom{m+k}{k} z^k$$</p>
+<p>配合“乘 $\frac{1}{1-z} =$ 前缀和”，就是后面第 8、9 条的推导工具：</p>
+<p>$$\sum_n \left(\sum_{k \le n} a_k\right) z^n = \frac{A(z)}{1 - z}.$$</p>
+<h3 id="2-5-武器-E：求导（造出因子-HEXOMATH-49-）"><a href="#2-5-武器-E：求导（造出因子-HEXOMATH-49-）" class="headerlink" title="2.5 武器 E：求导（造出因子 $k$）"></a>2.5 武器 E：求导（造出因子 $k$）</h3><p>$$A'(z) = \sum_k k\,a_k z^{k-1}.$$</p>
+<p>用于第 3 条（吸收恒等式）——把“外面的 $k$”吸收进系数里。</p>
+<hr>
+<h2 id="3-逐条推导"><a href="#3-逐条推导" class="headerlink" title="3. 逐条推导"></a>3. 逐条推导</h2><h3 id="1-阶乘展开（factorial-expansion）——定义"><a href="#1-阶乘展开（factorial-expansion）——定义" class="headerlink" title="(1) 阶乘展开（factorial expansion）——定义"></a>(1) 阶乘展开（factorial expansion）——定义</h3><p>$$\binom{n}{k} = \frac{n!}{k!\,(n-k)!} \quad (n \ge k \ge 0)$$</p>
+<p>这是定义，不需要推导。它由武器 A 在 $r = n$ 为自然数时的 Taylor 系数给出：</p>
+<p>$$\left.\frac{1}{k!}\frac{\mathrm{d}^k}{\mathrm{d}z^k}(1+z)^n\right|_{z=0} = \frac{n(n-1)\cdots(n-k+1)}{k!} = \frac{n!}{k!\,(n-k)!}.$$</p>
+<p>对一般实数&#x2F;复数 $r$ 则推广为 $\binom{r}{k} = \frac{r^{\underline{k}}}{k!}$（下降阶乘），这就是<strong>广义二项式系数</strong>。</p>
+<h3 id="2-对称性（symmetry）——第-2-条"><a href="#2-对称性（symmetry）——第-2-条" class="headerlink" title="(2) 对称性（symmetry）——第 2 条"></a>(2) 对称性（symmetry）——第 2 条</h3><p>$$\binom{n}{k} = \binom{n}{n-k}$$</p>
+<ul>
+<li><strong>方法一（代数）</strong>：直接由阶乘表达式，分母对 $k \leftrightarrow n-k$ 对称。</li>
+<li><strong>方法二（组合）</strong>：从 $n$ 个元素里选 $k$ 个 $\equiv$ 从 $n$ 个里“留下 $n-k$ 个不选”。</li>
+<li><strong>方法三（母函数视角）</strong>：由武器 A，$\binom{n}{k} = [z^k](1+z)^n$，而<br>$$\binom{n}{n-k} = [z^{n-k}](1+z)^n = [z^k]\,z^n(1+z^{-1})^n,$$<br>两个表达式本质相同（回想武器 C：$A(z)$ 与 $A(1/z)$ 通过常数项配对）。</li>
+</ul>
+<h3 id="3-吸收-提取（absorption-extraction）——第-3-条"><a href="#3-吸收-提取（absorption-extraction）——第-3-条" class="headerlink" title="(3) 吸收&#x2F;提取（absorption &#x2F; extraction）——第 3 条"></a>(3) 吸收&#x2F;提取（absorption &#x2F; extraction）——第 3 条</h3><p>$$\binom{r}{k} = \frac{r}{k}\binom{r-1}{k-1}$$</p>
+<p><strong>生成函数证明（用武器 E：求导）</strong>：对 $(1+z)^r = \sum_k \binom{r}{k} z^k$ 两边求导：</p>
+<p>$$r(1+z)^{r-1} = \sum_k k\binom{r}{k} z^{k-1}$$</p>
+<p>左边用武器 A（指数换成 $r-1$）展开：$r(1+z)^{r-1} = r\sum_j \binom{r-1}{j} z^j$。比较两边 $z^{k-1}$ 的系数：</p>
+<p>$$r\binom{r-1}{k-1} = k\binom{r}{k} \implies \binom{r}{k} = \frac{r}{k}\binom{r-1}{k-1}.$$</p>
+<blockquote>
+<p><strong>用途</strong>：当求和号外面挂了因子 $k$（或分母上有 $k$）时，用它把 $k$ “吸收”进二项式系数，使其变成 Table 174 里可套用的形状。等价形式：$k\binom{n}{k} = n\binom{n-1}{k-1}$。</p>
+</blockquote>
+<h3 id="4-加法-归纳（addition-induction）——第-4-条"><a href="#4-加法-归纳（addition-induction）——第-4-条" class="headerlink" title="(4) 加法&#x2F;归纳（addition &#x2F; induction）——第 4 条"></a>(4) 加法&#x2F;归纳（addition &#x2F; induction）——第 4 条</h3><p>$$\binom{r}{k} = \binom{r-1}{k} + \binom{r-1}{k-1}$$</p>
+<p><strong>生成函数证明（一步）</strong>：由 $(1+z)^r = (1+z)^{r-1} \cdot (1+z)$，两边取 $[z^k]$：</p>
+<p>$$[z^k](1+z)^r = [z^k](1+z)^{r-1} + [z^{k-1}](1+z)^{r-1}$$</p>
+<p>即得。这正是 Pascal 三角的递推，也是“归纳法证明恒等式”时能奏效的原因（把上指标 $r$ 降到 $r-1$，递归结构完美匹配归纳假设）。</p>
+<h3 id="5-上指标取负（upper-negation）——第-5-条"><a href="#5-上指标取负（upper-negation）——第-5-条" class="headerlink" title="(5) 上指标取负（upper negation）——第 5 条"></a>(5) 上指标取负（upper negation）——第 5 条</h3><p>$$\binom{r}{k} = (-1)^k \binom{k-r-1}{k}$$</p>
+<p><strong>生成函数证明（用武器 D）</strong>：先看两个母函数：</p>
+<ul>
+<li>由武器 A：$\sum_k \binom{r}{k}(-z)^k = (1-z)^r$，即 $\sum_k (-1)^k \binom{r}{k} z^k = (1-z)^r$。</li>
+<li>把武器 D 中的 $m$ 换成 $-r-1$：$\sum_k \binom{k-r-1}{k} z^k = \frac{1}{(1-z)^{-r}} = (1-z)^r$。</li>
+</ul>
+<p>两个级数相等，比较 $z^k$ 系数即得 $(-1)^k\binom{r}{k} = \binom{k-r-1}{k}$。</p>
+<blockquote>
+<p><strong>用途</strong>：把负的上指标“翻”成正的，或把上指标里的变量挪到条件里。它是“求和范围自动截断”的关键——当 $k-r-1 \ge 0$ 时右边才可能非零，等价于自动限制了 $k &gt; r$ 时左边为 $0$。</p>
+</blockquote>
+<h3 id="6-三项式改写（trinomial-revision）——第-6-条"><a href="#6-三项式改写（trinomial-revision）——第-6-条" class="headerlink" title="(6) 三项式改写（trinomial revision）——第 6 条"></a>(6) 三项式改写（trinomial revision）——第 6 条</h3><p>$$\binom{r}{m}\binom{m}{k} = \binom{r}{k}\binom{r-k}{m-k}$$</p>
+<p><strong>代数验证（两次阶乘展开）</strong>：</p>
+<p>$$\binom{r}{m}\binom{m}{k} = \frac{r!}{m!\,(r-m)!}\cdot\frac{m!}{k!\,(m-k)!} = \frac{r!}{k!\,(m-k)!\,(r-m)!},$$</p>
+<p>$$\binom{r}{k}\binom{r-k}{m-k} = \frac{r!}{k!\,(r-k)!}\cdot\frac{(r-k)!}{(m-k)!\,(r-m)!} = \frac{r!}{k!\,(m-k)!\,(r-m)!}.$$</p>
+<p>两边相等，且都等于三项式系数 $\frac{r!}{k!\,(m-k)!\,(r-m)!}$（把 $r$ 个元素分给三组）。</p>
+<blockquote>
+<p><strong>用途</strong>：这是“选子集”锤子。乘积 $\binom{r}{m}\binom{m}{k}$ 里 $m$ 出现了两次，而右边 $m$ 只出现一次，对 $m$ 求和时会“掉出一个自由的 $\binom{r}{k}$”——这是化简 $\sum_m \binom{r}{m}\binom{m}{k}$ 型求和的唯一出路。</p>
+</blockquote>
+<h3 id="7-二项式定理（binomial-theorem）——第-7-条"><a href="#7-二项式定理（binomial-theorem）——第-7-条" class="headerlink" title="(7) 二项式定理（binomial theorem）——第 7 条"></a>(7) 二项式定理（binomial theorem）——第 7 条</h3><p>$$\sum_k \binom{r}{k} x^k y^{r-k} = (x+y)^r$$</p>
+<ul>
+<li><strong>$r$ 为自然数</strong>：$n$ 个因子 $(x+y)$ 相乘，每项选 $x$ 或 $y$，取 $k$ 个 $x$ 的方案数是 $\binom{n}{k}$。</li>
+<li><strong>$r$ 任意</strong>：由武器 A 令 $z = x/y$、两边乘 $y^r$ 得到（形式幂级数恒等式）。</li>
+</ul>
+<h3 id="8-平行求和（parallel-summation）——第-8-条"><a href="#8-平行求和（parallel-summation）——第-8-条" class="headerlink" title="(8) 平行求和（parallel summation）——第 8 条"></a>(8) 平行求和（parallel summation）——第 8 条</h3><p>$$\sum_{k \le n} \binom{r+k}{k} = \binom{r+n+1}{n}$$</p>
+<p><strong>生成函数证明（前缀和 &#x3D; 乘 $\frac{1}{1-z}$）</strong>：由武器 D（把 $m$ 换成 $r$）：$\sum_k \binom{r+k}{k} z^k = \frac{1}{(1-z)^{r+1}}$。左边是对 $n$ 的前缀和，等价于母函数乘 $\frac{1}{1-z}$：</p>
+<p>$$\sum_n \left(\sum_{k \le n} \binom{r+k}{k}\right) z^n = \frac{1}{1-z}\cdot\frac{1}{(1-z)^{r+1}} = \frac{1}{(1-z)^{r+2}}.$$</p>
+<p>再用一次武器 D（$m = r+1$）提取系数：</p>
+<p>$$[z^n]\frac{1}{(1-z)^{r+2}} = \binom{(r+1)+n}{n} = \binom{r+n+1}{n}.$$</p>
+<h3 id="9-上指标求和（upper-summation）——第-9-条"><a href="#9-上指标求和（upper-summation）——第-9-条" class="headerlink" title="(9) 上指标求和（upper summation）——第 9 条"></a>(9) 上指标求和（upper summation）——第 9 条</h3><p>$$\sum_{0 \le k \le n} \binom{k}{m} = \binom{n+1}{m+1}$$</p>
+<p><strong>生成函数证明</strong>：先求单项母函数（下指标固定版本）：</p>
+<p>$$\sum_{k \ge 0} \binom{k}{m} z^k = \frac{z^m}{(1-z)^{m+1}}.$$</p>
+<p>同样地，前缀和 &#x3D; 乘 $\frac{1}{1-z}$：</p>
+<p>$$\sum_n \left(\sum_{0 \le k \le n} \binom{k}{m}\right) z^n = \frac{z^m}{(1-z)^{m+2}} = \sum_N \binom{N+m+1}{m+1} z^{N+m},$$</p>
+<p>取 $[z^n]$ 即 $N = n - m$：</p>
+<p>$$[z^n]\frac{z^m}{(1-z)^{m+2}} = \binom{(n-m)+m+1}{m+1} = \binom{n+1}{m+1}.$$</p>
+<blockquote>
+<p>这一条就是俗称的<strong>曲棍球棒恒等式（Hockey-stick identity）</strong>：把 Pascal 三角的某一列从顶加到底，结果恰好在拐角处。第 8 条是它的“平移版”，两条互为变形。</p>
+</blockquote>
+<h3 id="10-范德蒙德卷积（Vandermonde-convolution）——第-10-条（重点）"><a href="#10-范德蒙德卷积（Vandermonde-convolution）——第-10-条（重点）" class="headerlink" title="(10) 范德蒙德卷积（Vandermonde convolution）——第 10 条（重点）"></a>(10) 范德蒙德卷积（Vandermonde convolution）——第 10 条（重点）</h3><p>$$\sum_k \binom{r}{k}\binom{s}{n-k} = \binom{r+s}{n}$$</p>
+<ul>
+<li><strong>证法一：生成函数（一行）</strong>：由 $(1+z)^r \cdot (1+z)^s = (1+z)^{r+s}$，左边 $z^n$ 的系数是 $\sum_k \binom{r}{k}\binom{s}{n-k}$（武器 B：卷积 &#x3D; 乘法），右边是 $\binom{r+s}{n}$，比较系数即得。</li>
+<li><strong>证法二：组合双计数</strong>：从 $r$ 个男人、$s$ 个女人共 $r+s$ 人中选 $n$ 个人，右边直接是 $\binom{r+s}{n}$；左边按“选中 $k$ 个男人”分类求和。</li>
+<li><strong>证法三：常数项技巧（处理点积形式）</strong>：若两个下指标相同而非互补：<br>$$\sum_k \binom{r}{k}\binom{s}{k} = \mathrm{CT}_z\,(1+z)^r\left(1+\frac{1}{z}\right)^s = \mathrm{CT}_z\,z^{-s}(1+z)^{r+s} = \binom{r+s}{s}.$$</li>
+</ul>
+<blockquote>
+<p><strong>历史</strong>：Vandermonde 于 1770 年代末发表；但中国数学家<strong>朱世杰</strong>在 1303 年《四元玉鉴》中已用到，故现代文献亦称 <strong>Chu–Vandermonde identity（朱世杰–范德蒙德恒等式）</strong>。</p>
+</blockquote>
+<hr>
+<h2 id="4-三个实战范例"><a href="#4-三个实战范例" class="headerlink" title="4. 三个实战范例"></a>4. 三个实战范例</h2><h3 id="4-1-两个下指标相同的求和（点积型）"><a href="#4-1-两个下指标相同的求和（点积型）" class="headerlink" title="4.1 两个下指标相同的求和（点积型）"></a>4.1 两个下指标相同的求和（点积型）</h3><ul>
+<li><strong>问题</strong>：求 $S = \sum_{k=1}^{\min(x,y)} \binom{x}{k}\binom{y}{k}$。</li>
+<li><strong>解</strong>：先把下指标翻成互补，再用范德蒙德卷积，最后去掉 $k=0$ 那一项：<br>$$S = \sum_{k=1}^{\min(x,y)} \binom{x}{k}\binom{y}{y-k} = \binom{x+y}{y} - 1.$$</li>
+<li><strong>复杂度</strong>：直接求和是 $\mathcal{O}(\min(x,y))$；用恒等式配合阶乘预处理只需 $\mathcal{O}(1)$ 查询。当 $x, y \ge 10^9$（配合 Lucas 定理）时这是唯一的活路。</li>
+</ul>
+<h3 id="4-2-分界点枚举（Table-169-的-5-26-）"><a href="#4-2-分界点枚举（Table-169-的-5-26-）" class="headerlink" title="4.2 分界点枚举（Table 169 的 (5.26)）"></a>4.2 分界点枚举（Table 169 的 (5.26)）</h3><ul>
+<li><strong>问题</strong>：求 $T = \sum_{k=0}^n \binom{k}{r}\binom{n-k}{s}$。</li>
+<li><strong>解</strong>：由 §3(9) 知 $\sum_k \binom{k}{r} x^k = \frac{x^r}{(1-x)^{r+1}}$，同理 $\sum_j \binom{j}{s} x^j = \frac{x^s}{(1-x)^{s+1}}$。两者相乘（下标 $k+j=n$ 的卷积）：<br>$$\frac{x^r}{(1-x)^{r+1}}\cdot\frac{x^s}{(1-x)^{s+1}} = \frac{x^{r+s}}{(1-x)^{r+s+2}} = \sum_N \binom{N+r+s+1}{r+s+1} x^{N+r+s}.$$<br>取 $[x^n]$（即 $N = n - r - s$）：<br>$$T = \sum_{k=0}^n \binom{k}{r}\binom{n-k}{s} = \binom{n+1}{r+s+1}.$$</li>
+</ul>
+<h3 id="4-3-Catalan-数（从递推到通项）"><a href="#4-3-Catalan-数（从递推到通项）" class="headerlink" title="4.3 Catalan 数（从递推到通项）"></a>4.3 Catalan 数（从递推到通项）</h3><ul>
+<li><strong>递推</strong>：$C_0 = 1,\; C_{n+1} = \sum_{k=0}^n C_k C_{n-k}$。</li>
+<li><strong>第一步（建模）</strong>：设 $C(x) = \sum C_n x^n$。递推右边是卷积，于是<br>$$\frac{C(x) - 1}{x} = C(x)^2 \iff C = 1 + xC^2 \implies C(x) = \frac{1 - \sqrt{1-4x}}{2x}.$$</li>
+<li><strong>第二步（提取）</strong>：令 $w = C - 1$，则 $w = x(1+w)^2$，即 $w = x\phi(w)$，$\phi(w) = (1+w)^2$。由 <strong>Lagrange 反演</strong>（$[x^n]f(w) = \frac{1}{n}[w^{n-1}]f'(w)\phi(w)^n$）：<br>$$C_n = [x^n]w = \frac{1}{n}[w^{n-1}](1+w)^{2n} = \frac{1}{n}\binom{2n}{n-1} = \frac{1}{n+1}\binom{2n}{n}.$$</li>
+<li><strong>第三步（检验）</strong>：$n = 4$ 时 $\frac{1}{5}\binom{8}{4} = 14$ ✓。</li>
+</ul>
+<hr>
+<h2 id="5-总结：生成函数做恒等式的三步"><a href="#5-总结：生成函数做恒等式的三步" class="headerlink" title="5. 总结：生成函数做恒等式的三步"></a>5. 总结：生成函数做恒等式的三步</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">① 建模   组合结构 / 求和式  ──→  母函数或函数方程</span><br><span class="line">            · 下标和固定  →  相乘（卷积）</span><br><span class="line">            · 下标相等    →  常数项 CT</span><br><span class="line">            · 前缀和      →  乘 1/(1-z)</span><br><span class="line">            · 出现因子 k  →  求导</span><br><span class="line">② 求解   解方程（配方/部分分式）或停在隐式 w = xφ(w)</span><br><span class="line">③ 提取   [z^n]：广义二项式定理 / 1/(1-z)^m 家族 / Lagrange 反演</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>第 7 条</strong> &#x3D; ① 的起点（母函数本体）；</li>
+<li><strong>第 1–6 条</strong> &#x3D; ③ 之前的整形工具（把式子变成能套模子的形状）；</li>
+<li><strong>第 8–10 条</strong> &#x3D; ③ 的结果（能直接读出的求和公式）。</li>
+</ul>
+<blockquote>
+<p><strong>记忆建议</strong>：不必死背十条——背 <strong>§2 的五个武器 + §3(10) 范德蒙德卷积</strong>一条，其余七条都能在两三行内推出来！</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%BB%84%E5%90%88%E6%95%B0%E5%AD%A6/" rel="tag"># 组合数学</a>
+              <a href="/tags/%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0/" rel="tag"># 生成函数</a>
+              <a href="/tags/ACM/" rel="tag"># ACM</a>
+              <a href="/tags/%E5%85%B7%E4%BD%93%E6%95%B0%E5%AD%A6/" rel="tag"># 具体数学</a>
+              <a href="/tags/%E4%BA%8C%E9%A1%B9%E5%BC%8F%E7%B3%BB%E6%95%B0/" rel="tag"># 二项式系数</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/10/19/ACM%E5%B8%B8%E7%94%A8%E6%95%B0%E5%AD%A6%E7%BB%93%E8%AE%BA%E7%A0%94%E7%A9%B6%E7%AC%94%E8%AE%B0/" rel="prev" title="ACM 常用数学结论研究笔记：组合、数论、图计数与博弈速查">
+                  <i class="fa fa-angle-left"></i> ACM 常用数学结论研究笔记：组合、数论、图计数与博弈速查
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2026/10/22/ACM%E7%AE%97%E6%B3%95%E6%9D%BF%E5%AD%90%E5%90%88%E9%9B%86/" rel="next" title="ACM 算法板子合集（59 份）">
+                  ACM 算法板子合集（59 份） <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2025 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">奇点Y</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+<div class="footer-sign">记录个人心得，和大家交流算法及高数相关问题</div>
+<div class="footer-links">
+  <a href="https://github.com/QDy1013" target="_blank" rel="noopener"><i class="fab fa-github"></i> GitHub</a>
+  <a href="/archives/"><i class="fa fa-archive"></i> 归档</a>
+  <a href="/about/"><i class="fa fa-user"></i> 关于</a>
+</div>
+
+
+    </div>
+  </footer>
+
+  
+  <div aria-label="切换侧栏" class="toggle sidebar-toggle" role="button" tabindex="0">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" tabindex="0" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"QDy1013/QDy1013.github.io","issue_term":"pathname","theme":"github-light"}</script>
+<script src="/js/third-party/comments/utterances.js" defer></script>
+<script>
+// 奇点Y的随笔 · 交互小优化（内联在每页末尾，不额外发请求）
+(() => {
+  // 1. 鼠标悬停或手指按下站内链接时，提前下载那一页，点下去几乎立即打开
+  const prefetched = new Set([location.pathname]);
+  const prefetch = event => {
+    const link = event.target.closest && event.target.closest('a[href]');
+    if (!link || link.origin !== location.origin || link.hash && link.pathname === location.pathname) return;
+    if (navigator.connection && navigator.connection.saveData) return;
+    if (prefetched.has(link.pathname)) return;
+    prefetched.add(link.pathname);
+    const hint = document.createElement('link');
+    hint.rel = 'prefetch';
+    hint.href = link.pathname;
+    document.head.append(hint);
+  };
+  document.addEventListener('mouseover', prefetch, { passive: true });
+  document.addEventListener('touchstart', prefetch, { passive: true });
+
+  // 小提示条，用于“已复制”等反馈
+  const toast = text => {
+    let box = document.querySelector('.y-toast');
+    if (!box) {
+      box = document.createElement('div');
+      box.className = 'y-toast';
+      box.setAttribute('role', 'status');
+      document.body.append(box);
+    }
+    box.textContent = text;
+    box.classList.add('show');
+    clearTimeout(box.timer);
+    box.timer = setTimeout(() => box.classList.remove('show'), 1600);
+  };
+
+  // 2. 点标题旁的链接图标：复制这一节的链接，方便分享
+  document.addEventListener('click', event => {
+    const anchor = event.target.closest('.post-body .headerlink');
+    if (!anchor) return;
+    event.preventDefault();
+    const url = location.origin + location.pathname + anchor.getAttribute('href');
+    history.replaceState(null, '', anchor.getAttribute('href'));
+    anchor.parentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const fallback = () => toast('已定位到本节，可从地址栏复制链接');
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(() => toast('已复制本节链接'), fallback);
+    } else {
+      fallback();
+    }
+  });
+
+  // 液态玻璃：鼠标在卡片上移动时，卡片里的高光跟着鼠标走（只在有鼠标的设备上，且每帧最多更新一次）
+  if (matchMedia('(pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let pending = null;
+    document.addEventListener('pointermove', event => {
+      const card = event.target.closest && event.target.closest('.main-inner .post-block, .board-group, .home-card');
+      if (!card) return;
+      if (pending) cancelAnimationFrame(pending);
+      pending = requestAnimationFrame(() => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--mx', ((event.clientX - rect.left) / rect.width * 100).toFixed(1) + '%');
+        card.style.setProperty('--my', ((event.clientY - rect.top) / rect.height * 100).toFixed(1) + '%');
+        pending = null;
+      });
+    }, { passive: true });
+  }
+
+  // 宽屏左栏的位置：顶栏还看得见时贴在它下面 36px，顶栏滚出屏幕后停在离顶部 24px 处
+  const header = document.querySelector('.header');
+  if (header) {
+    let railFrame = null;
+    const placeRail = () => {
+      railFrame = null;
+      const top = Math.max(24, Math.round(header.getBoundingClientRect().bottom + 36));
+      document.documentElement.style.setProperty('--rail-top', top + 'px');
+    };
+    placeRail();
+    window.addEventListener('scroll', () => { if (!railFrame) railFrame = requestAnimationFrame(placeRail); }, { passive: true });
+    window.addEventListener('resize', placeRail, { passive: true });
+  }
+
+  // 首页上没有写摘要分隔的旧文章会整篇显示：裁成一小段预览，并补一个“阅读全文”按钮
+  document.querySelectorAll('.main-inner.index > .post-block').forEach(card => {
+    const body = card.querySelector('.post-body');
+    const link = card.querySelector('.post-title-link');
+    if (!body || !link || body.querySelector('.post-button')) return;
+    body.classList.add('y-clamped');
+    const button = document.createElement('div');
+    button.className = 'post-button';
+    button.innerHTML = '<a class="btn"></a>';
+    button.firstChild.href = link.href;
+    button.firstChild.textContent = '阅读全文 »';
+    body.after(button);
+  });
+
+  // 3. ACM 板子目录：输入关键词即时筛选 59 份板子 + 洛谷题号直达链接 + 快捷回顶筛选
+  const grid = document.querySelector('.board-grid');
+  if (grid) {
+    // 自动将“来源：Pxxxx”里的洛谷题号变成可点击链接
+    document.querySelectorAll('.post-body p').forEach(p => {
+      if (!p.textContent.trim().startsWith('来源：')) return;
+      p.innerHTML = p.innerHTML.replace(/\b(P\d{4,5})\b/g,
+        '<a class="luogu-link" href="https://www.luogu.com.cn/problem/$1" target="_blank" rel="noopener" title="在洛谷查看 $1 原题">$1</a>');
+    });
+
+    const box = document.createElement('div');
+    box.className = 'board-filter';
+    box.innerHTML = '<input type="search" placeholder="筛选板子（按 / 键快速聚焦），例如：线段树、背包、LCA" aria-label="筛选板子"><span class="board-filter-count"></span>';
+    grid.before(box);
+    const input = box.querySelector('input');
+    const count = box.querySelector('.board-filter-count');
+    const chips = [...grid.querySelectorAll('.board-chip')];
+    const filter = () => {
+      const words = input.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      let shown = 0;
+      chips.forEach(chip => {
+        const hit = words.every(word => chip.textContent.toLowerCase().includes(word));
+        chip.hidden = !hit;
+        if (hit) shown++;
+      });
+      grid.querySelectorAll('.board-group').forEach(group => {
+        const visible = group.querySelectorAll('.board-chip:not([hidden])').length;
+        const total = group.querySelectorAll('.board-chip').length;
+        group.hidden = !visible;
+        group.querySelector('.board-count').textContent = words.length ? `${visible} / ${total} 份` : `${total} 份`;
+      });
+      count.textContent = words.length ? (shown ? `找到 ${shown} 份` : '没有匹配的板子') : `共 ${chips.length} 份`;
+    };
+    input.addEventListener('input', filter);
+    input.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { input.value = ''; filter(); input.blur(); }
+    });
+    filter();
+
+    // 往下翻看板子时，右下角浮出“筛选板子”胶囊，或按 / 键直接跳回搜索框
+    const jumpBtn = document.createElement('button');
+    jumpBtn.type = 'button';
+    jumpBtn.className = 'board-jump-btn';
+    jumpBtn.setAttribute('aria-label', '回到板子筛选框');
+    jumpBtn.innerHTML = '<i class="fa fa-search"></i> <span>筛选板子</span>';
+    document.body.append(jumpBtn);
+
+    const jumpToFilter = () => {
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => { input.focus({ preventScroll: true }); input.select(); }, 260);
+    };
+    jumpBtn.addEventListener('click', jumpToFilter);
+
+    const toggleJumpBtn = () => {
+      const rect = grid.getBoundingClientRect();
+      jumpBtn.classList.toggle('show', rect.bottom < 0);
+    };
+    window.addEventListener('scroll', toggleJumpBtn, { passive: true });
+    toggleJumpBtn();
+
+    document.addEventListener('keydown', event => {
+      if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return;
+      const tag = document.activeElement && document.activeElement.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable) return;
+      event.preventDefault();
+      jumpToFilter();
+    });
+  }
+
+  // 4. 暖调夜间模式（Dark Mode）一键切换与图标同步
+  const root = document.documentElement;
+  const syncThemeUI = () => {
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    document.querySelectorAll('.theme-icon').forEach(icon => {
+      icon.classList.toggle('fa-moon', !isDark);
+      icon.classList.toggle('fa-sun', isDark);
+    });
+    document.querySelectorAll('.theme-label').forEach(label => {
+      label.textContent = isDark ? '日间' : '夜间';
+    });
+  };
+  syncThemeUI();
+
+  document.querySelectorAll('.theme-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('y-theme', next); } catch (e) {}
+      syncThemeUI();
+      toast(next === 'dark' ? '已切换为夜间护眼模式 🌙' : '已切换为日间纸张模式 ☀️');
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

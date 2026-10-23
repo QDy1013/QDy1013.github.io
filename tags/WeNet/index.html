@@ -3,6 +3,18 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+(() => {
+  try {
+    const saved = localStorage.getItem('y-theme');
+    if (saved === 'dark' || saved === 'light') {
+      document.documentElement.setAttribute('data-theme', saved);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  } catch (e) {}
+})();
+</script>
 <meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
@@ -110,6 +122,9 @@
   </div>
 
   <div class="site-nav-right">
+    <div class="toggle theme-toggle" aria-label="切换深浅色模式" role="button" tabindex="0" title="切换深色 / 浅色模式">
+      <i class="fa fa-moon fa-fw fa-lg theme-icon"></i>
+    </div>
     <div class="toggle popup-trigger" aria-label="搜索" role="button" tabindex="0">
         <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
@@ -124,6 +139,11 @@
         <a role="button" tabindex="0" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
       </li>
+    <li class="menu-item menu-item-theme">
+      <a role="button" tabindex="0" class="theme-toggle" aria-label="切换深浅色模式" title="切换深色 / 浅色模式">
+        <i class="fa fa-moon fa-fw theme-icon"></i><span class="theme-label">夜间</span>
+      </a>
+    </li>
   </ul>
 </nav>
 
@@ -184,18 +204,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-count">22</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -209,10 +229,16 @@
 <div class="sidebar-categories">
   <div class="sidebar-categories-title">按分类浏览</div>
   <nav class="home-card-links" aria-label="按分类浏览">
+      <a class="home-card-link" data-category="数学" href="/categories/%E6%95%B0%E5%AD%A6/">数学<span>2</span></a>
       <a class="home-card-link" data-category="算法" href="/categories/%E7%AE%97%E6%B3%95/">算法<span>2</span></a>
+      <a class="home-card-link" data-category="语音识别" href="/categories/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/">语音识别<span>3</span></a>
       <a class="home-card-link" data-category="随笔" href="/categories/%E9%9A%8F%E7%AC%94/">随笔<span>1</span></a>
-      <a class="home-card-link" data-category="语音识别" href="/categories/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/">语音识别<span>1</span></a>
   </nav>
+  <div class="sidebar-featured">
+    <a class="sidebar-featured-link" href="/2026/10/22/ACM%E7%AE%97%E6%B3%95%E6%9D%BF%E5%AD%90%E5%90%88%E9%9B%86/">
+      <span>📌</span> 59 份 ACM 板子速查
+    </a>
+  </div>
 </div>
 
         </div>
@@ -257,6 +283,26 @@
       <div class="post-title">
           <a class="post-title-link" href="/2026/10/22/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB%E7%A0%94%E7%A9%B6%E5%91%A8%E6%8A%A5/" itemprop="url">
             <span itemprop="name">语音识别研究周报：从 RNN 到 Transformer + CTC</span>
+          </a>
+      </div>
+
+      
+    </header>
+  </article>
+
+  <article itemscope itemtype="https://schema.org/Article">
+    <header class="post-header">
+      <div class="post-meta-container">
+        <time itemprop="dateCreated"
+              datetime="2026-10-17T19:00:00+08:00"
+              content="2026-10-17">
+          10-17
+        </time>
+      </div>
+
+      <div class="post-title">
+          <a class="post-title-link" href="/2026/10/17/WeNet%E8%AE%BA%E6%96%87%E5%85%A5%E9%97%A8%E5%AF%BC%E8%AF%BB/" itemprop="url">
+            <span itemprop="name">WeNet 论文入门导读：从 Fbank 到 U2 两遍识别与流式统一</span>
           </a>
       </div>
 
@@ -495,6 +541,30 @@
       jumpToFilter();
     });
   }
+
+  // 4. 暖调夜间模式（Dark Mode）一键切换与图标同步
+  const root = document.documentElement;
+  const syncThemeUI = () => {
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    document.querySelectorAll('.theme-icon').forEach(icon => {
+      icon.classList.toggle('fa-moon', !isDark);
+      icon.classList.toggle('fa-sun', isDark);
+    });
+    document.querySelectorAll('.theme-label').forEach(label => {
+      label.textContent = isDark ? '日间' : '夜间';
+    });
+  };
+  syncThemeUI();
+
+  document.querySelectorAll('.theme-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('y-theme', next); } catch (e) {}
+      syncThemeUI();
+      toast(next === 'dark' ? '已切换为夜间护眼模式 🌙' : '已切换为日间纸张模式 ☀️');
+    });
+  });
 })();
 </script>
 

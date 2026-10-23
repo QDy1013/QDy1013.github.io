@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+(() => {
+  try {
+    const saved = localStorage.getItem('y-theme');
+    if (saved === 'dark' || saved === 'light') {
+      document.documentElement.setAttribute('data-theme', saved);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  } catch (e) {}
+})();
+</script>
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="preconnect" href="https://fonts.loli.net">
+<link rel="preconnect" href="https://gstatic.loli.net" crossorigin>
+<link rel="stylesheet" href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap"></noscript>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"qdy1013.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"atom-one-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":400},"language":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"top_n_per_article":3,"unescape":false,"preload":true}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="这是一份面向算法竞赛（ACM &#x2F; ICPC &#x2F; 蓝桥杯 &#x2F; 考研机试）的常用数学结论与模型触发速查手册，涵盖组合计数、数论、图论计数、博弈论、线性代数、多项式与卷积、几何与平面图、概率与期望八大板块，并在文末附带「题面信号 $\to$ 优先联想」的考场识别清单。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ACM 常用数学结论研究笔记：组合、数论、图计数与博弈速查">
+<meta property="og:url" content="https://qdy1013.github.io/2026/10/19/ACM%E5%B8%B8%E7%94%A8%E6%95%B0%E5%AD%A6%E7%BB%93%E8%AE%BA%E7%A0%94%E7%A9%B6%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="奇点Y的随笔">
+<meta property="og:description" content="这是一份面向算法竞赛（ACM &#x2F; ICPC &#x2F; 蓝桥杯 &#x2F; 考研机试）的常用数学结论与模型触发速查手册，涵盖组合计数、数论、图论计数、博弈论、线性代数、多项式与卷积、几何与平面图、概率与期望八大板块，并在文末附带「题面信号 $\to$ 优先联想」的考场识别清单。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-10-19T12:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-23T06:18:25.163Z">
+<meta property="article:author" content="奇点Y">
+<meta property="article:tag" content="ACM">
+<meta property="article:tag" content="博弈论">
+<meta property="article:tag" content="数论">
+<meta property="article:tag" content="生成函数">
+<meta property="article:tag" content="算法模板">
+<meta property="article:tag" content="组合数学">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://qdy1013.github.io/2026/10/19/ACM%E5%B8%B8%E7%94%A8%E6%95%B0%E5%AD%A6%E7%BB%93%E8%AE%BA%E7%A0%94%E7%A9%B6%E7%AC%94%E8%AE%B0/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://qdy1013.github.io/2026/10/19/ACM%E5%B8%B8%E7%94%A8%E6%95%B0%E5%AD%A6%E7%BB%93%E8%AE%BA%E7%A0%94%E7%A9%B6%E7%AC%94%E8%AE%B0/","path":"2026/10/19/ACM常用数学结论研究笔记/","title":"ACM 常用数学结论研究笔记：组合、数论、图计数与博弈速查"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ACM 常用数学结论研究笔记：组合、数论、图计数与博弈速查 | 奇点Y的随笔</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" integrity="sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=" crossorigin="anonymous">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<script class="next-config" data-name="katex" type="application/json">{"copy_tex_js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/copy-tex.min.js","integrity":"sha256-Us54+rSGDSTvIhKKUs4kygE2ipA0RXpWWh0/zLqw3bs="}}</script>
+<script src="/js/third-party/math/katex.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="https://schema.org/WebPage">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="https://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" aria-expanded="false" aria-controls="site-nav" role="button" tabindex="0">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">奇点Y的随笔</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">感谢支持</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle theme-toggle" aria-label="切换深浅色模式" role="button" tabindex="0" title="切换深色 / 浅色模式">
+      <i class="fa fa-moon fa-fw fa-lg theme-icon"></i>
+    </div>
+    <div class="toggle popup-trigger" aria-label="搜索" role="button" tabindex="0">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav id="site-nav" class="site-nav" aria-label="主导航">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" tabindex="0" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+    <li class="menu-item menu-item-theme">
+      <a role="button" tabindex="0" class="theme-toggle" aria-label="切换深浅色模式" title="切换深色 / 浅色模式">
+        <i class="fa fa-moon fa-fw theme-icon"></i><span class="theme-label">夜间</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup" role="dialog" aria-modal="true" aria-label="站内搜索">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input aria-label="搜索文章" autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span aria-label="关闭搜索" class="popup-btn-close" role="button" tabindex="0">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container" aria-live="polite" aria-busy="false">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%93%8A-%E4%BC%98%E5%85%88%E7%BA%A7%E9%80%9F%E8%A7%88"><span class="nav-number">1.</span> <span class="nav-text">📊 优先级速览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81-%E7%BB%84%E5%90%88%E8%AE%A1%E6%95%B0"><span class="nav-number">2.</span> <span class="nav-text">一、 组合计数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Catalan-%E6%95%B0%EF%BC%88%E5%8D%A1%E7%89%B9%E5%85%B0%E6%95%B0%EF%BC%89"><span class="nav-number">2.1.</span> <span class="nav-text">1. Catalan 数（卡特兰数）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Ballot-%E5%AE%9A%E7%90%86%EF%BC%88%E6%8A%95%E7%A5%A8%E5%AE%9A%E7%90%86-Bertrand-Ballot%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">2. Ballot 定理（投票定理 &#x2F; Bertrand Ballot）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Raney-%E5%BC%95%E7%90%86%EF%BC%88%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%90%86-Cycle-Lemma%EF%BC%89"><span class="nav-number">2.3.</span> <span class="nav-text">3. Raney 引理（循环引理 &#x2F; Cycle Lemma）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%AE%B9%E6%96%A5%E5%8E%9F%E7%90%86%EF%BC%88Inclusion-Exclusion-Principle%EF%BC%89"><span class="nav-number">2.4.</span> <span class="nav-text">4. 容斥原理（Inclusion-Exclusion Principle）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E9%94%99%E6%8E%92%E5%85%AC%E5%BC%8F%EF%BC%88Derangement%EF%BC%89"><span class="nav-number">2.5.</span> <span class="nav-text">5. 错排公式（Derangement）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Lucas-%E5%AE%9A%E7%90%86"><span class="nav-number">2.6.</span> <span class="nav-text">6. Lucas 定理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-Vandermonde-%E6%81%92%E7%AD%89%E5%BC%8F%EF%BC%88%E8%8C%83%E5%BE%B7%E8%92%99%E5%BE%B7%E5%8D%B7%E7%A7%AF%EF%BC%89"><span class="nav-number">2.7.</span> <span class="nav-text">7. Vandermonde 恒等式（范德蒙德卷积）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-Burnside-%E5%BC%95%E7%90%86%E4%B8%8E-Polya-%E8%AE%A1%E6%95%B0"><span class="nav-number">2.8.</span> <span class="nav-text">8. Burnside 引理与 Pólya 计数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-Stirling-%E6%95%B0%E4%B8%8E-Bell-%E6%95%B0%EF%BC%88%E6%96%AF%E7%89%B9%E6%9E%97%E6%95%B0%E4%B8%8E%E8%B4%9D%E5%B0%94%E6%95%B0%EF%BC%89"><span class="nav-number">2.9.</span> <span class="nav-text">9. Stirling 数与 Bell 数（斯特林数与贝尔数）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-%E9%9A%94%E6%9D%BF%E6%B3%95%EF%BC%88Stars-and-Bars%EF%BC%89"><span class="nav-number">2.10.</span> <span class="nav-text">10. 隔板法（Stars and Bars）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81-%E6%95%B0%E8%AE%BA"><span class="nav-number">3.</span> <span class="nav-text">二、 数论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E8%B4%B9%E9%A9%AC%E5%B0%8F%E5%AE%9A%E7%90%86%E4%B8%8E%E6%AC%A7%E6%8B%89%E5%AE%9A%E7%90%86"><span class="nav-number">3.1.</span> <span class="nav-text">1. 费马小定理与欧拉定理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%89%A9%E5%B1%95%E6%AC%A7%E5%87%A0%E9%87%8C%E5%BE%97%EF%BC%88exgcd%EF%BC%89%E4%B8%8E%E4%B8%AD%E5%9B%BD%E5%89%A9%E4%BD%99%E5%AE%9A%E7%90%86%EF%BC%88CRT-EXCRT%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">2. 扩展欧几里得（exgcd）与中国剩余定理（CRT &#x2F; EXCRT）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Mobius-%E5%8F%8D%E6%BC%94%EF%BC%88%E8%8E%AB%E6%AF%94%E4%B9%8C%E6%96%AF%E5%8F%8D%E6%BC%94%EF%BC%89"><span class="nav-number">3.3.</span> <span class="nav-text">3. Möbius 反演（莫比乌斯反演）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Wilson-%E5%AE%9A%E7%90%86%E4%B8%8E%E4%BA%8C%E6%AC%A1%E5%89%A9%E4%BD%99"><span class="nav-number">3.4.</span> <span class="nav-text">4. Wilson 定理与二次剩余</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81-%E5%9B%BE%E8%AE%BA%E8%AE%A1%E6%95%B0"><span class="nav-number">4.</span> <span class="nav-text">三、 图论计数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Cayley-%E5%85%AC%E5%BC%8F%E4%B8%8E-Prufer-%E5%BA%8F%E5%88%97"><span class="nav-number">4.1.</span> <span class="nav-text">1. Cayley 公式与 Prüfer 序列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%9F%A9%E9%98%B5%E6%A0%91%E5%AE%9A%E7%90%86%EF%BC%88Kirchhoff-%E5%AE%9A%E7%90%86%EF%BC%89"><span class="nav-number">4.2.</span> <span class="nav-text">2. 矩阵树定理（Kirchhoff 定理）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81-%E5%8D%9A%E5%BC%88%E8%AE%BA"><span class="nav-number">5.</span> <span class="nav-text">四、 博弈论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Nim-%E5%BC%82%E6%88%96%E5%AE%9A%E7%90%86%E4%B8%8E-SG-%E5%87%BD%E6%95%B0%EF%BC%88Sprague%E2%80%93Grundy-%E5%AE%9A%E7%90%86%EF%BC%89"><span class="nav-number">5.1.</span> <span class="nav-text">1. Nim 异或定理与 SG 函数（Sprague–Grundy 定理）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81-%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0%E3%80%81%E5%A4%9A%E9%A1%B9%E5%BC%8F%E4%B8%8E%E5%87%A0%E4%BD%95"><span class="nav-number">6.</span> <span class="nav-text">五、 线性代数、多项式与几何</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0%E4%B8%89%E5%89%91%E5%AE%A2"><span class="nav-number">6.1.</span> <span class="nav-text">1. 线性代数三剑客</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%A4%9A%E9%A1%B9%E5%BC%8F%E4%B8%8E%E5%8D%B7%E7%A7%AF"><span class="nav-number">6.2.</span> <span class="nav-text">2. 多项式与卷积</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%87%A0%E4%BD%95%E4%B8%8E%E5%B9%B3%E9%9D%A2%E5%9B%BE"><span class="nav-number">6.3.</span> <span class="nav-text">3. 几何与平面图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%A6%82%E7%8E%87%E4%B8%8E%E6%9C%9F%E6%9C%9B"><span class="nav-number">6.4.</span> <span class="nav-text">4. 概率与期望</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%9D%E3%80%81-%E8%80%83%E5%9C%BA%E9%A2%98%E9%9D%A2%E4%BF%A1%E5%8F%B7%E8%AF%86%E5%88%AB%E6%B8%85%E5%8D%95"><span class="nav-number">7.</span> <span class="nav-text">九、 考场题面信号识别清单</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="https://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="奇点Y"
+      src="/images/avatar.webp">
+  <p class="site-author-name" itemprop="name">奇点Y</p>
+  <div class="site-description" itemprop="description">记录个人心得，和大家交流算法及高数相关问题</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/QDy1013" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;QDy1013" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+<div class="sidebar-categories">
+  <div class="sidebar-categories-title">按分类浏览</div>
+  <nav class="home-card-links" aria-label="按分类浏览">
+      <a class="home-card-link" data-category="数学" href="/categories/%E6%95%B0%E5%AD%A6/">数学<span>2</span></a>
+      <a class="home-card-link" data-category="算法" href="/categories/%E7%AE%97%E6%B3%95/">算法<span>2</span></a>
+      <a class="home-card-link" data-category="语音识别" href="/categories/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/">语音识别<span>3</span></a>
+      <a class="home-card-link" data-category="随笔" href="/categories/%E9%9A%8F%E7%AC%94/">随笔<span>1</span></a>
+  </nav>
+  <div class="sidebar-featured">
+    <a class="sidebar-featured-link" href="/2026/10/22/ACM%E7%AE%97%E6%B3%95%E6%9D%BF%E5%AD%90%E5%90%88%E9%9B%86/">
+      <span>📌</span> 59 份 ACM 板子速查
+    </a>
+  </div>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div id="main-content" tabindex="-1" class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block" data-category="数学">
+  
+  
+
+  <article itemscope itemtype="https://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://qdy1013.github.io/2026/10/19/ACM%E5%B8%B8%E7%94%A8%E6%95%B0%E5%AD%A6%E7%BB%93%E8%AE%BA%E7%A0%94%E7%A9%B6%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.webp">
+      <meta itemprop="name" content="奇点Y">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="奇点Y的随笔">
+      <meta itemprop="description" content="记录个人心得，和大家交流算法及高数相关问题">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="https://schema.org/CreativeWork">
+      <meta itemprop="name" content="ACM 常用数学结论研究笔记：组合、数论、图计数与博弈速查 | 奇点Y的随笔">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ACM 常用数学结论研究笔记：组合、数论、图计数与博弈速查
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-10-19 20:00:00" itemprop="dateCreated datePublished" datetime="2026-10-19T20:00:00+08:00">2026-10-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-23 14:18:25" itemprop="dateModified" datetime="2026-10-23T14:18:25+08:00">2026-10-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E5%AD%A6/" itemprop="url" rel="index"><span itemprop="name">数学</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+<span class="post-meta-item" title="正文字数（不含代码）">
+  <span class="post-meta-item-icon"><i class="far fa-file-lines"></i></span>
+  <span>5364 字</span>
+</span>
+<span class="post-meta-item" title="预计阅读时间">
+  <span class="post-meta-item-icon"><i class="far fa-clock"></i></span>
+  <span>约 14 分钟</span>
+</span>
+
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>这是一份面向算法竞赛（ACM &#x2F; ICPC &#x2F; 蓝桥杯 &#x2F; 考研机试）的<strong>常用数学结论与模型触发速查手册</strong>，涵盖<strong>组合计数、数论、图论计数、博弈论、线性代数、多项式与卷积、几何与平面图、概率与期望</strong>八大板块，并在文末附带「题面信号 $\to$ 优先联想」的考场识别清单。</p>
+<span id="more"></span>
+
+<blockquote>
+<p><strong>💡 使用方式</strong></p>
+<ul>
+<li><strong>不要只背名字</strong>：重点记「<strong>看到什么题面模型，该联想到什么数学结论</strong>」。</li>
+<li>先掌握 Catalan、Ballot、Raney、容斥、Lucas、CRT、Möbius、Burnside、SG、矩阵树这些高频结论。</li>
+<li>每个结论至少配 2～3 道题练手，否则比赛时很难从题面识别出来。</li>
+<li>公式里的除法在模质数下通常写成乘逆元；组合数要提前确认预处理范围。</li>
+</ul>
+</blockquote>
+<h2 id="📊-优先级速览"><a href="#📊-优先级速览" class="headerlink" title="📊 优先级速览"></a>📊 优先级速览</h2><table>
+<thead>
+<tr>
+<th align="center">优先级</th>
+<th align="left">核心结论</th>
+<th align="left">为什么重要</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>🔥 必会</strong></td>
+<td align="left">Catalan、Ballot、容斥、Lucas、CRT、扩展欧几里得、Nim &#x2F; SG</td>
+<td align="left">出现频率极高，模板化强，银牌区间经常直接考</td>
+</tr>
+<tr>
+<td align="center"><strong>⭐ 强烈建议</strong></td>
+<td align="left">Raney &#x2F; 循环引理、Burnside &#x2F; Pólya、Möbius 反演、矩阵树定理、Prüfer 序列</td>
+<td align="left">属于“见过就很快，没见过很难现场造”的结论</td>
+</tr>
+<tr>
+<td align="center"><strong>🚀 进阶</strong></td>
+<td align="left">杜教筛、二次剩余、BEST 定理、拉格朗日插值、FWT、生成函数</td>
+<td align="left">多校、区域赛、强校联训里常用于拉开区分度</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="一、-组合计数"><a href="#一、-组合计数" class="headerlink" title="一、 组合计数"></a>一、 组合计数</h2><h3 id="1-Catalan-数（卡特兰数）"><a href="#1-Catalan-数（卡特兰数）" class="headerlink" title="1. Catalan 数（卡特兰数）"></a>1. Catalan 数（卡特兰数）</h3><ul>
+<li><strong>模型触发</strong>：<ul>
+<li>合法括号序列、栈的合法出栈序列；</li>
+<li>网格路径不越过对角线；</li>
+<li>二叉树形态计数、凸多边形三角剖分。</li>
+</ul>
+</li>
+<li><strong>核心公式</strong>：<br>$$\mathrm{Cat}_n = \frac{1}{n+1}\binom{2n}{n} = \binom{2n}{n} - \binom{2n}{n+1}$$</li>
+<li><strong>常见用途</strong>：判断前缀合法的序列计数；把“不越界”路径转成反射法（折线法）。</li>
+<li><strong>注意点</strong>：严格区分<strong>严格不越过</strong>与<strong>不超过</strong>边界的偏移量差别。</li>
+</ul>
+<h3 id="2-Ballot-定理（投票定理-Bertrand-Ballot）"><a href="#2-Ballot-定理（投票定理-Bertrand-Ballot）" class="headerlink" title="2. Ballot 定理（投票定理 &#x2F; Bertrand Ballot）"></a>2. Ballot 定理（投票定理 &#x2F; Bertrand Ballot）</h3><ul>
+<li><strong>模型触发</strong>：$A$ 与 $B$ 的票数&#x2F;步数固定（$a &gt; b$），要求 $A$ 全程<strong>严格领先</strong> $B$（等价于一维前缀和始终为正）。</li>
+<li><strong>核心公式</strong>：<br>$$\text{严格领先方案数} = \frac{a - b}{a + b}\binom{a + b}{b}$$<br>（非严格领先常可转为 Catalan 或反射法。）</li>
+<li><strong>常见用途</strong>：投票、路径不穿线、比赛比分全程领先。</li>
+</ul>
+<h3 id="3-Raney-引理（循环引理-Cycle-Lemma）"><a href="#3-Raney-引理（循环引理-Cycle-Lemma）" class="headerlink" title="3. Raney 引理（循环引理 &#x2F; Cycle Lemma）"></a>3. Raney 引理（循环引理 &#x2F; Cycle Lemma）</h3><ul>
+<li><strong>模型触发</strong>：<ul>
+<li>一串步长总和为正，要求<strong>所有前缀和均为正</strong>；</li>
+<li>允许步长不是简单的 $+1/-1$（例如 $+1$ 与 $1-c$）；</li>
+<li>题面出现“初始资源 $n$、中途不能耗尽、最后刚好归零”时优先联想。</li>
+</ul>
+</li>
+<li><strong>核心公式</strong>：<ul>
+<li>若整数序列 $x_i \le 1$ 且 $\sum_{i=1}^m x_i = r &gt; 0$，则其所有 $m$ 个循环移位中<strong>恰有 $r$ 个</strong>满足前缀和全为正。</li>
+<li>常见合法数模型：$\frac{n}{m}\binom{m}{k}$。</li>
+</ul>
+</li>
+<li><strong>注意点</strong>：循环类大小通常是 $m$；若序列有周期，用标准引理处理，不要手动乱除。</li>
+</ul>
+<h3 id="4-容斥原理（Inclusion-Exclusion-Principle）"><a href="#4-容斥原理（Inclusion-Exclusion-Principle）" class="headerlink" title="4. 容斥原理（Inclusion-Exclusion Principle）"></a>4. 容斥原理（Inclusion-Exclusion Principle）</h3><ul>
+<li><strong>模型触发</strong>：要求“至少一个条件满足”或“没有任何条件满足”；限制很多但每个限制子集单独计算容易。</li>
+<li><strong>核心公式</strong>：<br>$$\left|\bigcup_{i=1}^n A_i\right| = \sum_i |A_i| - \sum_{i&lt;j}|A_i \cap A_j| + \sum_{i&lt;j&lt;k}|A_i \cap A_j \cap A_k| - \cdots$$<br>（求“恰好 $k$ 个满足”常用<strong>二项式反演</strong>形式。）</li>
+</ul>
+<h3 id="5-错排公式（Derangement）"><a href="#5-错排公式（Derangement）" class="headerlink" title="5. 错排公式（Derangement）"></a>5. 错排公式（Derangement）</h3><ul>
+<li><strong>模型触发</strong>：$n$ 个元素排列，要求每个元素都不在原来的位置（$\pi_i \ne i$）。</li>
+<li><strong>核心公式</strong>：<br>$$D_n = n! \sum_{i=0}^n \frac{(-1)^i}{i!}, \qquad D_n = (n-1)(D_{n-1} + D_{n-2})$$</li>
+</ul>
+<h3 id="6-Lucas-定理"><a href="#6-Lucas-定理" class="headerlink" title="6. Lucas 定理"></a>6. Lucas 定理</h3><ul>
+<li><strong>模型触发</strong>：$n, m$ 很大（如 $10^{18}$），模数 $p$ 是较小质数，求 $\binom{n}{m} \bmod p$。</li>
+<li><strong>核心公式</strong>：<br>$$\binom{n}{m} \equiv \prod_i \binom{n_i}{m_i} \pmod p$$<br>其中 $n_i, m_i$ 是 $n, m$ 在 $p$ 进制下的各位数字。</li>
+<li><strong>注意点</strong>：模数必须是质数；合数模数要拆 CRT 或用扩展 Lucas（exLucas）。</li>
+</ul>
+<h3 id="7-Vandermonde-恒等式（范德蒙德卷积）"><a href="#7-Vandermonde-恒等式（范德蒙德卷积）" class="headerlink" title="7. Vandermonde 恒等式（范德蒙德卷积）"></a>7. Vandermonde 恒等式（范德蒙德卷积）</h3><ul>
+<li><strong>模型触发</strong>：组合数卷积，左右两部分各选若干个，总共选 $n$ 个。</li>
+<li><strong>核心公式</strong>：<br>$$\sum_i \binom{a}{i}\binom{b}{n-i} = \binom{a+b}{n}$$</li>
+</ul>
+<h3 id="8-Burnside-引理与-Polya-计数"><a href="#8-Burnside-引理与-Polya-计数" class="headerlink" title="8. Burnside 引理与 Pólya 计数"></a>8. Burnside 引理与 Pólya 计数</h3><ul>
+<li><strong>模型触发</strong>：旋转、翻转、置换后视为同一种方案，问<strong>本质不同</strong>的染色、排列或图形数量。</li>
+<li><strong>核心公式</strong>：<br>$$\text{本质不同方案数} = \frac{1}{|G|} \sum_{g \in G} |X^g|$$<br>即“所有群作用下的不动点数量之和 $\div$ 群大小”。在 $m$ 色染色问题中，置换 $g$ 的不动点数为 $m^{c(g)}$（$c(g)$ 为置换环个数）。</li>
+<li><strong>注意点</strong>：必须明确“哪些变换视为相同”（仅旋转 vs 旋转+翻转，群大小 $|G|$ 不同）。</li>
+</ul>
+<h3 id="9-Stirling-数与-Bell-数（斯特林数与贝尔数）"><a href="#9-Stirling-数与-Bell-数（斯特林数与贝尔数）" class="headerlink" title="9. Stirling 数与 Bell 数（斯特林数与贝尔数）"></a>9. Stirling 数与 Bell 数（斯特林数与贝尔数）</h3><ul>
+<li><strong>模型触发</strong>：把 $n$ 个不同元素分成 $k$ 个非空无序组（第二类斯特林数）；或将 $n$ 个元素排成 $k$ 个轮换（第一类斯特林数）。</li>
+<li><strong>核心公式</strong>：<br>$$\left\{ \begin{matrix} n \\ k \end{matrix} \right\} = \left\{ \begin{matrix} n-1 \\ k-1 \end{matrix} \right\} + k \left\{ \begin{matrix} n-1 \\ k \end{matrix} \right\}, \qquad B_n = \sum_{k=0}^n \left\{ \begin{matrix} n \\ k \end{matrix} \right\}$$</li>
+</ul>
+<h3 id="10-隔板法（Stars-and-Bars）"><a href="#10-隔板法（Stars-and-Bars）" class="headerlink" title="10. 隔板法（Stars and Bars）"></a>10. 隔板法（Stars and Bars）</h3><ul>
+<li><strong>模型触发</strong>：把 $n$ 个相同物品分给 $k$ 个不同盒子（不定方程整数解个数）。</li>
+<li><strong>核心公式</strong>：<ul>
+<li>非负整数解（$x_1 + \cdots + x_k = n,\; x_i \ge 0$）：$\displaystyle\binom{n+k-1}{k-1}$</li>
+<li>正整数解（$x_1 + \cdots + x_k = n,\; x_i \ge 1$）：$\displaystyle\binom{n-1}{k-1}$</li>
+<li>若有上界限制 $x_i \le u_i$，通常结合<strong>容斥原理</strong>。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="二、-数论"><a href="#二、-数论" class="headerlink" title="二、 数论"></a>二、 数论</h2><h3 id="1-费马小定理与欧拉定理"><a href="#1-费马小定理与欧拉定理" class="headerlink" title="1. 费马小定理与欧拉定理"></a>1. 费马小定理与欧拉定理</h3><ul>
+<li><strong>费马小定理</strong>（$p$ 为质数，$\gcd(a, p) = 1$）：<br>$$a^{p-1} \equiv 1 \pmod p \implies a^{-1} \equiv a^{p-2} \pmod p$$</li>
+<li><strong>欧拉定理</strong>（任意模数 $m$，$\gcd(a, m) = 1$）：<br>$$a^{\varphi(m)} \equiv 1 \pmod m$$</li>
+</ul>
+<h3 id="2-扩展欧几里得（exgcd）与中国剩余定理（CRT-EXCRT）"><a href="#2-扩展欧几里得（exgcd）与中国剩余定理（CRT-EXCRT）" class="headerlink" title="2. 扩展欧几里得（exgcd）与中国剩余定理（CRT &#x2F; EXCRT）"></a>2. 扩展欧几里得（exgcd）与中国剩余定理（CRT &#x2F; EXCRT）</h3><ul>
+<li><strong>exgcd</strong>：求解 $ax + by = \gcd(a, b)$；$a$ 在 $\bmod m$ 下有逆元 $\iff \gcd(a, m) = 1$。</li>
+<li><strong>CRT &#x2F; EXCRT</strong>：合并同余方程组 $x \equiv a_i \pmod{m_i}$。模数不互质时用 EXCRT 逐条通过 exgcd 合并，必须检查 $(a_i - a_j)$ 能否被 $\gcd(m_i, m_j)$ 整除。</li>
+</ul>
+<h3 id="3-Mobius-反演（莫比乌斯反演）"><a href="#3-Mobius-反演（莫比乌斯反演）" class="headerlink" title="3. Möbius 反演（莫比乌斯反演）"></a>3. Möbius 反演（莫比乌斯反演）</h3><ul>
+<li><strong>模型触发</strong>：出现 $\gcd$、互质对计数、约数求和；已知 $F(n) = \sum_{d \mid n} G(d)$ 求 $G(n)$。</li>
+<li><strong>核心公式</strong>：<br>$$G(n) = \sum_{d \mid n} \mu(d)\,F\!\left(\frac{n}{d}\right), \qquad [\gcd(i, j) = 1] = \sum_{d \mid \gcd(i, j)} \mu(d)$$</li>
+<li><strong>常见搭档</strong>：线性筛预处理 $\mu$ 前缀和 + <strong>整除分块</strong> $\mathcal{O}(\sqrt{n})$ 单次查询。</li>
+</ul>
+<h3 id="4-Wilson-定理与二次剩余"><a href="#4-Wilson-定理与二次剩余" class="headerlink" title="4. Wilson 定理与二次剩余"></a>4. Wilson 定理与二次剩余</h3><ul>
+<li><strong>Wilson 定理</strong>：$(p-1)! \equiv -1 \pmod p \iff p$ 是质数。</li>
+<li><strong>二次剩余（Euler 判别法）</strong>：对奇质数 $p$，方程 $x^2 \equiv a \pmod p$ 有非零解当且仅当<br>$$a^{\frac{p-1}{2}} \equiv 1 \pmod p$$<br>（求根可使用 Cipolla 或 Tonelli–Shanks 算法。）</li>
+</ul>
+<hr>
+<h2 id="三、-图论计数"><a href="#三、-图论计数" class="headerlink" title="三、 图论计数"></a>三、 图论计数</h2><h3 id="1-Cayley-公式与-Prufer-序列"><a href="#1-Cayley-公式与-Prufer-序列" class="headerlink" title="1. Cayley 公式与 Prüfer 序列"></a>1. Cayley 公式与 Prüfer 序列</h3><ul>
+<li><strong>Cayley 公式</strong>：$n$ 个带标号顶点的无根树总数为 $n^{n-2}$（完全图 $K_n$ 的生成树个数）。</li>
+<li><strong>Prüfer 序列</strong>：带标号无根树与长度为 $n-2$、值域 $[1, n]$ 的序列一一对应，且点 $i$ 的度数 $d_i = (\text{序列中 } i \text{ 出现的次数}) + 1$。</li>
+<li><strong>给定度数序列的树数量</strong>：<br>$$\frac{(n-2)!}{\prod_{i=1}^n (d_i - 1)!}$$</li>
+</ul>
+<h3 id="2-矩阵树定理（Kirchhoff-定理）"><a href="#2-矩阵树定理（Kirchhoff-定理）" class="headerlink" title="2. 矩阵树定理（Kirchhoff 定理）"></a>2. 矩阵树定理（Kirchhoff 定理）</h3><ul>
+<li><strong>模型触发</strong>：求一般无向图&#x2F;有向图的生成树数量（或边权乘积之和）。</li>
+<li><strong>核心公式</strong>：构造拉普拉斯矩阵 $L = D - A$（即 $L_{ii} = \deg(i)$，$L_{ij} = -\text{edge\_count}(i, j)$），删去任意第 $k$ 行和第 $k$ 列后的主子式行列式 $\det(L^{(k)})$ 即为生成树数量。</li>
+</ul>
+<hr>
+<h2 id="四、-博弈论"><a href="#四、-博弈论" class="headerlink" title="四、 博弈论"></a>四、 博弈论</h2><h3 id="1-Nim-异或定理与-SG-函数（Sprague–Grundy-定理）"><a href="#1-Nim-异或定理与-SG-函数（Sprague–Grundy-定理）" class="headerlink" title="1. Nim 异或定理与 SG 函数（Sprague–Grundy 定理）"></a>1. Nim 异或定理与 SG 函数（Sprague–Grundy 定理）</h3><ul>
+<li><strong>Nim 定理</strong>：$n$ 堆石子 $a_1, \dots, a_n$，先手必败当且仅当<br>$$a_1 \oplus a_2 \oplus \cdots \oplus a_n = 0.$$</li>
+<li><strong>SG 函数</strong>：在公平组合游戏（ICG）中，定义<br>$$\mathrm{SG}(x) = \mathrm{mex}\{\mathrm{SG}(y) \mid x \to y\}, \qquad \mathrm{SG}_{\text{总}} = \mathrm{SG}(x_1) \oplus \mathrm{SG}(x_2) \oplus \cdots \oplus \mathrm{SG}(x_k).$$</li>
+</ul>
+<hr>
+<h2 id="五、-线性代数、多项式与几何"><a href="#五、-线性代数、多项式与几何" class="headerlink" title="五、 线性代数、多项式与几何"></a>五、 线性代数、多项式与几何</h2><h3 id="1-线性代数三剑客"><a href="#1-线性代数三剑客" class="headerlink" title="1. 线性代数三剑客"></a>1. 线性代数三剑客</h3><ul>
+<li><strong>高斯消元</strong>：实数&#x2F;模数解方程、树&#x2F;图上随机游走概率期望方程；$\mathbb{F}_2$ 异或方程组常用 <code>std::bitset</code> 优化至 $\mathcal{O}(n^3 / w)$。</li>
+<li><strong>矩阵快速幂</strong>：状态转移固定，求第 $n$ 项或走 $n$ 步后的状态 $F_n = A^n F_0$。</li>
+<li><strong>异或线性基</strong>：维护 $\mathbb{F}_2$ 下的一组极大线性无关组，支持 $\mathcal{O}(\log V)$ 插入、最大&#x2F;最小异或查询、第 $k$ 小异或查询。</li>
+</ul>
+<h3 id="2-多项式与卷积"><a href="#2-多项式与卷积" class="headerlink" title="2. 多项式与卷积"></a>2. 多项式与卷积</h3><ul>
+<li><strong>NTT &#x2F; FFT</strong>：加速加法卷积 $c_k = \sum_{i} a_i b_{k-i}$（常用 NTT 模数 $998244353$，原根 $g = 3$）。</li>
+<li><strong>FWT（快速沃尔什变换）</strong>：加速位运算卷积 $c_k = \sum_{i \odot j = k} a_i b_j$（其中 $\odot \in \{\mathrm{OR}, \mathrm{AND}, \mathrm{XOR}\}$）。</li>
+<li><strong>拉格朗日插值</strong>：$n$ 次多项式由 $n+1$ 个点值唯一确定；若横坐标连续取值 $1 \dots n+1$，可 $\mathcal{O}(n)$ 求出任意单点 $f(k)$。</li>
+</ul>
+<h3 id="3-几何与平面图"><a href="#3-几何与平面图" class="headerlink" title="3. 几何与平面图"></a>3. 几何与平面图</h3><ul>
+<li><strong>鞋带公式（Shoelace Formula）</strong>：简单多边形面积 $2S = \left|\sum_{i=1}^n (x_i y_{i+1} - x_{i+1} y_i)\right|$。</li>
+<li><strong>Pick 定理</strong>：顶点均为整点的简单格点多边形，面积 $S = I + \frac{B}{2} - 1$（$I$ 为内部格点数，$B$ 为边界格点数）。</li>
+<li><strong>平面图欧拉公式</strong>：连通平面图满足 $V - E + F = 2$（若含 $c$ 个连通块则为 $V - E + F = c + 1$）。</li>
+</ul>
+<h3 id="4-概率与期望"><a href="#4-概率与期望" class="headerlink" title="4. 概率与期望"></a>4. 概率与期望</h3><ul>
+<li><strong>期望线性性</strong>：$\mathbb{E}[X + Y] = \mathbb{E}[X] + \mathbb{E}[Y]$（<strong>不要求独立</strong>！常把全局复杂期望拆成每个元素&#x2F;每条边&#x2F;每个位置的指示器变量 $0/1$ 贡献概率之和）。</li>
+</ul>
+<hr>
+<h2 id="九、-考场题面信号识别清单"><a href="#九、-考场题面信号识别清单" class="headerlink" title="九、 考场题面信号识别清单"></a>九、 考场题面信号识别清单</h2><table>
+<thead>
+<tr>
+<th align="left">题面信号 &#x2F; 关键词</th>
+<th align="left">优先联想工具</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">括号序列、网格路径不越对角线、合法进出栈</td>
+<td align="left"><strong>Catalan 数</strong>、<strong>Ballot 定理</strong>、反射法</td>
+</tr>
+<tr>
+<td align="left">初始资源 $n$，中途不能为 $0$&#x2F;负，最后刚好归零</td>
+<td align="left"><strong>Raney 引理（循环引理）</strong></td>
+</tr>
+<tr>
+<td align="left">“至少一个满足” &#x2F; “没有任何满足” &#x2F; 恰好 $k$ 个满足</td>
+<td align="left"><strong>容斥原理</strong>、<strong>二项式反演</strong></td>
+</tr>
+<tr>
+<td align="left">出现 $\gcd(i,j)$、互质对、约数和</td>
+<td align="left"><strong>Möbius 反演</strong> + 整除分块</td>
+</tr>
+<tr>
+<td align="left">超大组合数 $\binom{n}{m} \bmod p$（$p$ 为小质数）</td>
+<td align="left"><strong>Lucas 定理</strong></td>
+</tr>
+<tr>
+<td align="left">旋转、翻转后视为同一种方案（求本质不同数）</td>
+<td align="left"><strong>Burnside 引理</strong>、<strong>Pólya 计数</strong></td>
+</tr>
+<tr>
+<td align="left">带标号无根树计数、限制点度数的树计数</td>
+<td align="left"><strong>Cayley 公式</strong>、<strong>Prüfer 序列</strong>、<strong>矩阵树定理</strong></td>
+</tr>
+<tr>
+<td align="left">若干独立子游戏轮流操作、有向无环图移动棋子</td>
+<td align="left"><strong>Nim 异或定理</strong>、<strong>SG 函数</strong></td>
+</tr>
+<tr>
+<td align="left">固定线性转移做 $10^{18}$ 步</td>
+<td align="left"><strong>矩阵快速幂</strong></td>
+</tr>
+<tr>
+<td align="left">两数组下标相加合并 &#x2F; 位运算合并</td>
+<td align="left"><strong>NTT &#x2F; FFT</strong>、<strong>FWT</strong></td>
+</tr>
+<tr>
+<td align="left">答案是关于 $n$ 的低次多项式，求超大 $n$ 处的值</td>
+<td align="left"><strong>拉格朗日插值</strong></td>
+</tr>
+</tbody></table>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E8%AE%BA/" rel="tag"># 数论</a>
+              <a href="/tags/%E7%BB%84%E5%90%88%E6%95%B0%E5%AD%A6/" rel="tag"># 组合数学</a>
+              <a href="/tags/%E5%8D%9A%E5%BC%88%E8%AE%BA/" rel="tag"># 博弈论</a>
+              <a href="/tags/%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0/" rel="tag"># 生成函数</a>
+              <a href="/tags/ACM/" rel="tag"># ACM</a>
+              <a href="/tags/%E7%AE%97%E6%B3%95%E6%A8%A1%E6%9D%BF/" rel="tag"># 算法模板</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/10/18/%E6%AD%A3%E5%88%99%E5%8C%96%E4%B8%8E%E5%AD%A6%E4%B9%A0%E7%8E%87%E8%B0%83%E5%BA%A6%E5%AD%A6%E4%B9%A0%E8%AE%B2%E4%B9%89/" rel="prev" title="语音识别中的正则化与学习率调度：SpecAugment、Dropout、Label Smoothing 与重打分解码">
+                  <i class="fa fa-angle-left"></i> 语音识别中的正则化与学习率调度：SpecAugment、Dropout、Label Smoothing 与重打分解码
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2026/10/20/%E4%BA%8C%E9%A1%B9%E5%BC%8F%E7%B3%BB%E6%95%B0%E5%8D%81%E5%A4%A7%E6%81%92%E7%AD%89%E5%BC%8F%E4%B8%8E%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0%E6%8E%A8%E5%AF%BC/" rel="next" title="二项式系数十大恒等式与生成函数推导">
+                  二项式系数十大恒等式与生成函数推导 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2025 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">奇点Y</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+<div class="footer-sign">记录个人心得，和大家交流算法及高数相关问题</div>
+<div class="footer-links">
+  <a href="https://github.com/QDy1013" target="_blank" rel="noopener"><i class="fab fa-github"></i> GitHub</a>
+  <a href="/archives/"><i class="fa fa-archive"></i> 归档</a>
+  <a href="/about/"><i class="fa fa-user"></i> 关于</a>
+</div>
+
+
+    </div>
+  </footer>
+
+  
+  <div aria-label="切换侧栏" class="toggle sidebar-toggle" role="button" tabindex="0">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" tabindex="0" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"QDy1013/QDy1013.github.io","issue_term":"pathname","theme":"github-light"}</script>
+<script src="/js/third-party/comments/utterances.js" defer></script>
+<script>
+// 奇点Y的随笔 · 交互小优化（内联在每页末尾，不额外发请求）
+(() => {
+  // 1. 鼠标悬停或手指按下站内链接时，提前下载那一页，点下去几乎立即打开
+  const prefetched = new Set([location.pathname]);
+  const prefetch = event => {
+    const link = event.target.closest && event.target.closest('a[href]');
+    if (!link || link.origin !== location.origin || link.hash && link.pathname === location.pathname) return;
+    if (navigator.connection && navigator.connection.saveData) return;
+    if (prefetched.has(link.pathname)) return;
+    prefetched.add(link.pathname);
+    const hint = document.createElement('link');
+    hint.rel = 'prefetch';
+    hint.href = link.pathname;
+    document.head.append(hint);
+  };
+  document.addEventListener('mouseover', prefetch, { passive: true });
+  document.addEventListener('touchstart', prefetch, { passive: true });
+
+  // 小提示条，用于“已复制”等反馈
+  const toast = text => {
+    let box = document.querySelector('.y-toast');
+    if (!box) {
+      box = document.createElement('div');
+      box.className = 'y-toast';
+      box.setAttribute('role', 'status');
+      document.body.append(box);
+    }
+    box.textContent = text;
+    box.classList.add('show');
+    clearTimeout(box.timer);
+    box.timer = setTimeout(() => box.classList.remove('show'), 1600);
+  };
+
+  // 2. 点标题旁的链接图标：复制这一节的链接，方便分享
+  document.addEventListener('click', event => {
+    const anchor = event.target.closest('.post-body .headerlink');
+    if (!anchor) return;
+    event.preventDefault();
+    const url = location.origin + location.pathname + anchor.getAttribute('href');
+    history.replaceState(null, '', anchor.getAttribute('href'));
+    anchor.parentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const fallback = () => toast('已定位到本节，可从地址栏复制链接');
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(() => toast('已复制本节链接'), fallback);
+    } else {
+      fallback();
+    }
+  });
+
+  // 液态玻璃：鼠标在卡片上移动时，卡片里的高光跟着鼠标走（只在有鼠标的设备上，且每帧最多更新一次）
+  if (matchMedia('(pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let pending = null;
+    document.addEventListener('pointermove', event => {
+      const card = event.target.closest && event.target.closest('.main-inner .post-block, .board-group, .home-card');
+      if (!card) return;
+      if (pending) cancelAnimationFrame(pending);
+      pending = requestAnimationFrame(() => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--mx', ((event.clientX - rect.left) / rect.width * 100).toFixed(1) + '%');
+        card.style.setProperty('--my', ((event.clientY - rect.top) / rect.height * 100).toFixed(1) + '%');
+        pending = null;
+      });
+    }, { passive: true });
+  }
+
+  // 宽屏左栏的位置：顶栏还看得见时贴在它下面 36px，顶栏滚出屏幕后停在离顶部 24px 处
+  const header = document.querySelector('.header');
+  if (header) {
+    let railFrame = null;
+    const placeRail = () => {
+      railFrame = null;
+      const top = Math.max(24, Math.round(header.getBoundingClientRect().bottom + 36));
+      document.documentElement.style.setProperty('--rail-top', top + 'px');
+    };
+    placeRail();
+    window.addEventListener('scroll', () => { if (!railFrame) railFrame = requestAnimationFrame(placeRail); }, { passive: true });
+    window.addEventListener('resize', placeRail, { passive: true });
+  }
+
+  // 首页上没有写摘要分隔的旧文章会整篇显示：裁成一小段预览，并补一个“阅读全文”按钮
+  document.querySelectorAll('.main-inner.index > .post-block').forEach(card => {
+    const body = card.querySelector('.post-body');
+    const link = card.querySelector('.post-title-link');
+    if (!body || !link || body.querySelector('.post-button')) return;
+    body.classList.add('y-clamped');
+    const button = document.createElement('div');
+    button.className = 'post-button';
+    button.innerHTML = '<a class="btn"></a>';
+    button.firstChild.href = link.href;
+    button.firstChild.textContent = '阅读全文 »';
+    body.after(button);
+  });
+
+  // 3. ACM 板子目录：输入关键词即时筛选 59 份板子 + 洛谷题号直达链接 + 快捷回顶筛选
+  const grid = document.querySelector('.board-grid');
+  if (grid) {
+    // 自动将“来源：Pxxxx”里的洛谷题号变成可点击链接
+    document.querySelectorAll('.post-body p').forEach(p => {
+      if (!p.textContent.trim().startsWith('来源：')) return;
+      p.innerHTML = p.innerHTML.replace(/\b(P\d{4,5})\b/g,
+        '<a class="luogu-link" href="https://www.luogu.com.cn/problem/$1" target="_blank" rel="noopener" title="在洛谷查看 $1 原题">$1</a>');
+    });
+
+    const box = document.createElement('div');
+    box.className = 'board-filter';
+    box.innerHTML = '<input type="search" placeholder="筛选板子（按 / 键快速聚焦），例如：线段树、背包、LCA" aria-label="筛选板子"><span class="board-filter-count"></span>';
+    grid.before(box);
+    const input = box.querySelector('input');
+    const count = box.querySelector('.board-filter-count');
+    const chips = [...grid.querySelectorAll('.board-chip')];
+    const filter = () => {
+      const words = input.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      let shown = 0;
+      chips.forEach(chip => {
+        const hit = words.every(word => chip.textContent.toLowerCase().includes(word));
+        chip.hidden = !hit;
+        if (hit) shown++;
+      });
+      grid.querySelectorAll('.board-group').forEach(group => {
+        const visible = group.querySelectorAll('.board-chip:not([hidden])').length;
+        const total = group.querySelectorAll('.board-chip').length;
+        group.hidden = !visible;
+        group.querySelector('.board-count').textContent = words.length ? `${visible} / ${total} 份` : `${total} 份`;
+      });
+      count.textContent = words.length ? (shown ? `找到 ${shown} 份` : '没有匹配的板子') : `共 ${chips.length} 份`;
+    };
+    input.addEventListener('input', filter);
+    input.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { input.value = ''; filter(); input.blur(); }
+    });
+    filter();
+
+    // 往下翻看板子时，右下角浮出“筛选板子”胶囊，或按 / 键直接跳回搜索框
+    const jumpBtn = document.createElement('button');
+    jumpBtn.type = 'button';
+    jumpBtn.className = 'board-jump-btn';
+    jumpBtn.setAttribute('aria-label', '回到板子筛选框');
+    jumpBtn.innerHTML = '<i class="fa fa-search"></i> <span>筛选板子</span>';
+    document.body.append(jumpBtn);
+
+    const jumpToFilter = () => {
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => { input.focus({ preventScroll: true }); input.select(); }, 260);
+    };
+    jumpBtn.addEventListener('click', jumpToFilter);
+
+    const toggleJumpBtn = () => {
+      const rect = grid.getBoundingClientRect();
+      jumpBtn.classList.toggle('show', rect.bottom < 0);
+    };
+    window.addEventListener('scroll', toggleJumpBtn, { passive: true });
+    toggleJumpBtn();
+
+    document.addEventListener('keydown', event => {
+      if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return;
+      const tag = document.activeElement && document.activeElement.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable) return;
+      event.preventDefault();
+      jumpToFilter();
+    });
+  }
+
+  // 4. 暖调夜间模式（Dark Mode）一键切换与图标同步
+  const root = document.documentElement;
+  const syncThemeUI = () => {
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    document.querySelectorAll('.theme-icon').forEach(icon => {
+      icon.classList.toggle('fa-moon', !isDark);
+      icon.classList.toggle('fa-sun', isDark);
+    });
+    document.querySelectorAll('.theme-label').forEach(label => {
+      label.textContent = isDark ? '日间' : '夜间';
+    });
+  };
+  syncThemeUI();
+
+  document.querySelectorAll('.theme-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('y-theme', next); } catch (e) {}
+      syncThemeUI();
+      toast(next === 'dark' ? '已切换为夜间护眼模式 🌙' : '已切换为日间纸张模式 ☀️');
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
