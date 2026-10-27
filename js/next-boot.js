@@ -105,3 +105,20 @@ document.addEventListener('DOMContentLoaded', () => {
   NexT.boot.motion();
 });
 
+
+/* y-reading-tools-loader */
+(() => {
+  const load = () => {
+    if (document.getElementById('y-reading-tools-script')) return;
+    const style = document.createElement('link');
+    style.rel = 'stylesheet';
+    style.href = '/css/reading-tools.css?v=20261027r1';
+    const script = document.createElement('script');
+    script.id = 'y-reading-tools-script';
+    script.src = '/js/reading-tools.js?v=20261027r1';
+    style.addEventListener('load', () => document.body.append(script), { once: true });
+    document.head.append(style);
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load, { once: true });
+  else load();
+})();
