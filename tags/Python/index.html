@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+(() => {
+  try {
+    const saved = localStorage.getItem('y-theme');
+    if (saved === 'dark' || saved === 'light') {
+      document.documentElement.setAttribute('data-theme', saved);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  } catch (e) {}
+})();
+</script>
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 8.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="preconnect" href="https://fonts.loli.net">
+<link rel="preconnect" href="https://gstatic.loli.net" crossorigin>
+<link rel="stylesheet" href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap"></noscript>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"qdy1013.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"atom-one-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":400},"language":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"top_n_per_article":3,"unescape":false,"preload":true}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="记录个人心得，和大家交流算法及高数相关问题">
+<meta property="og:type" content="website">
+<meta property="og:title" content="奇点Y的随笔">
+<meta property="og:url" content="https://qdy1013.github.io/tags/Python/index.html">
+<meta property="og:site_name" content="奇点Y的随笔">
+<meta property="og:description" content="记录个人心得，和大家交流算法及高数相关问题">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="奇点Y">
+<meta property="article:tag" content="算法，高等数学，学习笔记，Y">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://qdy1013.github.io/tags/Python/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"tags/Python/index.html","title":""}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>标签: Python | 奇点Y的随笔</title>
+  
+
+
+
+
+  <script>
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "z49j5q3sec");
+</script>
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script>
+<script class="next-config" data-name="katex" type="application/json">{"css":"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css","css_integrity":"sha256-UF1fgpAiu3tPJN/uCqEUHNe7pnr+QR0SQDNfgglgtcM=","js":"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js","auto_render_js":"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js","copy_tex_js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/copy-tex.min.js","integrity":"sha256-Us54+rSGDSTvIhKKUs4kygE2ipA0RXpWWh0/zLqw3bs="}}</script>
+<script src="/js/third-party/math/katex.js" defer></script>
+
+
+
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.clarity.ms">
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="https://schema.org/WebPage">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="https://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" aria-expanded="false" aria-controls="site-nav" role="button" tabindex="0">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">奇点Y的随笔</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">感谢支持</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle theme-toggle" aria-label="切换深浅色模式" role="button" tabindex="0" title="切换深色 / 浅色模式">
+      <i class="fa fa-moon fa-fw fa-lg theme-icon"></i>
+    </div>
+    <div class="toggle popup-trigger" aria-label="搜索" role="button" tabindex="0">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav id="site-nav" class="site-nav" aria-label="主导航">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" tabindex="0" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+    <li class="menu-item menu-item-theme">
+      <a role="button" tabindex="0" class="theme-toggle" aria-label="切换深浅色模式" title="切换深色 / 浅色模式">
+        <i class="fa fa-moon fa-fw theme-icon"></i><span class="theme-label">夜间</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup" role="dialog" aria-modal="true" aria-label="站内搜索">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input aria-label="搜索文章" autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span aria-label="关闭搜索" class="popup-btn-close" role="button" tabindex="0">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container" aria-live="polite" aria-busy="false">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="https://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="奇点Y"
+      src="/images/avatar.webp">
+  <p class="site-author-name" itemprop="name">奇点Y</p>
+  <div class="site-description" itemprop="description">记录个人心得，和大家交流算法及高数相关问题</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/QDy1013" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;QDy1013" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+<div class="sidebar-categories">
+  <div class="sidebar-categories-title">按分类浏览</div>
+  <nav class="home-card-links" aria-label="按分类浏览">
+      <a class="home-card-link" data-category="数学" href="/categories/%E6%95%B0%E5%AD%A6/">数学<span>2</span></a>
+      <a class="home-card-link" data-category="算法" href="/categories/%E7%AE%97%E6%B3%95/">算法<span>2</span></a>
+      <a class="home-card-link" data-category="语音识别" href="/categories/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/">语音识别<span>5</span></a>
+      <a class="home-card-link" data-category="随笔" href="/categories/%E9%9A%8F%E7%AC%94/">随笔<span>1</span></a>
+  </nav>
+  <div class="sidebar-featured">
+    <a class="sidebar-featured-link" href="/2026/10/22/ACM%E7%AE%97%E6%B3%95%E6%9D%BF%E5%AD%90%E5%90%88%E9%9B%86/">
+      <span>📌</span> 59 份 ACM 板子速查
+    </a>
+  </div>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div id="main-content" tabindex="-1" class="main-inner tag posts-collapse">
+
+
+  
+  
+  
+  <div class="post-block">
+    <div class="post-content">
+      <div class="collection-title">
+        <h1 class="collection-header">Python
+          <small>标签</small>
+        </h1>
+      </div>
+
+      
+    <div class="collection-year">
+      <span class="collection-header">2026</span>
+    </div>
+
+  <article itemscope itemtype="https://schema.org/Article">
+    <header class="post-header">
+      <div class="post-meta-container">
+        <time itemprop="dateCreated"
+              datetime="2026-10-31T10:00:00+08:00"
+              content="2026-10-31">
+          10-31
+        </time>
+      </div>
+
+      <div class="post-title">
+          <a class="post-title-link" href="/2026/10/31/rnn-asr-guide/" itemprop="url">
+            <span itemprop="name">从零读懂普通 RNN 语音识别 从数据读取到训练与预测</span>
+          </a>
+      </div>
+
+      
+    </header>
+  </article>
+
+  <article itemscope itemtype="https://schema.org/Article">
+    <header class="post-header">
+      <div class="post-meta-container">
+        <time itemprop="dateCreated"
+              datetime="2026-10-31T09:59:00+08:00"
+              content="2026-10-31">
+          10-31
+        </time>
+      </div>
+
+      <div class="post-title">
+          <a class="post-title-link" href="/2026/10/31/rnn-asr-source/" itemprop="url">
+            <span itemprop="name">普通 RNN 语音识别完整源码</span>
+          </a>
+      </div>
+
+      
+    </header>
+  </article>
+
+    </div>
+  </div>
+  
+  
+  
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2025 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">奇点Y</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+<div class="footer-sign">记录个人心得，和大家交流算法及高数相关问题</div>
+<div class="footer-links">
+  <a href="https://github.com/QDy1013" target="_blank" rel="noopener"><i class="fab fa-github"></i> GitHub</a>
+  <a href="/archives/"><i class="fa fa-archive"></i> 归档</a>
+  <a href="/about/"><i class="fa fa-user"></i> 关于</a>
+</div>
+
+
+    </div>
+  </footer>
+
+  
+  <div aria-label="切换侧栏" class="toggle sidebar-toggle" role="button" tabindex="0">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" tabindex="0" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"QDy1013/QDy1013.github.io","issue_term":"pathname","theme":"github-light"}</script>
+<script src="/js/third-party/comments/utterances.js" defer></script>
+<script>
+// 奇点Y的随笔 · 交互小优化（内联在每页末尾，不额外发请求）
+(() => {
+  // 1. 鼠标悬停或手指按下站内链接时，提前下载那一页，点下去几乎立即打开
+  const prefetched = new Set([location.pathname]);
+  const prefetch = event => {
+    const link = event.target.closest && event.target.closest('a[href]');
+    if (!link || link.origin !== location.origin || link.hash && link.pathname === location.pathname) return;
+    if (navigator.connection && navigator.connection.saveData) return;
+    if (prefetched.has(link.pathname)) return;
+    prefetched.add(link.pathname);
+    const hint = document.createElement('link');
+    hint.rel = 'prefetch';
+    hint.href = link.pathname;
+    document.head.append(hint);
+  };
+  document.addEventListener('mouseover', prefetch, { passive: true });
+  document.addEventListener('touchstart', prefetch, { passive: true });
+
+  // 小提示条，用于“已复制”等反馈
+  const toast = text => {
+    let box = document.querySelector('.y-toast');
+    if (!box) {
+      box = document.createElement('div');
+      box.className = 'y-toast';
+      box.setAttribute('role', 'status');
+      document.body.append(box);
+    }
+    box.textContent = text;
+    box.classList.add('show');
+    clearTimeout(box.timer);
+    box.timer = setTimeout(() => box.classList.remove('show'), 1600);
+  };
+
+  // 2. 点标题旁的链接图标：复制这一节的链接，方便分享
+  document.addEventListener('click', event => {
+    const anchor = event.target.closest('.post-body .headerlink');
+    if (!anchor) return;
+    event.preventDefault();
+    const url = location.origin + location.pathname + anchor.getAttribute('href');
+    history.replaceState(null, '', anchor.getAttribute('href'));
+    anchor.parentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const fallback = () => toast('已定位到本节，可从地址栏复制链接');
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(() => toast('已复制本节链接'), fallback);
+    } else {
+      fallback();
+    }
+  });
+
+  // 液态玻璃：鼠标在卡片上移动时，卡片里的高光跟着鼠标走（只在有鼠标的设备上，且每帧最多更新一次）
+  if (matchMedia('(pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let pending = null;
+    document.addEventListener('pointermove', event => {
+      const card = event.target.closest && event.target.closest('.main-inner .post-block, .board-group, .home-card');
+      if (!card) return;
+      if (pending) cancelAnimationFrame(pending);
+      pending = requestAnimationFrame(() => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--mx', ((event.clientX - rect.left) / rect.width * 100).toFixed(1) + '%');
+        card.style.setProperty('--my', ((event.clientY - rect.top) / rect.height * 100).toFixed(1) + '%');
+        pending = null;
+      });
+    }, { passive: true });
+  }
+
+  // 宽屏左栏的位置：顶栏还看得见时贴在它下面 36px，顶栏滚出屏幕后停在离顶部 24px 处
+  const header = document.querySelector('.header');
+  if (header) {
+    let railFrame = null;
+    const placeRail = () => {
+      railFrame = null;
+      const top = Math.max(24, Math.round(header.getBoundingClientRect().bottom + 36));
+      document.documentElement.style.setProperty('--rail-top', top + 'px');
+    };
+    placeRail();
+    window.addEventListener('scroll', () => { if (!railFrame) railFrame = requestAnimationFrame(placeRail); }, { passive: true });
+    window.addEventListener('resize', placeRail, { passive: true });
+  }
+
+  // 首页上没有写摘要分隔的旧文章会整篇显示：裁成一小段预览，并补一个“阅读全文”按钮
+  document.querySelectorAll('.main-inner.index > .post-block').forEach(card => {
+    const body = card.querySelector('.post-body');
+    const link = card.querySelector('.post-title-link');
+    if (!body || !link || body.querySelector('.post-button')) return;
+    body.classList.add('y-clamped');
+    const button = document.createElement('div');
+    button.className = 'post-button';
+    button.innerHTML = '<a class="btn"></a>';
+    button.firstChild.href = link.href;
+    button.firstChild.textContent = '阅读全文 »';
+    body.after(button);
+  });
+
+  // 3. ACM 板子目录：输入关键词即时筛选 59 份板子 + 洛谷题号直达链接 + 快捷回顶筛选
+  const grid = document.querySelector('.board-grid');
+  if (grid) {
+    // 自动将“来源：Pxxxx”里的洛谷题号变成可点击链接
+    document.querySelectorAll('.post-body p').forEach(p => {
+      if (!p.textContent.trim().startsWith('来源：')) return;
+      p.innerHTML = p.innerHTML.replace(/\b(P\d{4,5})\b/g,
+        '<a class="luogu-link" href="https://www.luogu.com.cn/problem/$1" target="_blank" rel="noopener" title="在洛谷查看 $1 原题">$1</a>');
+    });
+
+    const box = document.createElement('div');
+    box.className = 'board-filter';
+    box.innerHTML = '<input type="search" placeholder="筛选板子（按 / 键快速聚焦），例如：线段树、背包、LCA" aria-label="筛选板子"><span class="board-filter-count"></span>';
+    grid.before(box);
+    const input = box.querySelector('input');
+    const count = box.querySelector('.board-filter-count');
+    const chips = [...grid.querySelectorAll('.board-chip')];
+    const filter = () => {
+      const words = input.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      let shown = 0;
+      chips.forEach(chip => {
+        const hit = words.every(word => chip.textContent.toLowerCase().includes(word));
+        chip.hidden = !hit;
+        if (hit) shown++;
+      });
+      grid.querySelectorAll('.board-group').forEach(group => {
+        const visible = group.querySelectorAll('.board-chip:not([hidden])').length;
+        const total = group.querySelectorAll('.board-chip').length;
+        group.hidden = !visible;
+        group.querySelector('.board-count').textContent = words.length ? `${visible} / ${total} 份` : `${total} 份`;
+      });
+      count.textContent = words.length ? (shown ? `找到 ${shown} 份` : '没有匹配的板子') : `共 ${chips.length} 份`;
+    };
+    input.addEventListener('input', filter);
+    input.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { input.value = ''; filter(); input.blur(); }
+    });
+    filter();
+
+    // 往下翻看板子时，右下角浮出“筛选板子”胶囊，或按 / 键直接跳回搜索框
+    const jumpBtn = document.createElement('button');
+    jumpBtn.type = 'button';
+    jumpBtn.className = 'board-jump-btn';
+    jumpBtn.setAttribute('aria-label', '回到板子筛选框');
+    jumpBtn.innerHTML = '<i class="fa fa-search"></i> <span>筛选板子</span>';
+    document.body.append(jumpBtn);
+
+    const jumpToFilter = () => {
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => { input.focus({ preventScroll: true }); input.select(); }, 260);
+    };
+    jumpBtn.addEventListener('click', jumpToFilter);
+
+    const toggleJumpBtn = () => {
+      const rect = grid.getBoundingClientRect();
+      jumpBtn.classList.toggle('show', rect.bottom < 0);
+    };
+    window.addEventListener('scroll', toggleJumpBtn, { passive: true });
+    toggleJumpBtn();
+
+    document.addEventListener('keydown', event => {
+      if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return;
+      const tag = document.activeElement && document.activeElement.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable) return;
+      event.preventDefault();
+      jumpToFilter();
+    });
+  }
+
+  // 4. 暖调夜间模式（Dark Mode）一键切换与图标同步
+  const root = document.documentElement;
+  const syncThemeUI = () => {
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    document.querySelectorAll('.theme-icon').forEach(icon => {
+      icon.classList.toggle('fa-moon', !isDark);
+      icon.classList.toggle('fa-sun', isDark);
+    });
+    document.querySelectorAll('.theme-label').forEach(label => {
+      label.textContent = isDark ? '日间' : '夜间';
+    });
+  };
+  syncThemeUI();
+
+  document.querySelectorAll('.theme-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('y-theme', next); } catch (e) {}
+      syncThemeUI();
+      toast(next === 'dark' ? '已切换为夜间护眼模式 🌙' : '已切换为日间纸张模式 ☀️');
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
