@@ -275,7 +275,7 @@
         resetSession({ keepQuote: true }); $('.y-ai-login-error').textContent = data.error || '登录已失效，请重新登录。';
       }
       if (response.status === 403 && path === '/api/chat') await loadAccount();
-      throw Error(data.error || '暂时无法回答，请稍后重试。');
+      const error = Error(data.error || '暂时无法回答，请稍后重试。'); error.status = response.status; throw error;
     }
     return data;
   }
@@ -439,7 +439,10 @@
       history[mode] = [...turns, item, { role: 'assistant', content: data.answer.slice(0, 5000) }]; visible[mode].push(answer); addMessage(answer);
       if (quoted === selected) { quoted = null; renderQuote(); }
     } catch (error) {
-      if (epoch !== turnEpoch) return;
+      if (epoch !== turnEpoch) {
+        if (error.status === 401 && !token && !$('#y-ai-question').value.trim()) $('#y-ai-question').value = draft;
+        return;
+      }
       visible[mode] = visible[mode].filter(message => message !== item); renderConversation();
       if (!$('#y-ai-question').value.trim()) $('#y-ai-question').value = draft;
       $('.y-ai-status').textContent = error.name === 'AbortError' ? '等待已结束，问题与引用已保留，可以重试。' : error.message;
