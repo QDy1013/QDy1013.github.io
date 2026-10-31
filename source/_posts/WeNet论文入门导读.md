@@ -16,7 +16,7 @@ tags:
 
 <!-- more -->
 
-![WeNet 论文理解总览](/images/wenet-overview.png)
+![WeNet 论文理解总览](/images/wenet-overview.webp)
 
 ---
 
@@ -56,7 +56,7 @@ $$\text{声音波形} \longrightarrow \text{Fbank } (T \times 80) \longrightarro
 
 ## 03. 编码器与两个解码支路怎样合作
 
-U2 的核心架构由**一个共享编码器（Shared Encoder）**和**两个解码模块（CTC Decoder + Attention Decoder）**组成：
+U2 的核心架构由 **一个共享编码器（Shared Encoder）** 和 **两个解码模块（CTC Decoder + Attention Decoder）** 组成：
 
 | 部分 | 接收什么 | 产生什么 |
 | :--- | :--- | :--- |
@@ -86,7 +86,7 @@ U2 的核心架构由**一个共享编码器（Shared Encoder）**和**两个解
                                         示例：今天的天气很好
 ```
 
-1. **第一遍（First Pass）**：CTC 把声音向量 $\mathbf{H}$ 转成逐帧概率，再通过**前缀束搜索（Prefix Beam Search）**维护若干高分候选文字（`N-best hypotheses`）。在流式模式下，可以在语音不断到达时实时给出阶段性识别结果。
+1. **第一遍（First Pass）**：CTC 把声音向量 $\mathbf{H}$ 转成逐帧概率，再通过 **前缀束搜索（Prefix Beam Search）** 维护若干高分候选文字（`N-best hypotheses`）。在流式模式下，可以在语音不断到达时实时给出阶段性识别结果。
 2. **第二遍（Second Pass / Rescoring）**：在句子结束后，Attention 解码器同时读取声音向量 $\mathbf{H}$ 和这 $N$ 条候选文字，通过 Teacher Forcing 并行计算每条候选的 Attention 得分，再与 CTC 得分加权选出最终结果：
    $$S_{\text{final}} = \lambda\,S_{\text{CTC}} + (1 - \lambda)\,S_{\text{Attention}}$$
 
@@ -123,7 +123,7 @@ U2 的核心架构由**一个共享编码器（Shared Encoder）**和**两个解
 
 $$\mathcal{L}_{\text{joint}} = \lambda\,\mathcal{L}_{\text{CTC}} + (1 - \lambda)\,\mathcal{L}_{\text{AED}}$$
 
-常用配置中 $\lambda = 0.3$（即 `ctc_weight = 0.3`）。请区分：**“联合训练”**指训练阶段用两个损失共同更新编码器；**“两遍识别”**指推理阶段先由 CTC 产生候选、再由 Attention 重打分。
+常用配置中 $\lambda = 0.3$（即 `ctc_weight = 0.3`）。请区分： **“联合训练”** 指训练阶段用两个损失共同更新编码器； **“两遍识别”** 指推理阶段先由 CTC 产生候选、再由 Attention 重打分。
 
 ---
 

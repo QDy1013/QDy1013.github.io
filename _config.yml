@@ -55,6 +55,10 @@ prismjs:
   line_number: true
   tab_replace: ''
 
+# Markdown 渲染：文章里的图片加 loading="lazy"，滚动到附近才下载
+marked:
+  lazyload: true
+
 # Home page setting
 # path: Root path for your blogs index page. (default = '')
 # per_page: Posts displayed per page. (0 = disable pagination)
