@@ -26,9 +26,9 @@ html[data-theme=dark] #y-ai-launcher,html[data-theme=dark] #y-ai-panel{--ya-pape
 #y-ai-backdrop{display:none}
 html.y-ai-drawer-mode.y-ai-drawer-open,html.y-ai-drawer-mode.y-ai-drawer-open body{overflow:hidden}
 html.y-ai-drawer-mode #y-ai-backdrop:not([hidden]){display:block;position:fixed;inset:0;z-index:1200;background:#1d150f66;animation:y-ai-fade .2s ease-out}
-html.y-ai-drawer-mode #y-ai-panel{top:0!important;right:0!important;bottom:auto!important;left:0!important;width:var(--ya-drawer-w,100%);height:var(--ya-drawer-h,85dvh);zoom:var(--ya-zoom,1);max-height:none!important;border-radius:0 0 22px 22px;border-top:0;box-shadow:0 14px 48px #2a1b1040;font-size:15px;animation:y-ai-slide .28s cubic-bezier(.2,.8,.2,1)}
+html.y-ai-drawer-mode #y-ai-panel{top:0!important;right:0!important;bottom:auto!important;left:0!important;width:var(--ya-drawer-w,100%);height:var(--ya-drawer-h,65dvh);zoom:var(--ya-zoom,1);max-height:none!important;border-radius:0 0 22px 22px;border-top:0;box-shadow:0 14px 48px #2a1b1040;font-size:15px;animation:y-ai-slide .28s cubic-bezier(.2,.8,.2,1)}
 html.y-ai-drawer-mode #y-ai-launcher{zoom:var(--ya-zoom,1)}
-html.y-ai-drawer-mode #y-ai-panel .y-ai-header{cursor:default;touch-action:auto;padding:calc(16px + env(safe-area-inset-top)) 16px 14px 18px;gap:11px}
+html.y-ai-drawer-mode #y-ai-panel .y-ai-header{cursor:default;touch-action:auto;padding:16px 16px 14px 18px;gap:11px}
 html.y-ai-drawer-mode #y-ai-panel .y-ai-move-handle{cursor:default;pointer-events:none;width:38px;height:38px}
 html.y-ai-drawer-mode #y-ai-panel .y-ai-position-reset{display:none}
 html.y-ai-drawer-mode #y-ai-panel .y-ai-heading strong{font-size:20px}
@@ -83,14 +83,32 @@ html.y-ai-drawer-mode #y-ai-panel .y-ai-message-quote pre{font-size:13px}
 @keyframes y-ai-fade{from{opacity:0}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){#y-ai-panel,#y-ai-backdrop{animation:none!important}}
 
-/* 简约版：去掉标题和模式切换后收紧顶部；引用默认只露两行，点按展开。 */
+/* 简约版：去掉标题和模式切换后收紧顶部；引用只占输入框上方一行说明。 */
 #y-ai-panel .y-ai-header{padding-top:10px;padding-bottom:10px}
 #y-ai-panel .y-ai-messages{padding-top:14px}
-#y-ai-panel .y-ai-quote{padding-bottom:8px;margin-bottom:8px}
-#y-ai-panel pre.y-ai-quote-preview{cursor:pointer;margin-top:4px}
-#y-ai-panel pre.y-ai-quote-preview:not(.y-ai-expanded){max-height:calc(2 * 1.65em + 8px)!important;padding-bottom:0;overflow:hidden}
-#y-ai-panel pre.y-ai-quote-preview.y-ai-expanded{max-height:180px!important;overflow:auto}
-html.y-ai-drawer-mode #y-ai-panel .y-ai-header{position:absolute;top:env(safe-area-inset-top);right:6px;z-index:2;padding:0;border:0;background:none}
+#y-ai-panel .y-ai-quote{padding-bottom:6px;margin-bottom:8px}
+/* 网页本来就显示在浏览器地址栏下面，不加刘海安全区；有的手机浏览器会报一个很大的值，顶部会空出一大块。 */
+html.y-ai-drawer-mode #y-ai-panel .y-ai-header{position:absolute;top:0;right:6px;z-index:2;padding:0;border:0;background:none}
 html.y-ai-drawer-mode #y-ai-panel .y-ai-move-handle{display:none}
-html.y-ai-drawer-mode #y-ai-panel .y-ai-access{padding:calc(14px + env(safe-area-inset-top)) 58px 12px 18px}
-html.y-ai-drawer-mode #y-ai-panel .y-ai-messages{padding-top:14px}
+html.y-ai-drawer-mode #y-ai-panel .y-ai-access{padding:10px 58px 9px 18px}
+/* 手机上面板只占屏幕 65%：输入框一行、发送键放右边，去掉清空按钮和欢迎区的说明与示例，把高度留给对话。 */
+html.y-ai-drawer-mode #y-ai-panel .y-ai-messages{padding:10px 18px}
+html.y-ai-drawer-mode #y-ai-panel .y-ai-welcome{padding:4px 0}
+html.y-ai-drawer-mode #y-ai-panel .y-ai-welcome h2{font-size:17px;margin:0}
+html.y-ai-drawer-mode #y-ai-panel .y-ai-welcome p,html.y-ai-drawer-mode #y-ai-panel .y-ai-welcome button{display:none}
+html.y-ai-drawer-mode #y-ai-panel .y-ai-compose{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:10px;margin:0 12px;padding:8px 8px 8px 13px}
+html.y-ai-drawer-mode #y-ai-panel .y-ai-compose .y-ai-quote{grid-column:1/-1}
+html.y-ai-drawer-mode #y-ai-panel textarea{height:1.8em;min-height:0}
+html.y-ai-drawer-mode #y-ai-panel .y-ai-compose-bottom{padding-top:0}
+html.y-ai-drawer-mode #y-ai-panel .y-ai-compose-bottom>span,html.y-ai-drawer-mode #y-ai-panel .y-ai-clear{display:none}
+html.y-ai-drawer-mode #y-ai-panel .y-ai-footnote{font-size:11px!important;padding:5px 16px 2px}
+/* 底部拉手：往下拉全屏、往上推收成顶部一条；账号行也能拖。 */
+.y-ai-grabber{display:none}
+html.y-ai-drawer-mode #y-ai-panel .y-ai-grabber{display:flex;justify-content:center;align-items:center;height:24px;flex-shrink:0;touch-action:none;cursor:grab}
+html.y-ai-drawer-mode #y-ai-panel .y-ai-grabber span{width:46px;height:5px;border-radius:3px;background:var(--ya-muted);opacity:.55}
+html.y-ai-drawer-mode #y-ai-panel .y-ai-access{touch-action:none}
+html.y-ai-drawer-mode #y-ai-panel{transition:height .22s ease}
+html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-dragging{transition:none}
+html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-full{height:var(--ya-drawer-full,100dvh);border-radius:0}
+html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-min{height:auto}
+html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-min>:not(.y-ai-header):not(.y-ai-access):not(.y-ai-grabber){display:none!important}
