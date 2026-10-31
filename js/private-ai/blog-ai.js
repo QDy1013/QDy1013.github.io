@@ -562,15 +562,21 @@
     if (event.key === 'ArrowDown') { event.preventDefault(); setSheet(sheet === 'min' ? 'normal' : 'full'); }
     if (event.key === 'ArrowUp') { event.preventDefault(); setSheet(sheet === 'full' ? 'normal' : 'min'); }
   });
+  // 手机上「问一问」按钮浮在面板之上：点一下面板全屏展开，再点一下完全收起。
+  function syncLauncher(open) {
+    launcher.querySelector('span').textContent = open && drawerMode ? '收起' : '问一问';
+    launcher.setAttribute('aria-label', open ? '收起 AI 问答窗口' : '打开 AI 问答窗口');
+    launcher.setAttribute('aria-expanded', String(open));
+  }
   function close() {
     panel.hidden = true; backdrop.hidden = true; document.documentElement.classList.remove('y-ai-drawer-open');
-    launcher.setAttribute('aria-expanded', 'false'); (returnFocus || launcher).focus();
+    syncLauncher(false); (returnFocus || launcher).focus();
   }
   async function openPanel() {
     if (panel.hidden) returnFocus = document.activeElement;
     panel.hidden = false; backdrop.hidden = false; document.documentElement.classList.add('y-ai-drawer-open'); syncDrawer();
-    setSheet('normal');
-    launcher.setAttribute('aria-expanded', 'true');
+    setSheet(drawerMode ? 'full' : 'normal');
+    syncLauncher(true);
     fitPanel();
     setAuthorized(account || (token ? cachedAccount : null)); renderConversation();
     if (token) {
