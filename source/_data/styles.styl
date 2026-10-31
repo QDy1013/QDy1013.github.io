@@ -1844,3 +1844,166 @@ html[data-theme="dark"] {
   .search-input { color: #F6F1EA; }
   .toggle .toggle-line { background: #E6DED4; }
 }
+
+// =============================================================
+// 宽屏阅读（≥1440px）：把左右两侧的留白让给正文
+// 上面的 1180px 版面只在 1200–1439px 之间用；屏幕再宽时按下面的尺寸放宽，
+// 左侧导航栏宽度固定，多出来的空间全给正文，代码块一行能多放 40~60 个字符。
+// =============================================================
+@media (min-width: 1440px) {
+  :root {
+    --layout-w: unquote("min(1560px, calc(100vw - 72px))");
+    --rail-w: 300px;
+    --rail-gap: 32px;
+  }
+
+  header.header { width: var(--layout-w); }
+
+  .sidebar, .sidebar-active .sidebar {
+    left: calc(50% - (var(--layout-w) / 2));
+    width: var(--rail-w);
+  }
+
+  .main-inner, .footer-inner {
+    width: calc(var(--layout-w) - var(--rail-w) - var(--rail-gap));
+    margin-left: calc(50% - (var(--layout-w) / 2) + var(--rail-w) + var(--rail-gap));
+    margin-right: 0;
+  }
+
+  // 卡片左右留白略收，正文和代码都往上靠一点
+  .main-inner .post-block { padding-left: 38px; padding-right: 38px; }
+
+  // 代码块再向卡片两边各借 22px：长行能多塞几个字符，正文段落不动
+  .post-body figure.highlight,
+  .post-body .y-ai-code-actions {
+    margin-left: -22px;
+    margin-right: -22px;
+  }
+}
+
+// ≥1780px：再放宽一档，2160 / 2560 这类屏幕基本能铺满
+@media (min-width: 1780px) {
+  :root { --layout-w: unquote("min(1780px, calc(100vw - 84px))"); }
+}
+
+@media (min-width: 2280px) {
+  :root { --layout-w: unquote("min(2080px, calc(100vw - 110px))"); }
+}
+
+// =============================================================
+// 代码块顶栏、语言标签、复制按钮与折叠体验优化
+// =============================================================
+.post-body figure.highlight {
+  padding-top: 34px;
+
+  &::before {
+    margin-top: -22px;
+  }
+
+  // 把原本 40px 压在代码前两行上的语言大水印移入顶部 Mac 标题栏左侧
+  .code-lang {
+    top: 8px;
+    left: 74px;
+    right: auto;
+    font-family: $mono;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    line-height: 18px;
+    color: $muted;
+    opacity: 0.85;
+  }
+
+  // 复制按钮常驻显示在 Mac 顶栏右侧，不再悬停前完全透明或压住第一行代码
+  .copy-btn {
+    top: 4px;
+    right: 10px;
+    opacity: 0.82;
+    font-family: system-ui, "Microsoft YaHei", sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 2px 9px;
+    border-radius: 6px;
+    color: $muted;
+    transition: opacity 0.18s, background 0.18s, color 0.18s;
+  }
+  .copy-btn:hover {
+    opacity: 1;
+    color: $accent;
+    background: rgba(201, 100, 66, 0.12);
+  }
+
+  // 自动换行开关开启时，代码自动折行显示完整注释
+  &.y-code-wrap .table-container {
+    overflow-x: hidden;
+  }
+  &.y-code-wrap .code pre,
+  &.y-code-wrap .code .line {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  // 折叠遮罩与展开/收起胶囊按钮，避免裸箭头直接叠在代码文字上
+  .fold-cover {
+    height: 72px;
+    background-image: linear-gradient(to top, #FDFBF7 12%, rgba(253, 251, 247, 0) 100%);
+    pointer-events: none;
+  }
+
+  .expand-btn {
+    bottom: 10px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    z-index: 3;
+    padding: 5px 18px;
+    border-radius: 999px;
+    font-family: system-ui, "Microsoft YaHei", sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    color: $accent-deep;
+    background: rgba(253, 251, 247, 0.95);
+    border: 1px solid rgba(201, 100, 66, 0.38);
+    box-shadow: 0 4px 14px rgba(60, 40, 20, 0.12);
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+    white-space: nowrap;
+  }
+  .expand-btn:hover {
+    color: #FDFBF7;
+    background: $accent;
+    border-color: $accent;
+  }
+
+  &.unfold .expand-btn {
+    display: inline-block;
+    position: sticky;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 4px 0 8px;
+  }
+}
+
+html[data-theme="dark"] .post-body figure.highlight {
+  .code-lang { color: #A89D91; }
+  .copy-btn { color: #C8BEB2; }
+  .copy-btn:hover {
+    color: #F49D82;
+    background: rgba(229, 161, 126, 0.16);
+  }
+  .fold-cover {
+    background-image: linear-gradient(to top, #1C1917 15%, rgba(28, 25, 23, 0) 100%);
+  }
+  .expand-btn {
+    color: #F4A68A;
+    background: rgba(36, 32, 29, 0.94);
+    border-color: rgba(229, 161, 126, 0.38);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  }
+  .expand-btn:hover {
+    color: #1C1917;
+    background: #E5A17E;
+    border-color: #E5A17E;
+  }
+}

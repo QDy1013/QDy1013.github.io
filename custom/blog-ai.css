@@ -134,7 +134,26 @@ html.y-ai-drawer-mode #y-ai-panel,html.y-ai-drawer-mode #y-ai-panel .y-ai-messag
 /* 页面被缩小显示时，划词弹出的「问 AI」菜单跟面板一样放大。 */
 html.y-ai-drawer-mode #y-ai-selection-menu{zoom:var(--ya-zoom,1)}
 /* 点按不闪灰、不等双击判定；手机输入框不小于 16px，免得浏览器聚焦时自动放大页面。 */
-#y-ai-launcher,#y-ai-panel button,#y-ai-selection-menu button,.post-body .y-ai-code-ask,.y-ai-grabber{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+#y-ai-launcher,#y-ai-panel button,#y-ai-selection-menu button,.post-body .y-ai-code-ask,.post-body .y-ai-code-wrap,.y-ai-grabber{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 html.y-ai-drawer-mode #y-ai-panel .y-ai-grabber{touch-action:none}
 html.y-ai-drawer-mode #y-ai-panel input,html.y-ai-drawer-mode #y-ai-panel textarea{font-size:16px}
 html.y-ai-drawer-mode #y-ai-panel textarea{max-height:none;resize:none}
+
+/* 桌面端增强：恢复标题、模式标签栏、宽屏切换按钮、左下角拖拽缩放手柄与代码行号连选高亮；手机端保持紧凑。 */
+#y-ai-panel.y-ai-panel-wide{width:min(740px,calc(100vw - 44px));height:min(820px,calc(100dvh - 64px))}
+#y-ai-panel .y-ai-size-toggle{font-family:Arial,sans-serif;font-size:18px;width:28px;height:34px;color:var(--ya-muted);flex-shrink:0;border-radius:8px;transition:color .15s,background .15s}
+#y-ai-panel .y-ai-size-toggle:hover,#y-ai-panel .y-ai-position-reset:hover,#y-ai-panel .y-ai-close:hover{color:var(--ya-accent);background:var(--ya-tint)}
+#y-ai-panel .y-ai-size-toggle[aria-pressed=true]{color:var(--ya-accent)}
+#y-ai-panel .y-ai-resizer{position:absolute;left:0;bottom:0;width:16px;height:16px;cursor:nesw-resize;z-index:3;touch-action:none}
+#y-ai-panel .y-ai-resizer::before{content:"";position:absolute;left:4px;bottom:4px;width:7px;height:7px;border-left:2px solid var(--ya-muted);border-bottom:2px solid var(--ya-muted);opacity:.45;border-radius:0 0 0 3px}
+#y-ai-panel .y-ai-resizer:hover::before{opacity:.9;border-color:var(--ya-accent)}
+html.y-ai-drawer-mode #y-ai-panel .y-ai-heading,html.y-ai-drawer-mode #y-ai-panel .y-ai-size-toggle,html.y-ai-drawer-mode #y-ai-panel .y-ai-resizer,html.y-ai-drawer-mode #y-ai-panel .y-ai-tabs,html.y-ai-drawer-mode #y-ai-panel a.y-ai-quote-title{display:none!important}
+.y-ai-code-actions{gap:8px;align-items:center}
+.post-body .y-ai-code-wrap{font-family:system-ui,"Microsoft YaHei",sans-serif;font-size:12px;line-height:1.5;border:1px solid rgba(120,90,60,.22);border-radius:8px;padding:6px 11px;background:rgba(253,251,247,.7);color:#6e6257;cursor:pointer;transition:all .15s}
+.post-body .y-ai-code-wrap:hover,.post-body .y-ai-code-wrap[aria-pressed=true]{color:#b85e40;border-color:#b85e4055;background:#b85e4012}
+html[data-theme=dark] .post-body .y-ai-code-wrap{color:#b7a99a;border-color:rgba(235,211,185,.2);background:rgba(40,36,32,.7)}
+html[data-theme=dark] .post-body .y-ai-code-wrap:hover,html[data-theme=dark] .post-body .y-ai-code-wrap[aria-pressed=true]{color:#e5a17e;border-color:#e5a17e66;background:#e5a17e1a}
+.post-body figure.highlight .gutter .line.y-ai-line-selected{color:#b85e40;font-weight:700}
+.post-body figure.highlight .code .line.y-ai-line-selected{display:inline-block;min-width:100%;background:rgba(201,100,66,.14);border-radius:3px}
+html[data-theme=dark] .post-body figure.highlight .gutter .line.y-ai-line-selected{color:#e5a17e}
+html[data-theme=dark] .post-body figure.highlight .code .line.y-ai-line-selected{background:rgba(229,161,126,.18)}
