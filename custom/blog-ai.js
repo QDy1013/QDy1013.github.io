@@ -279,7 +279,106 @@
     }
     return data;
   }
-  function renderText(parent, text) {
+  // 只借助 Marked 识别 Markdown，逐个创建允许的 DOM 元素；不执行回复中的 HTML。
+  function renderMarkdown(parent, tokens, depth = 0) {
+    function append(tag, token, target = parent) {
+      const node = document.createElement(tag); target.append(node);
+      if (token.tokens && depth < 32) renderMarkdown(node, token.tokens, depth + 1);
+      else node.textContent = token.text || '';
+      return node;
+    }
+    function textValue(value) {
+      // 只解码独立实体，送进解码器的内容不能含标签或属性。
+      return String(value || '').replace(/&(?:#\d+|#x[\da-f]+|[a-z][\da-z]*);/gi, entity => {
+        const decoder = document.createElement('textarea'); decoder.innerHTML = entity; return decoder.value;
+      });
+    }
+    function link(token) {
+      let url;
+      try { url = new URL(token.href, location.href); } catch { return append('span', token); }
+      if (!['https:', 'http:', 'mailto:'].includes(url.protocol)) return append('span', token);
+      const node = append('a', token); node.href = url.href;
+      node.target = '_blank'; node.rel = 'noopener noreferrer';
+      if (token.title) node.title = token.title;
+      return node;
+    }
+    for (const token of tokens) {
+      if (depth > 32) { parent.append(document.createTextNode(token.raw || token.text || '')); continue; }
+      switch (token.type) {
+        case 'space': case 'def': break;
+        case 'paragraph': append('p', token); break;
+        case 'heading': append('h' + Math.min(6, token.depth + 1), token); break;
+        case 'strong': append('strong', token); break;
+        case 'em': append('em', token); break;
+        case 'del': append('del', token); break;
+        case 'codespan': { const node = document.createElement('code'); node.textContent = token.text; parent.append(node); break; }
+        case 'br': parent.append(document.createElement('br')); break;
+        case 'hr': parent.append(document.createElement('hr')); break;
+        case 'text': case 'escape': {
+          if (token.tokens) renderMarkdown(parent, token.tokens, depth + 1);
+          else parent.append(document.createTextNode(textValue(token.text)));
+          break;
+        }
+        case 'html': {
+          if (/^<br\s*\/?\s*>$/i.test(token.text.trim())) parent.append(document.createElement('br'));
+          else parent.append(document.createTextNode(token.text));
+          break;
+        }
+        case 'blockquote': append('blockquote', token); break;
+        case 'link': link(token); break;
+        case 'image': link({ ...token, text: token.text || '查看图片', tokens: null }); break;
+        case 'list': {
+          const list = document.createElement(token.ordered ? 'ol' : 'ul');
+          if (token.ordered && Number.isSafeInteger(token.start) && token.start > 0) list.start = token.start;
+          parent.append(list);
+          for (const item of token.items) {
+            const li = document.createElement('li'); list.append(li);
+            if (item.task) { li.className = 'y-ai-task'; li.append(document.createTextNode(item.checked ? '☑ ' : '☐ ')); }
+            renderMarkdown(li, item.tokens, depth + 1);
+          }
+          break;
+        }
+        case 'table': {
+          const wrap = document.createElement('div'); wrap.className = 'y-ai-table-wrap'; wrap.tabIndex = 0;
+          wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '回答中的表格，可横向滚动');
+          const table = document.createElement('table'); wrap.append(table); parent.append(wrap);
+          for (const [section, rows, cellTag] of [['thead', [token.header], 'th'], ['tbody', token.rows, 'td']]) {
+            const group = document.createElement(section); table.append(group);
+            for (const row of rows) {
+              const tr = document.createElement('tr'); group.append(tr);
+              row.forEach((cell, index) => {
+                const td = append(cellTag, cell, tr);
+                if (cellTag === 'th') td.scope = 'col';
+                if (['left', 'right', 'center'].includes(token.align[index])) td.style.textAlign = token.align[index];
+              });
+            }
+          }
+          break;
+        }
+        case 'code': {
+          const wrap = document.createElement('div'); wrap.className = 'y-ai-code-panel';
+          const header = document.createElement('div'); header.className = 'y-ai-code-header';
+          const language = document.createElement('span'); language.textContent = (token.lang || '代码').split(/\s+/)[0].slice(0, 32);
+          const copy = document.createElement('button'); copy.type = 'button'; copy.textContent = '复制'; copy.setAttribute('aria-label', '复制这段代码');
+          const pre = document.createElement('pre'); pre.className = 'y-ai-code-block';
+          const code = document.createElement('code'); code.textContent = token.text; pre.append(code);
+          copy.addEventListener('click', async () => {
+            try { await navigator.clipboard.writeText(code.textContent); copy.textContent = '已复制'; }
+            catch { copy.textContent = '请手动选择复制'; }
+            setTimeout(() => { copy.textContent = '复制'; }, 2000);
+          });
+          header.append(language, copy); wrap.append(header, pre); parent.append(wrap); break;
+        }
+        default: parent.append(document.createTextNode(token.raw || token.text || ''));
+      }
+    }
+  }
+  function renderText(parent, text, markdown = true) {
+    if (markdown && window.marked?.lexer) {
+      const node = document.createElement('div'); node.className = 'y-ai-markdown';
+      try { renderMarkdown(node, window.marked.lexer(String(text), { gfm: true, breaks: true })); parent.append(node); return; }
+      catch { /* 解析器加载或解析失败时保留可阅读的纯文字。 */ }
+    }
     const pieces = String(text).split(/```[^\n]*\n([\s\S]*?)```/g);
     pieces.forEach((part, i) => {
       const node = document.createElement(i % 2 ? 'pre' : 'div');
@@ -290,7 +389,7 @@
   function addMessage(item) {
     const message = document.createElement('div'); message.className = 'y-ai-message y-ai-' + item.role;
     const label = document.createElement('span'); label.className = 'y-ai-message-label'; label.textContent = item.role === 'user' ? '你' : '随笔助手';
-    const content = document.createElement('div'); content.className = 'y-ai-message-content'; renderText(content, item.content);
+    const content = document.createElement('div'); content.className = 'y-ai-message-content'; renderText(content, item.content, item.role === 'assistant');
     if (item.selection) {
       const details = document.createElement('details'); details.className = 'y-ai-message-quote';
       const summary = document.createElement('summary'); summary.textContent = '引用' + (item.selection.kind === 'code' ? '代码' : '正文') + ' · ' + item.selection.title;

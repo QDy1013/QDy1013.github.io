@@ -17,15 +17,19 @@ hexo.extend.filter.register('after_generate', async function () {
   this.route.set('ai-index.json', JSON.stringify({ version: 1, documents }));
   this.route.set('ai-config.json', JSON.stringify({ enabled: config.enabled === true, endpoint: config.endpoint || '' }));
   for (const name of ['blog-ai.js', 'blog-ai.css']) this.route.set('js/private-ai/' + name, fs.readFileSync(path.join(root, 'custom', name)));
+  this.route.set('js/private-ai/marked.min.js', fs.readFileSync(path.join(root, 'custom/vendor/marked.min.js')));
+  this.route.set('js/private-ai/marked.LICENSE.txt', fs.readFileSync(path.join(root, 'custom/vendor/marked.LICENSE.md')));
   for (const name of this.route.list().filter(name => name.endsWith('.html'))) {
     const chunks = [];
     for await (const chunk of this.route.get(name)) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
     let html = Buffer.concat(chunks).toString('utf8');
     if (html.includes('data-private-ai-assets')) {
-      html = html.replace(/\/js\/private-ai\/blog-ai\.(css|js)(?:\?[^"']*)?/g, '/js/private-ai/blog-ai.$1?v=selection-drag-20261031-v2');
+      html = html.replace(/\/js\/private-ai\/blog-ai\.(css|js)(?:\?[^"']*)?/g, '/js/private-ai/blog-ai.$1?v=markdown-20261031');
+      html = html.replace(/<script\b[^>]*src="\/js\/private-ai\/marked\.min\.js[^"\s]*"[^>]*><\/script>\s*/g, '');
+      html = html.replace('<script src="/js/private-ai/blog-ai.js', '<script src="/js/private-ai/marked.min.js?v=markdown-20261031" defer></script>\n<script src="/js/private-ai/blog-ai.js');
     } else {
-      html = html.replace('</head>', '<link data-private-ai-assets rel="stylesheet" href="/js/private-ai/blog-ai.css?v=selection-drag-20261031-v2">\n</head>')
-        .replace('</body>', '<script src="/js/private-ai/blog-ai.js?v=selection-drag-20261031-v2" defer></script>\n</body>');
+      html = html.replace('</head>', '<link data-private-ai-assets rel="stylesheet" href="/js/private-ai/blog-ai.css?v=markdown-20261031">\n</head>')
+        .replace('</body>', '<script src="/js/private-ai/marked.min.js?v=markdown-20261031" defer></script>\n<script src="/js/private-ai/blog-ai.js?v=markdown-20261031" defer></script>\n</body>');
     }
     this.route.set(name, html);
   }
