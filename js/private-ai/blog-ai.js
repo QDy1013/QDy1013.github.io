@@ -320,14 +320,15 @@
       scheduleSelection();
     });
   }
-  // 固定窗口默认停靠在页面左侧栏区域（不遮挡右侧正文与代码），只通过顶部拖动；桌面端支持切换宽屏与拖拽右下角调整尺寸。
-  const positionKey = 'y-blog-ai-panel-left-v1';
+  // 固定窗口默认占满页面左侧区域（上下顶满视口、左右贴合正文左侧空白，不遮挡右侧正文与代码），支持顶部拖动、宽屏切换与右下角缩放。
+  const positionKey = 'y-blog-ai-panel-left-v2';
   let panelPosition = null, panelSize = null, panelWide = false, drag = null, resizeDrag = null;
   const resizer = document.createElement('div');
   resizer.className = 'y-ai-resizer'; resizer.title = '拖拽右下角调整窗口大小';
   panel.append(resizer);
   try {
     sessionStorage.removeItem('y-blog-ai-panel-position');
+    sessionStorage.removeItem('y-blog-ai-panel-left-v1');
     const saved = JSON.parse(sessionStorage.getItem(positionKey));
     if (saved) {
       if (Number.isFinite(saved.left) && Number.isFinite(saved.top)) panelPosition = { left: saved.left, top: saved.top };
@@ -351,36 +352,40 @@
   }
   function defaultLeftPlacement(view) {
     const main = document.querySelector('.main-inner');
-    const sidebar = document.querySelector('.sidebar');
+    const top = 10, height = Math.max(420, Math.round(view.height - 20));
     if (view.width >= 1200 && main) {
       const mainLeft = Math.round(main.getBoundingClientRect().left);
-      const sideLeft = sidebar ? Math.round(sidebar.getBoundingClientRect().left) : 16;
-      if (mainLeft >= 356) {
-        const width = Math.min(420, Math.max(340, mainLeft - 28));
-        const left = Math.max(14, Math.min(sideLeft, mainLeft - width - 14));
-        return { left, width: Math.min(width, mainLeft - left - 12) };
+      if (mainLeft >= 340) {
+        const left = 12;
+        const width = Math.min(560, Math.max(340, mainLeft - left - 14));
+        return { left, top, width, height };
       }
     }
-    return { left: 18, width: Math.min(400, view.width - 36) };
+    return { left: 12, top, width: Math.min(420, view.width - 24), height };
   }
   function applyPosition(left = panelPosition?.left, top = panelPosition?.top) {
     // 手机面板的位置由可见区域决定，不碰也不保存电脑上浮动窗口的拖动位置。
     if (panel.hidden || drawerMode) return;
     syncWideUI();
     const view = viewportBounds();
+    const def = defaultLeftPlacement(view);
     if (panelSize) {
       const w = Math.max(340, Math.min(panelSize.width, view.width - 20));
-      const h = Math.max(380, Math.min(panelSize.height, view.height - 20));
+      const h = Math.max(380, Math.min(panelSize.height, view.height - 16));
       panel.style.width = w + 'px';
       panel.style.height = h + 'px';
     } else if (!panelWide) {
-      const def = defaultLeftPlacement(view);
       panel.style.width = def.width + 'px';
-      panel.style.removeProperty('height');
-      if (!Number.isFinite(left)) panel.style.left = def.left + 'px';
+      panel.style.height = def.height + 'px';
+      if (!Number.isFinite(left) || !Number.isFinite(top)) {
+        Object.assign(panel.style, { left: def.left + 'px', top: def.top + 'px', right: 'auto', bottom: '10px' });
+      }
     } else {
       panel.style.removeProperty('width');
-      panel.style.removeProperty('height');
+      panel.style.height = def.height + 'px';
+      if (!Number.isFinite(left) || !Number.isFinite(top)) {
+        Object.assign(panel.style, { left: def.left + 'px', top: def.top + 'px', right: 'auto', bottom: '10px' });
+      }
     }
     panel.style.maxHeight = Math.max(180, view.height - 16) + 'px';
     if (!Number.isFinite(left) || !Number.isFinite(top)) return;
