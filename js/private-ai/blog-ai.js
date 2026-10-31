@@ -7,7 +7,7 @@
   launcher.setAttribute('aria-expanded', 'false'); launcher.setAttribute('aria-controls', 'y-ai-panel');
   launcher.setAttribute('aria-label', '打开 AI 问答窗口');
   const panel = document.createElement('section');
-  panel.id = 'y-ai-panel'; panel.hidden = true; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-label', '奇点Y的问答窗口');
+  panel.id = 'y-ai-panel'; panel.hidden = true; panel.tabIndex = -1; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-label', '奇点Y的问答窗口');
   panel.innerHTML = `
     <header class="y-ai-header"><button class="y-ai-symbol y-ai-move-handle" type="button" aria-label="移动问答窗口，可用方向键调整位置" title="拖动窗口 · 方向键微调"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/></svg></button><div class="y-ai-heading"></div><button class="y-ai-position-reset" aria-label="恢复窗口默认位置" title="恢复默认位置" type="button">↺</button><button class="y-ai-close" aria-label="关闭问答窗口" type="button">×</button></header>
     <div class="y-ai-access"><span class="y-ai-dot"></span><span class="y-ai-access-label">账号访问</span><button class="y-ai-admin-open" type="button" hidden>AI 权限</button><button class="y-ai-password-open" type="button" hidden>改密码</button><button class="y-ai-logout" type="button" hidden>退出</button></div>
@@ -32,18 +32,29 @@
     const root = document.documentElement;
     root.classList.toggle('y-ai-drawer-mode', drawerMode);
     // 页面被缩小显示时，按「可见宽度 ÷ 屏幕宽度」把侧栏和按钮放大回正常字号。
-    const viewWidth = window.visualViewport?.width || innerWidth, viewHeight = window.visualViewport?.height || innerHeight;
+    const viewport = window.visualViewport;
+    const viewWidth = viewport?.width || innerWidth, viewHeight = viewport?.height || innerHeight, viewTop = viewport?.offsetTop || 0;
     const ratio = screen.width > 0 ? viewWidth / screen.width : 1;
     const zoom = drawerMode && ratio > 1.1 ? Math.min(3, ratio) : 1;
-    if (zoom > 1) {
+    if (drawerMode) {
+      // 面板和按钮都按「可见区域」定位：弹出键盘后浏览器会把可见区域往下挪、高度变小，面板跟着贴在键盘上方。
+      const hiddenBelow = Math.max(0, document.documentElement.clientHeight - viewTop - viewHeight);
       root.style.setProperty('--ya-zoom', zoom.toFixed(3));
       root.style.setProperty('--ya-drawer-w', viewWidth / zoom + 'px');
       root.style.setProperty('--ya-drawer-h', viewHeight * 0.65 / zoom + 'px');
       root.style.setProperty('--ya-drawer-full', viewHeight / zoom + 'px');
-    } else for (const name of ['--ya-zoom', '--ya-drawer-w', '--ya-drawer-h', '--ya-drawer-full']) root.style.removeProperty(name);
+      root.style.setProperty('--ya-drawer-top', viewTop / zoom + 'px');
+      root.style.setProperty('--ya-drawer-bottom', hiddenBelow / zoom + 'px');
+    } else for (const name of ['--ya-zoom', '--ya-drawer-w', '--ya-drawer-h', '--ya-drawer-full', '--ya-drawer-top', '--ya-drawer-bottom']) root.style.removeProperty(name);
+  }
+  // 手机上不替读者把光标放进输入框，免得一打开面板就弹出键盘；只聚焦面板本身，键盘等读者自己点输入框再出来。
+  function focusField(field) {
+    if (drawerMode && /^(INPUT|TEXTAREA)$/.test(field.tagName)) panel.focus({ preventScroll: true });
+    else field.focus({ preventScroll: true });
   }
   for (const query of [narrowQuery, touchQuery]) query.addEventListener ? query.addEventListener('change', syncDrawer) : query.addListener?.(syncDrawer);
-  window.addEventListener('resize', syncDrawer); window.visualViewport?.addEventListener('resize', syncDrawer); syncDrawer();
+  window.addEventListener('resize', syncDrawer); syncDrawer();
+  for (const type of ['resize', 'scroll']) window.visualViewport?.addEventListener(type, syncDrawer);
   // 网址带 ?ai-debug 时在页面顶部列出判断依据，方便用手机截图排查。
   if (/[?&#]ai-debug/.test(location.href)) {
     const debug = document.createElement('pre');
@@ -104,7 +115,8 @@
     $('.y-ai-logout').hidden = !account;
     $('.y-ai-password-open').hidden = !account;
     $('.y-ai-admin-open').hidden = account?.role !== 'admin';
-    $('.y-ai-access-label').textContent = account ? account.username + (account.role === 'admin' ? ' · 管理员' : '') : '账号访问';
+    // 手机上账号行很挤，只显示用户名；管理员身份从「AI 权限」按钮就能看出来。
+    $('.y-ai-access-label').textContent = account ? account.username + (account.role === 'admin' && !drawerMode ? ' · 管理员' : '') : '账号访问';
     $('.y-ai-access-message').textContent = account?.aiAccess === 'disabled' ? 'AI 权限已被撤销，请联系博主重新开通。' : 'AI 权限等待博主开通，请联系博主。';
     panel.classList.toggle('y-ai-authorized', Boolean(account));
     setView('chat');
@@ -146,14 +158,14 @@
     quoteCard.hidden = !quoted;
     quoteNotice.hidden = !quoted || account?.aiAccess === 'approved';
     $('#y-ai-question').required = !quoted;
-    $('#y-ai-question').placeholder = quoted ? '想问这段什么？直接发送也可以解释片段。' : mode === 'blog' ? '想读懂哪篇文章？' : '输入你的问题…';
+    $('#y-ai-question').placeholder = quoted ? '想问这段什么？' : mode === 'blog' ? '想读懂哪篇文章？' : '输入你的问题…';
     if (!quoted) return;
     // 引用只显示一行说明，不展示具体内容，给对话留出位置；发出的问题里仍可展开查看。
     quoteCard.querySelector('.y-ai-quote-heading span').textContent = (quoted.kind === 'code'
-      ? '引用代码 · ' + quoted.text.split('\n').length + ' 行' : '引用正文 · ' + quoted.text.length + ' 字') + (quoted.truncated ? ' · 已截取前 6000 字' : '');
+      ? '引用代码 · ' + quoted.text.split('\n').length + ' 行' : '引用正文 · ' + quoted.text.length + ' 字') + (quoted.truncated ? ' · 已截断' : '');
     quoteNotice.querySelector('span').textContent = account ? '片段已保留，开通 AI 权限后可提问。' : '片段已保留，登录后可继续提问。';
   }
-  function removeQuote() { if (!busy) { quoted = null; renderQuote(); (account?.aiAccess === 'approved' ? $('#y-ai-question') : $('#y-ai-username')).focus(); } }
+  function removeQuote() { if (!busy) { quoted = null; renderQuote(); focusField(account?.aiAccess === 'approved' ? $('#y-ai-question') : $('#y-ai-username')); } }
   $('.y-ai-quote-remove').addEventListener('click', removeQuote);
   quoteNotice.querySelector('button').addEventListener('click', removeQuote);
   function elementOf(node) { return node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement; }
@@ -205,10 +217,12 @@
     const rect = [...range.getClientRects()].filter(r => r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight).at(-1);
     if (!rect) return;
     candidate = quote; selectionMenu.hidden = false;
+    // 菜单在手机上按页面缩小比例放大过，算好的屏幕位置要再除以放大倍数才落在原处。
+    const zoom = drawerMode ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ya-zoom')) || 1 : 1;
     const box = selectionMenu.getBoundingClientRect();
-    selectionMenu.style.left = Math.max(8, Math.min(innerWidth - box.width - 8, rect.left)) + 'px';
+    selectionMenu.style.left = Math.max(8, Math.min(innerWidth - box.width - 8, rect.left)) / zoom + 'px';
     const below = rect.bottom + 8;
-    selectionMenu.style.top = Math.max(8, Math.min(innerHeight - box.height - 8, below + box.height < innerHeight ? below : rect.top - box.height - 8)) + 'px';
+    selectionMenu.style.top = Math.max(8, Math.min(innerHeight - box.height - 8, below + box.height < innerHeight ? below : rect.top - box.height - 8)) / zoom + 'px';
   }
   function scheduleSelection() { clearTimeout(selectionTimer); selectionTimer = setTimeout(inspectSelection, 100); }
   document.addEventListener('selectionchange', scheduleSelection);
@@ -277,7 +291,8 @@
       width: viewport?.width || innerWidth, height: viewport?.height || innerHeight };
   }
   function applyPosition(left = panelPosition?.left, top = panelPosition?.top) {
-    if (panel.hidden) return;
+    // 手机面板的位置由可见区域决定，不碰也不保存电脑上浮动窗口的拖动位置。
+    if (panel.hidden || drawerMode) return;
     const view = viewportBounds();
     panel.style.maxHeight = Math.max(180, view.height - 16) + 'px';
     if (!Number.isFinite(left) || !Number.isFinite(top)) return;
@@ -327,7 +342,7 @@
     applyPosition(box.left + directions[event.key][0] * step, box.top + directions[event.key][1] * step); savePosition();
   });
   function fitPanel() {
-    if (panel.hidden) return;
+    if (panel.hidden || drawerMode) return;
     if (panelPosition) { applyPosition(); savePosition(); }
     else {
       applyPosition();
@@ -490,8 +505,11 @@
       }
       message.append(refs);
     }
-    $('.y-ai-messages').append(message);
-    $('.y-ai-messages').scrollTop = $('.y-ai-messages').scrollHeight;
+    const list = $('.y-ai-messages');
+    list.append(message);
+    // 回答比对话区高时停在回答开头，读者从头往下读；提问和短回答直接滚到底。
+    if (item.role === 'assistant' && message.offsetHeight > list.clientHeight * 0.6) list.scrollTop = message.offsetTop - list.offsetTop - 8;
+    else list.scrollTop = list.scrollHeight;
   }
   function renderConversation() {
     $('.y-ai-messages').replaceChildren();
@@ -502,7 +520,7 @@
       welcome.append(heading, text);
       for (const question of mode === 'blog' ? ['RNN 怎样把声音变成文字？', 'WeNet 的两遍识别是什么？'] : ['帮我解释一段 Python 代码', '怎么安排今天的学习？']) {
         const button = document.createElement('button'); button.type = 'button'; button.textContent = question + ' ↗';
-        button.addEventListener('click', () => { $('#y-ai-question').value = question; $('#y-ai-question').focus(); }); welcome.append(button);
+        button.addEventListener('click', () => { $('#y-ai-question').value = question; focusField($('#y-ai-question')); }); welcome.append(button);
       }
       $('.y-ai-messages').append(welcome);
     } else for (const item of visible[mode]) addMessage(item);
@@ -562,21 +580,53 @@
     if (event.key === 'ArrowDown') { event.preventDefault(); setSheet(sheet === 'min' ? 'normal' : 'full'); }
     if (event.key === 'ArrowUp') { event.preventDefault(); setSheet(sheet === 'full' ? 'normal' : 'min'); }
   });
+  // 手机输入框随内容长高，最多四行；清空后缩回一行。键盘上的回车键显示为「发送」。
+  const question = $('#y-ai-question');
+  question.setAttribute('enterkeyhint', 'send');
+  function growQuestion() {
+    question.style.removeProperty('height');
+    if (!drawerMode || !question.value) return;
+    const line = parseFloat(getComputedStyle(question).lineHeight) || 28;
+    question.style.height = Math.min(question.scrollHeight, line * 4) + 'px';
+  }
+  question.addEventListener('input', growQuestion);
+  // 键盘弹出、面板变矮时，原本停在对话底部的仍然停在底部。
+  const messageList = $('.y-ai-messages');
+  let stickToBottom = true;
+  messageList.addEventListener('scroll', () => { stickToBottom = messageList.scrollHeight - messageList.scrollTop - messageList.clientHeight < 24; }, { passive: true });
+  if ('ResizeObserver' in window) new ResizeObserver(() => { if (stickToBottom) messageList.scrollTop = messageList.scrollHeight; }).observe(messageList);
+  // 面板打开时不让背后的页面跟着滑：遮罩上的滑动直接拦下；面板里只有真能滚动的区域可以滚。
+  backdrop.addEventListener('touchmove', event => event.preventDefault(), { passive: false });
+  panel.addEventListener('touchmove', event => {
+    if (!drawerMode || sheet === 'min') return;
+    const scroller = event.target.closest('.y-ai-messages, textarea, .y-ai-unlock, .y-ai-waiting, .y-ai-accounts, .y-ai-password-form, pre, .y-ai-table-wrap');
+    if (!scroller || scroller.scrollHeight <= scroller.clientHeight + 1 && scroller.scrollWidth <= scroller.clientWidth + 1) event.preventDefault();
+  }, { passive: false });
   // 手机上「问一问」按钮浮在面板之上：点一下面板全屏展开，再点一下完全收起。
   function syncLauncher(open) {
     launcher.querySelector('span').textContent = open && drawerMode ? '收起' : '问一问';
     launcher.setAttribute('aria-label', open ? '收起 AI 问答窗口' : '打开 AI 问答窗口');
     launcher.setAttribute('aria-expanded', String(open));
   }
+  // 手机返回键先关面板而不是离开文章：打开时压一条同网址的历史记录，关面板时再把它退掉，并保持阅读位置不动。
+  // 注意本脚本里的 history 是对话记录，浏览器历史要写 window.history。
+  let panelHistory = false, restoreScroll = null;
+  window.addEventListener('popstate', () => {
+    if (restoreScroll !== null) { const y = restoreScroll; restoreScroll = null; window.scrollTo({ top: y, behavior: 'instant' }); return; }
+    if (panelHistory) { panelHistory = false; if (!panel.hidden) close(); }
+  });
   function close() {
+    if (panel.contains(document.activeElement)) document.activeElement.blur();
     panel.hidden = true; backdrop.hidden = true; document.documentElement.classList.remove('y-ai-drawer-open');
-    syncLauncher(false); (returnFocus || launcher).focus();
+    syncLauncher(false); focusField(returnFocus || launcher);
+    if (panelHistory) { panelHistory = false; restoreScroll = window.scrollY; window.history.back(); }
   }
   async function openPanel() {
     if (panel.hidden) returnFocus = document.activeElement;
     panel.hidden = false; backdrop.hidden = false; document.documentElement.classList.add('y-ai-drawer-open'); syncDrawer();
     setSheet(drawerMode ? 'full' : 'normal');
     syncLauncher(true);
+    if (drawerMode && !panelHistory) { try { window.history.pushState({ yAiPanel: true }, ''); panelHistory = true; } catch {} }
     fitPanel();
     setAuthorized(account || (token ? cachedAccount : null)); renderConversation();
     if (token) {
@@ -586,7 +636,7 @@
       const check = verifyAccount().catch(error => { $('.y-ai-login-error').textContent = error.message; $('.y-ai-waiting-status').textContent = error.message; });
       if (!known) await check;
     }
-    (account?.aiAccess === 'approved' ? $('#y-ai-question') : account ? $('.y-ai-refresh-access') : $('#y-ai-username')).focus();
+    focusField(account?.aiAccess === 'approved' ? $('#y-ai-question') : account ? $('.y-ai-refresh-access') : $('#y-ai-username'));
   }
   launcher.addEventListener('click', () => { if (!panel.hidden) close(); else openPanel(); });
   $('.y-ai-close').addEventListener('click', close);
@@ -603,17 +653,17 @@
       const result = await request(authMode === 'register' ? '/api/register' : '/api/session', { username: $('#y-ai-username').value, password: $('#y-ai-password').value });
       if (authMode === 'register') {
         setAuthMode('login'); $('#y-ai-password').value = ''; $('#y-ai-confirm').value = '';
-        $('.y-ai-login-error').textContent = result.message; $('#y-ai-password').focus();
+        $('.y-ai-login-error').textContent = result.message; focusField($('#y-ai-password'));
       } else {
         if (typeof result.token !== 'string' || !result.account) throw Error('登录未完成，请重试。');
         saveToken(result.token); $('#y-ai-password').value = ''; $('#y-ai-confirm').value = '';
         setAuthorized(result.account); renderConversation();
-        (account.aiAccess === 'approved' ? $('#y-ai-question') : $('.y-ai-refresh-access')).focus();
+        focusField(account.aiAccess === 'approved' ? $('#y-ai-question') : $('.y-ai-refresh-access'));
       }
     } catch (error) { $('.y-ai-login-error').textContent = error.message; }
     finally { button.disabled = false; for (const tab of panel.querySelectorAll('[data-auth]')) tab.disabled = false; }
   });
-  $('.y-ai-logout').addEventListener('click', () => { resetSession(); setAuthMode('login'); $('#y-ai-username').focus(); });
+  $('.y-ai-logout').addEventListener('click', () => { resetSession(); setAuthMode('login'); focusField($('#y-ai-username')); });
   $('.y-ai-refresh-access').addEventListener('click', async () => {
     const button = $('.y-ai-refresh-access'); button.disabled = true; $('.y-ai-waiting-status').textContent = '';
     try { await loadAccount(); if (account?.aiAccess !== 'approved') $('.y-ai-waiting-status').textContent = '暂未开通，可以联系博主。'; }
@@ -621,7 +671,7 @@
     finally { button.disabled = false; }
   });
   for (const button of panel.querySelectorAll('.y-ai-back')) button.addEventListener('click', () => setView('chat'));
-  $('.y-ai-password-open').addEventListener('click', () => { setView('password'); $('.y-ai-password-status').textContent = ''; $('#y-ai-old-password').focus(); });
+  $('.y-ai-password-open').addEventListener('click', () => { setView('password'); $('.y-ai-password-status').textContent = ''; focusField($('#y-ai-old-password')); });
   $('.y-ai-password-form').addEventListener('submit', async e => {
     e.preventDefault(); const button = $('.y-ai-password-submit'); button.disabled = true;
     try {
@@ -669,7 +719,7 @@
     if (busy) return; mode = tab.dataset.mode;
     for (const t of panel.querySelectorAll('[data-mode]')) t.setAttribute('aria-selected', String(t === tab));
     renderQuote();
-    $('.y-ai-status').textContent = ''; renderConversation(); $('#y-ai-question').focus();
+    $('.y-ai-status').textContent = ''; renderConversation(); focusField($('#y-ai-question'));
   });
   $('.y-ai-clear').addEventListener('click', () => { if (!busy) { history[mode] = []; visible[mode] = []; $('.y-ai-status').textContent = ''; renderConversation(); } });
   $('#y-ai-question').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); if (!busy) $('.y-ai-compose').requestSubmit(); } });
@@ -683,7 +733,9 @@
     const item = { role: 'user', content: text, ...(selected ? { selection: { title: selected.title, url: selected.url, kind: selected.kind, text: selected.text } } : {}) };
     const size = message => message.content.length + (message.selection ? message.selection.text.length + message.selection.title.length + message.selection.url.length + 150 : 0);
     while (turns.length && [...turns, item].reduce((n, m) => n + size(m), 0) > 20000) turns.splice(0, 2);
-    visible[mode].push(item); renderConversation(); $('#y-ai-question').value = ''; setBusy(true); controller = new AbortController();
+    visible[mode].push(item); renderConversation(); $('#y-ai-question').value = ''; growQuestion(); setBusy(true); controller = new AbortController();
+    // 手机上发出问题后收起键盘，把高度让给即将出现的回答。
+    if (drawerMode) $('#y-ai-question').blur();
     const timer = setTimeout(() => controller.abort(), 75000);
     try { const data = await request('/api/chat', { mode, messages: [...turns, item] }, controller.signal);
       if (epoch !== turnEpoch) return;
@@ -692,11 +744,11 @@
       if (quoted === selected) { quoted = null; renderQuote(); }
     } catch (error) {
       if (epoch !== turnEpoch) {
-        if (error.status === 401 && !token && !$('#y-ai-question').value.trim()) $('#y-ai-question').value = draft;
+        if (error.status === 401 && !token && !$('#y-ai-question').value.trim()) { $('#y-ai-question').value = draft; growQuestion(); }
         return;
       }
       visible[mode] = visible[mode].filter(message => message !== item); renderConversation();
-      if (!$('#y-ai-question').value.trim()) $('#y-ai-question').value = draft;
+      if (!$('#y-ai-question').value.trim()) { $('#y-ai-question').value = draft; growQuestion(); }
       $('.y-ai-status').textContent = error.name === 'AbortError' ? '等待已结束，问题与引用已保留，可以重试。' : error.message;
     }
     finally { clearTimeout(timer); if (epoch === turnEpoch) { const status = $('.y-ai-status').textContent; setBusy(false); $('.y-ai-status').textContent = status.startsWith('正在') ? '' : status; } }

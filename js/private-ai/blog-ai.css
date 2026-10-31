@@ -24,9 +24,8 @@ html[data-theme=dark] #y-ai-launcher,html[data-theme=dark] #y-ai-panel{--ya-pape
 
 /* 手机上改成从顶部滑下的面板，占满宽度、留出底部一截正文，字号整体放大；桌面仍是可拖动的浮动窗口。 */
 #y-ai-backdrop{display:none}
-html.y-ai-drawer-mode.y-ai-drawer-open,html.y-ai-drawer-mode.y-ai-drawer-open body{overflow:hidden}
 html.y-ai-drawer-mode #y-ai-backdrop:not([hidden]){display:block;position:fixed;inset:0;z-index:1200;background:#1d150f66;animation:y-ai-fade .2s ease-out}
-html.y-ai-drawer-mode #y-ai-panel{top:0!important;right:0!important;bottom:auto!important;left:0!important;width:var(--ya-drawer-w,100%);height:var(--ya-drawer-h,65dvh);zoom:var(--ya-zoom,1);max-height:none!important;border-radius:0 0 22px 22px;border-top:0;box-shadow:0 14px 48px #2a1b1040;font-size:15px;animation:y-ai-slide .28s cubic-bezier(.2,.8,.2,1)}
+html.y-ai-drawer-mode #y-ai-panel{top:var(--ya-drawer-top,0px)!important;right:0!important;bottom:auto!important;left:0!important;width:var(--ya-drawer-w,100%);height:var(--ya-drawer-h,65dvh);zoom:var(--ya-zoom,1);max-height:none!important;border-radius:0 0 22px 22px;border-top:0;box-shadow:0 14px 48px #2a1b1040;font-size:15px;animation:y-ai-slide .28s cubic-bezier(.2,.8,.2,1)}
 html.y-ai-drawer-mode #y-ai-launcher{zoom:var(--ya-zoom,1)}
 html.y-ai-drawer-mode #y-ai-panel .y-ai-header{cursor:default;touch-action:auto;padding:16px 16px 14px 18px;gap:11px}
 html.y-ai-drawer-mode #y-ai-panel .y-ai-move-handle{cursor:default;pointer-events:none;width:38px;height:38px}
@@ -113,5 +112,15 @@ html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-full{height:var(--ya-drawer-full,10
 html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-min{height:auto}
 html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-min>:not(.y-ai-header):not(.y-ai-access):not(.y-ai-grabber){display:none!important}
 /* 「问一问」浮在面板和遮罩之上、位置固定：点一下全屏展开，再点一下收起；全屏时面板底部给它让出一条。 */
-html.y-ai-drawer-mode #y-ai-launcher{z-index:1203;right:14px;bottom:18px;padding:11px 16px}
+html.y-ai-drawer-mode #y-ai-launcher{z-index:1203;right:14px;bottom:calc(18px + var(--ya-drawer-bottom,0px));padding:11px 16px}
 html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-full{padding-bottom:76px}
+#y-ai-panel:focus{outline:none}
+/* 不再给页面加 overflow:hidden（会把页面滚回顶部）；面板里的滚动区域滚到头也不带动背后的页面，背后滑动由脚本拦下。 */
+html.y-ai-drawer-mode #y-ai-panel,html.y-ai-drawer-mode #y-ai-panel .y-ai-messages,html.y-ai-drawer-mode #y-ai-panel .y-ai-unlock,html.y-ai-drawer-mode #y-ai-panel .y-ai-waiting,html.y-ai-drawer-mode #y-ai-panel .y-ai-accounts,html.y-ai-drawer-mode #y-ai-panel .y-ai-password-form,html.y-ai-drawer-mode #y-ai-panel textarea,html.y-ai-drawer-mode #y-ai-panel pre,html.y-ai-drawer-mode #y-ai-panel .y-ai-table-wrap{overscroll-behavior:contain}
+/* 页面被缩小显示时，划词弹出的「问 AI」菜单跟面板一样放大。 */
+html.y-ai-drawer-mode #y-ai-selection-menu{zoom:var(--ya-zoom,1)}
+/* 点按不闪灰、不等双击判定；手机输入框不小于 16px，免得浏览器聚焦时自动放大页面。 */
+#y-ai-launcher,#y-ai-panel button,#y-ai-selection-menu button,.post-body .y-ai-code-ask,.y-ai-grabber{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+html.y-ai-drawer-mode #y-ai-panel .y-ai-grabber{touch-action:none}
+html.y-ai-drawer-mode #y-ai-panel input,html.y-ai-drawer-mode #y-ai-panel textarea{font-size:16px}
+html.y-ai-drawer-mode #y-ai-panel textarea{max-height:none;resize:none}
