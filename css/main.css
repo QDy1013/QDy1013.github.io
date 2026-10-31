@@ -1267,7 +1267,7 @@ pre code {
   vertical-align: middle;
 }
 .links-of-author a::before {
-  background: #d2ff4b;
+  background: #7098cc;
   display: inline-block;
   margin-right: 3px;
   transform: translateY(-2px);
@@ -4859,6 +4859,150 @@ html[data-theme="dark"] .search-input {
 }
 html[data-theme="dark"] .toggle .toggle-line {
   background: #e6ded4;
+}
+@media (min-width: 1440px) {
+  :root {
+    --layout-w: min(1560px, calc(100vw - 72px));
+    --rail-w: 300px;
+    --rail-gap: 32px;
+  }
+  header.header {
+    width: var(--layout-w);
+  }
+  .sidebar,
+  .sidebar-active .sidebar {
+    left: calc(50% - (var(--layout-w) / 2));
+    width: var(--rail-w);
+  }
+  .main-inner,
+  .footer-inner {
+    width: calc(var(--layout-w) - var(--rail-w) - var(--rail-gap));
+    margin-left: calc(50% - (var(--layout-w) / 2) + var(--rail-w) + var(--rail-gap));
+    margin-right: 0;
+  }
+  .main-inner .post-block {
+    padding-left: 38px;
+    padding-right: 38px;
+  }
+  .post-body figure.highlight,
+  .post-body .y-ai-code-actions {
+    margin-left: -22px;
+    margin-right: -22px;
+  }
+}
+@media (min-width: 1780px) {
+  :root {
+    --layout-w: min(1780px, calc(100vw - 84px));
+  }
+}
+@media (min-width: 2280px) {
+  :root {
+    --layout-w: min(2080px, calc(100vw - 110px));
+  }
+}
+.post-body figure.highlight {
+  padding-top: 34px;
+}
+.post-body figure.highlight::before {
+  margin-top: -22px;
+}
+.post-body figure.highlight .code-lang {
+  top: 8px;
+  left: 74px;
+  right: auto;
+  font-family: "JetBrains Mono", Consolas, "Courier New", monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 18px;
+  color: #8a7f75;
+  opacity: 0.85;
+}
+.post-body figure.highlight .copy-btn {
+  top: 4px;
+  right: 10px;
+  opacity: 0.82;
+  font-family: system-ui, "Microsoft YaHei", sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 2px 9px;
+  border-radius: 6px;
+  color: #8a7f75;
+  transition: opacity 0.18s, background 0.18s, color 0.18s;
+}
+.post-body figure.highlight .copy-btn:hover {
+  opacity: 1;
+  color: #c96442;
+  background: rgba(201,100,66,0.12);
+}
+.post-body figure.highlight.y-code-wrap .table-container {
+  overflow-x: hidden;
+}
+.post-body figure.highlight.y-code-wrap .code pre,
+.post-body figure.highlight.y-code-wrap .code .line {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.post-body figure.highlight .fold-cover {
+  height: 72px;
+  background-image: linear-gradient(to top, #fdfbf7 12%, rgba(253,251,247,0) 100%);
+  pointer-events: none;
+}
+.post-body figure.highlight .expand-btn {
+  bottom: 10px;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  z-index: 3;
+  padding: 5px 18px;
+  border-radius: 999px;
+  font-family: system-ui, "Microsoft YaHei", sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #a84f32;
+  background: rgba(253,251,247,0.95);
+  border: 1px solid rgba(201,100,66,0.38);
+  box-shadow: 0 4px 14px rgba(60,40,20,0.12);
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+  white-space: nowrap;
+}
+.post-body figure.highlight .expand-btn:hover {
+  color: #fdfbf7;
+  background: #c96442;
+  border-color: #c96442;
+}
+.post-body figure.highlight.unfold .expand-btn {
+  display: inline-block;
+  position: sticky;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 4px 0 8px;
+}
+html[data-theme="dark"] .post-body figure.highlight .code-lang {
+  color: #a89d91;
+}
+html[data-theme="dark"] .post-body figure.highlight .copy-btn {
+  color: #c8beb2;
+}
+html[data-theme="dark"] .post-body figure.highlight .copy-btn:hover {
+  color: #f49d82;
+  background: rgba(229,161,126,0.16);
+}
+html[data-theme="dark"] .post-body figure.highlight .fold-cover {
+  background-image: linear-gradient(to top, #1c1917 15%, rgba(28,25,23,0) 100%);
+}
+html[data-theme="dark"] .post-body figure.highlight .expand-btn {
+  color: #f4a68a;
+  background: rgba(36,32,29,0.94);
+  border-color: rgba(229,161,126,0.38);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.45);
+}
+html[data-theme="dark"] .post-body figure.highlight .expand-btn:hover {
+  color: #1c1917;
+  background: #e5a17e;
+  border-color: #e5a17e;
 }
 @keyframes y-glow-breathe {
   from {

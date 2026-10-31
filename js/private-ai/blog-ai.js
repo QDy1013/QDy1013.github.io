@@ -9,13 +9,13 @@
   const panel = document.createElement('section');
   panel.id = 'y-ai-panel'; panel.hidden = true; panel.tabIndex = -1; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-label', '奇点Y的问答窗口');
   panel.innerHTML = `
-    <header class="y-ai-header"><button class="y-ai-symbol y-ai-move-handle" type="button" aria-label="移动问答窗口，可用方向键调整位置" title="拖动窗口 · 方向键微调"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/></svg></button><div class="y-ai-heading"></div><button class="y-ai-position-reset" aria-label="恢复窗口默认位置" title="恢复默认位置" type="button">↺</button><button class="y-ai-close" aria-label="关闭问答窗口" type="button">×</button></header>
+    <header class="y-ai-header"><button class="y-ai-symbol y-ai-move-handle" type="button" aria-label="移动问答窗口，可用方向键调整位置" title="拖动窗口 · 方向键微调"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/></svg></button><div class="y-ai-heading"><strong>随笔之间</strong><span>拖动顶部可移动 · 选中内容可提问</span></div><button class="y-ai-size-toggle" aria-label="切换宽屏窗口" title="加宽窗口 / 恢复标准尺寸（也可双击标题栏）" type="button" aria-pressed="false">⤢</button><button class="y-ai-position-reset" aria-label="恢复窗口默认位置与尺寸" title="恢复默认位置与尺寸" type="button">↺</button><button class="y-ai-close" aria-label="关闭问答窗口" type="button">×</button></header>
     <div class="y-ai-access"><span class="y-ai-dot"></span><span class="y-ai-access-label">账号访问</span><button class="y-ai-admin-open" type="button" hidden>AI 权限</button><button class="y-ai-password-open" type="button" hidden>改密码</button><button class="y-ai-logout" type="button" hidden>退出</button></div>
     <form class="y-ai-unlock"><div class="y-ai-lock-mark">✧</div><h2>登录你的问答角落</h2><p>注册即可拥有账号，<br>AI 使用权限由博主单独开通。</p><div class="y-ai-auth-tabs"><button type="button" data-auth="login" aria-pressed="true">登录</button><button type="button" data-auth="register" aria-pressed="false">注册账号</button></div><label for="y-ai-username">用户名</label><input id="y-ai-username" name="username" type="text" autocomplete="username" spellcheck="false" placeholder="字母、数字、下划线或短横线" minlength="3" maxlength="32" required><label for="y-ai-password">密码</label><input id="y-ai-password" name="password" type="password" autocomplete="current-password" placeholder="10–128 位密码" minlength="10" maxlength="128" required><div class="y-ai-confirm-field" hidden><label for="y-ai-confirm">再次输入密码</label><input id="y-ai-confirm" type="password" autocomplete="new-password" maxlength="128"></div><button class="y-ai-auth-submit" type="submit">登录</button><div class="y-ai-login-error" role="status"></div></form>
-    <div class="y-ai-waiting" hidden><div class="y-ai-lock-mark">✧</div><h2>账号已登录</h2><p class="y-ai-access-message">AI 权限等待博主开通。</p><button class="y-ai-refresh-access" type="button">刷新权限状态</button><p>开通后即可提问。</p><div class="y-ai-waiting-status" role="status"></div></div>
+    <div class="y-ai-waiting" hidden><div class="y-ai-lock-mark">✧</div><h2>账号已登录</h2><p class="y-ai-access-message">AI 权限等待博主开通。</p><button class="y-ai-refresh-access" type="button">刷新权限状态</button><p>开通后即可使用博客问答与自由聊天。</p><div class="y-ai-waiting-status" role="status"></div></div>
     <div class="y-ai-management" hidden><div class="y-ai-view-header"><button class="y-ai-back" type="button">← 返回</button><h2>AI 权限管理</h2><button class="y-ai-refresh-accounts" type="button">刷新</button></div><p class="y-ai-manage-note">注册不等于获得 AI 权限。开通后才能提问，撤销后立即停止使用。</p><div class="y-ai-manage-status" role="status"></div><div class="y-ai-accounts"></div><div class="y-ai-pagination"><button class="y-ai-prev" type="button">上一页</button><span class="y-ai-page-label"></span><button class="y-ai-next" type="button">下一页</button></div></div>
     <form class="y-ai-password-form" hidden><div class="y-ai-view-header"><button class="y-ai-back" type="button">← 返回</button><h2>修改密码</h2></div><label for="y-ai-old-password">当前密码</label><input id="y-ai-old-password" type="password" autocomplete="current-password" maxlength="128" required><label for="y-ai-new-password">新密码</label><input id="y-ai-new-password" type="password" autocomplete="new-password" minlength="10" maxlength="128" required><label for="y-ai-new-confirm">再次输入新密码</label><input id="y-ai-new-confirm" type="password" autocomplete="new-password" maxlength="128" required><button class="y-ai-password-submit" type="submit">保存新密码</button><div class="y-ai-password-status" role="status"></div></form>
-    <div class="y-ai-chat" hidden><div class="y-ai-messages" role="log" aria-label="对话内容" aria-live="polite" aria-relevant="additions"></div><div class="y-ai-status" role="status"></div><form class="y-ai-compose"><label class="y-ai-sr" for="y-ai-question">输入问题</label><textarea id="y-ai-question" rows="2" maxlength="4000" placeholder="想读懂哪篇文章？" required></textarea><div class="y-ai-compose-bottom"><button class="y-ai-clear" type="button">清空对话</button><span>Enter 发送 · Shift+Enter 换行</span><button class="y-ai-send" type="submit" aria-label="发送问题">↑</button></div></form><p class="y-ai-footnote">问题将发送给 DeepSeek，回答请结合原文判断。</p></div>`;
+    <div class="y-ai-chat" hidden><div class="y-ai-tabs" role="tablist" aria-label="选择问答方式"><button type="button" role="tab" aria-selected="true" data-mode="blog">博客问答</button><button type="button" role="tab" aria-selected="false" data-mode="general">自由聊天</button></div><div class="y-ai-messages" role="log" aria-label="对话内容" aria-live="polite" aria-relevant="additions"></div><div class="y-ai-status" role="status"></div><form class="y-ai-compose"><label class="y-ai-sr" for="y-ai-question">输入问题</label><textarea id="y-ai-question" rows="2" maxlength="4000" placeholder="想读懂哪篇文章？" required></textarea><div class="y-ai-compose-bottom"><button class="y-ai-clear" type="button">清空对话</button><span>Enter 发送 · Shift+Enter 换行</span><button class="y-ai-send" type="submit" aria-label="发送问题">↑</button></div></form><p class="y-ai-footnote">问题将发送给 DeepSeek，回答请结合原文判断。</p></div>`;
   // 手机上窗口改成从顶部滑下的面板，底部留一截遮罩，点遮罩即可收起。
   const backdrop = document.createElement('div');
   backdrop.id = 'y-ai-backdrop'; backdrop.hidden = true;
@@ -78,7 +78,7 @@
   }
   const quoteCard = document.createElement('div');
   quoteCard.className = 'y-ai-quote'; quoteCard.hidden = true;
-  quoteCard.innerHTML = '<div class="y-ai-quote-heading"><span>引用片段</span><button type="button" class="y-ai-quote-remove" aria-label="移除引用片段">×</button></div><pre class="y-ai-quote-preview" title="点按展开或收起"></pre>';
+  quoteCard.innerHTML = '<div class="y-ai-quote-heading"><span>引用片段</span><button type="button" class="y-ai-quote-remove" aria-label="移除引用片段">×</button></div><a class="y-ai-quote-title" target="_blank" rel="noopener"></a><pre class="y-ai-quote-preview" title="点按展开或收起"></pre>';
   $('.y-ai-compose').prepend(quoteCard);
   const quoteNotice = document.createElement('div');
   quoteNotice.className = 'y-ai-context-notice'; quoteNotice.hidden = true;
@@ -163,10 +163,12 @@
     quoteCard.hidden = !quoted;
     quoteNotice.hidden = !quoted || account?.aiAccess === 'approved';
     $('#y-ai-question').required = !quoted;
-    $('#y-ai-question').placeholder = quoted ? '想问这段什么？' : mode === 'blog' ? '想读懂哪篇文章？' : '输入你的问题…';
+    $('#y-ai-question').placeholder = quoted ? '想问这段什么？直接发送也可解释片段' : mode === 'blog' ? '想读懂哪篇文章？' : '输入你的问题…';
     if (!quoted) return;
     quoteCard.querySelector('.y-ai-quote-heading span').textContent = (quoted.kind === 'code'
       ? '引用代码 · ' + quoted.text.split('\n').length + ' 行' : '引用正文 · ' + quoted.text.length + ' 字') + (quoted.truncated ? ' · 已截断' : '');
+    const titleLink = $('.y-ai-quote-title');
+    if (titleLink) { titleLink.textContent = quoted.title; titleLink.href = quoted.url; }
     // 引用内容自动换行，一句话完整显示；超过四行先收起，点按展开。去掉代码共同的缩进，省出横向空间。
     const lines = quoted.text.split('\n');
     const indent = Math.min(...lines.filter(line => line.trim()).map(line => line.match(/^[ \t]*/)[0].length));
@@ -188,7 +190,7 @@
   function elementOf(node) { return node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement; }
   function selectedText(range) {
     const fragment = range.cloneContents();
-    fragment.querySelectorAll('.gutter, button, .copy-btn, .highlight-tools, script, style').forEach(node => node.remove());
+    fragment.querySelectorAll('.gutter, button, .copy-btn, .code-lang, .expand-btn, .fold-cover, .highlight-tools, script, style').forEach(node => node.remove());
     let text = '';
     function read(node) {
       if (node.nodeType === Node.TEXT_NODE) { text += node.textContent; return; }
@@ -262,6 +264,17 @@
   for (const button of selectionMenu.querySelectorAll('button')) button.addEventListener('click', () => askSelection(candidate, button.dataset.selectionAction === 'explain'));
   for (const block of document.querySelectorAll('.post-body figure.highlight, .post-body > pre')) {
     const actions = document.createElement('div'); actions.className = 'y-ai-code-actions';
+    if (block.matches('figure.highlight')) {
+      const wrapButton = document.createElement('button'); wrapButton.type = 'button'; wrapButton.className = 'y-ai-code-wrap';
+      wrapButton.textContent = '自动换行'; wrapButton.setAttribute('aria-pressed', 'false');
+      wrapButton.title = '切换代码长行自动换行 / 横向滚动';
+      wrapButton.addEventListener('click', () => {
+        const wrapped = block.classList.toggle('y-code-wrap');
+        wrapButton.setAttribute('aria-pressed', String(wrapped));
+        wrapButton.textContent = wrapped ? '取消换行' : '自动换行';
+      });
+      actions.append(wrapButton);
+    }
     const button = document.createElement('button'); button.type = 'button'; button.className = 'y-ai-code-ask';
     button.textContent = '✧ 整段问 AI'; button.setAttribute('aria-label', '引用这段代码并向 AI 提问');
     button.addEventListener('click', () => {
@@ -273,6 +286,13 @@
   }
   // 点击代码块左侧行号选中整行，Shift 点击从上次点的行号连选到这一行；选中后沿用划词提问菜单。
   let lineAnchor = null;
+  function clearLineHighlight() {
+    for (const node of document.querySelectorAll('.y-ai-line-selected')) node.classList.remove('y-ai-line-selected');
+  }
+  document.addEventListener('selectionchange', () => {
+    const s = window.getSelection();
+    if (!s || s.isCollapsed) clearLineHighlight();
+  });
   for (const gutter of document.querySelectorAll('.post-body figure.highlight td.gutter')) {
     const block = gutter.closest('figure.highlight');
     const numbers = [...gutter.querySelectorAll('.line')];
@@ -289,19 +309,40 @@
       if (!extend) lineAnchor = { block, index };
       const from = extend ? Math.min(lineAnchor.index, index) : index;
       const to = extend ? Math.max(lineAnchor.index, index) : index;
+      clearLineHighlight();
+      for (let i = from; i <= to; i++) {
+        numbers[i]?.classList.add('y-ai-line-selected');
+        lines[i]?.classList.add('y-ai-line-selected');
+      }
       const range = document.createRange();
       range.setStart(lines[from], 0); range.setEnd(lines[to], lines[to].childNodes.length);
       const selection = window.getSelection(); selection.removeAllRanges(); selection.addRange(range);
       scheduleSelection();
     });
   }
-  // 固定窗口只通过顶部拖动，正文、输入框与代码选择不会触发拖动。
+  // 固定窗口只通过顶部拖动，正文、输入框与代码选择不会触发拖动；桌面端支持切换宽屏与拖拽左下角调整尺寸。
   const positionKey = 'y-blog-ai-panel-position';
-  let panelPosition = null, drag = null;
+  let panelPosition = null, panelSize = null, panelWide = false, drag = null, resizeDrag = null;
+  const resizer = document.createElement('div');
+  resizer.className = 'y-ai-resizer'; resizer.title = '拖拽调整窗口大小';
+  panel.append(resizer);
   try {
     const saved = JSON.parse(sessionStorage.getItem(positionKey));
-    if (saved && Number.isFinite(saved.left) && Number.isFinite(saved.top)) panelPosition = saved;
+    if (saved) {
+      if (Number.isFinite(saved.left) && Number.isFinite(saved.top)) panelPosition = { left: saved.left, top: saved.top };
+      if (Number.isFinite(saved.width) && Number.isFinite(saved.height)) panelSize = { width: saved.width, height: saved.height };
+      if (typeof saved.wide === 'boolean') panelWide = saved.wide;
+    }
   } catch {}
+  function syncWideUI() {
+    panel.classList.toggle('y-ai-panel-wide', !drawerMode && panelWide && !panelSize);
+    const btn = $('.y-ai-size-toggle');
+    if (btn) {
+      btn.setAttribute('aria-pressed', String(panelWide));
+      btn.textContent = panelWide ? '⤡' : '⤢';
+      btn.title = panelWide ? '恢复标准窗口尺寸（也可双击标题栏）' : '加宽窗口（也可双击标题栏）';
+    }
+  }
   function viewportBounds() {
     const viewport = window.visualViewport;
     return { left: viewport?.offsetLeft || 0, top: viewport?.offsetTop || 0,
@@ -310,7 +351,17 @@
   function applyPosition(left = panelPosition?.left, top = panelPosition?.top) {
     // 手机面板的位置由可见区域决定，不碰也不保存电脑上浮动窗口的拖动位置。
     if (panel.hidden || drawerMode) return;
+    syncWideUI();
     const view = viewportBounds();
+    if (panelSize) {
+      const w = Math.max(360, Math.min(panelSize.width, view.width - 20));
+      const h = Math.max(380, Math.min(panelSize.height, view.height - 20));
+      panel.style.width = w + 'px';
+      panel.style.height = h + 'px';
+    } else {
+      panel.style.removeProperty('width');
+      panel.style.removeProperty('height');
+    }
     panel.style.maxHeight = Math.max(180, view.height - 16) + 'px';
     if (!Number.isFinite(left) || !Number.isFinite(top)) return;
     const box = panel.getBoundingClientRect();
@@ -320,14 +371,57 @@
       top: Math.max(view.top + 8, Math.min(top, view.top + view.height - keepY)) };
     Object.assign(panel.style, { left: panelPosition.left + 'px', top: panelPosition.top + 'px', right: 'auto', bottom: 'auto' });
   }
-  function savePosition() { try { sessionStorage.setItem(positionKey, JSON.stringify(panelPosition)); } catch {} }
+  function savePosition() {
+    try {
+      sessionStorage.setItem(positionKey, JSON.stringify({
+        ...(panelPosition || {}),
+        ...(panelSize ? { width: panelSize.width, height: panelSize.height } : {}),
+        wide: panelWide
+      }));
+    } catch {}
+  }
   function resetPosition() {
-    drag = null; panel.classList.remove('y-ai-dragging'); panelPosition = null;
-    for (const property of ['left', 'top', 'right', 'bottom', 'max-height']) panel.style.removeProperty(property);
+    drag = null; resizeDrag = null; panel.classList.remove('y-ai-dragging', 'y-ai-panel-wide');
+    panelPosition = null; panelSize = null; panelWide = false; syncWideUI();
+    for (const property of ['left', 'top', 'right', 'bottom', 'width', 'height', 'max-height']) panel.style.removeProperty(property);
     try { sessionStorage.removeItem(positionKey); } catch {}
     applyPosition();
   }
+  function toggleWide() {
+    if (drawerMode) return;
+    panelSize = null;
+    panelWide = !panelWide;
+    syncWideUI();
+    fitPanel();
+    savePosition();
+  }
   const header = $('.y-ai-header');
+  $('.y-ai-size-toggle').addEventListener('click', toggleWide);
+  header.addEventListener('dblclick', event => {
+    if (drawerMode || event.target.closest('button')) return;
+    toggleWide();
+  });
+  resizer.addEventListener('pointerdown', event => {
+    if (drawerMode || !event.isPrimary || event.button !== 0) return;
+    const box = panel.getBoundingClientRect();
+    resizeDrag = { id: event.pointerId, x: event.clientX, y: event.clientY, left: box.left, top: box.top, right: box.right, width: box.width, height: box.height };
+    resizer.setPointerCapture(event.pointerId); event.preventDefault(); event.stopPropagation();
+  });
+  resizer.addEventListener('pointermove', event => {
+    if (!resizeDrag || event.pointerId !== resizeDrag.id) return;
+    const view = viewportBounds();
+    const dx = event.clientX - resizeDrag.x, dy = event.clientY - resizeDrag.y;
+    const nextWidth = Math.round(Math.max(360, Math.min(view.width - 20, resizeDrag.width - dx)));
+    const nextHeight = Math.round(Math.max(380, Math.min(view.height - 20, resizeDrag.height + dy)));
+    panelSize = { width: nextWidth, height: nextHeight };
+    panelPosition = { left: Math.max(8, resizeDrag.right - nextWidth), top: resizeDrag.top };
+    applyPosition(panelPosition.left, panelPosition.top);
+  });
+  for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) resizer.addEventListener(type, () => {
+    if (!resizeDrag) return;
+    if (resizer.hasPointerCapture(resizeDrag.id)) resizer.releasePointerCapture(resizeDrag.id);
+    resizeDrag = null; savePosition();
+  });
   header.addEventListener('pointerdown', event => {
     if (drawerMode || !event.isPrimary || event.button !== 0 || event.target.closest('button:not(.y-ai-move-handle)')) return;
     const box = panel.getBoundingClientRect();

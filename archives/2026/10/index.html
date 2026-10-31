@@ -100,7 +100,7 @@
   <noscript>
     <link rel="stylesheet" href="/css/noscript.css">
   </noscript>
-<link data-private-ai-assets rel="stylesheet" href="/js/private-ai/blog-ai.css?v=quote-20261031">
+<link data-private-ai-assets rel="stylesheet" href="/js/private-ai/blog-ai.css?v=desktop-20261031">
 </head>
 
 <body itemscope itemtype="https://schema.org/WebPage">
@@ -725,10 +725,88 @@
       toast(next === 'dark' ? '已切换为夜间护眼模式 🌙' : '已切换为日间纸张模式 ☀️');
     });
   });
+
+  // 5. 代码块体验增强：顶栏显示语言与总行数、复制按钮文字与提示、长代码支持展开与再次收起
+  const enhanceCodeblocks = () => {
+    document.querySelectorAll('.post-body figure.highlight').forEach(block => {
+      if (block.dataset.yEnhanced) return;
+      const lang = block.querySelector('.code-lang');
+      const copyBtn = block.querySelector('.copy-btn');
+      const expandBtn = block.querySelector('.expand-btn');
+      if (!lang && !copyBtn && !expandBtn) return;
+      block.dataset.yEnhanced = '1';
+
+      const lineCount = block.querySelectorAll('.code .line').length;
+      if (lang && lineCount > 0 && !lang.textContent.includes('行')) {
+        lang.textContent = `${lang.textContent.trim()} · ${lineCount} 行`;
+      }
+
+      if (copyBtn && !copyBtn.querySelector('.y-copy-label')) {
+        const label = document.createElement('span');
+        label.className = 'y-copy-label';
+        label.textContent = ' 复制';
+        copyBtn.append(label);
+        copyBtn.addEventListener('click', () => {
+          label.textContent = ' 已复制';
+          toast('已复制代码');
+          setTimeout(() => { label.textContent = ' 复制'; }, 1600);
+        });
+      }
+
+      if (expandBtn) {
+        const cleanBtn = expandBtn.cloneNode(false);
+        const collapsedText = lineCount > 0 ? `展开全部代码（共 ${lineCount} 行） ▾` : '展开全部代码 ▾';
+        const expandedText = '收起代码 ▴';
+        cleanBtn.textContent = collapsedText;
+        cleanBtn.setAttribute('role', 'button');
+        cleanBtn.tabIndex = 0;
+        expandBtn.replaceWith(cleanBtn);
+        const toggleFold = () => {
+          if (block.classList.contains('unfold')) {
+            block.classList.add('highlight-fold');
+            block.classList.remove('unfold');
+            cleanBtn.textContent = collapsedText;
+            const rect = block.getBoundingClientRect();
+            if (rect.top < 24) block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } else {
+            block.classList.remove('highlight-fold');
+            block.classList.add('unfold');
+            cleanBtn.textContent = expandedText;
+          }
+        };
+        cleanBtn.addEventListener('click', toggleFold);
+        cleanBtn.addEventListener('keydown', event => {
+          if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleFold(); }
+        });
+      }
+    });
+  };
+  enhanceCodeblocks();
+  window.addEventListener('DOMContentLoaded', () => setTimeout(enhanceCodeblocks, 60));
+  window.addEventListener('load', enhanceCodeblocks);
+
+  // 6. 宽屏文章目录跟随：正文滚动切换当前小节时，左侧悬浮栏目录自动保持当前项在视野内
+  const sidebar = document.querySelector('.sidebar');
+  const tocNav = sidebar && sidebar.querySelector('.post-toc .nav');
+  if (sidebar && tocNav && 'MutationObserver' in window) {
+    let lastActive = null;
+    new MutationObserver(() => {
+      if (!matchMedia('(min-width: 1200px)').matches) return;
+      const active = tocNav.querySelector('.active-current > a');
+      if (!active || active === lastActive) return;
+      lastActive = active;
+      const barRect = sidebar.getBoundingClientRect();
+      const linkRect = active.getBoundingClientRect();
+      if (linkRect.top < barRect.top + 48 || linkRect.bottom > barRect.bottom - 48) {
+        const targetTop = sidebar.scrollTop + (linkRect.top - barRect.top) - barRect.height * 0.4;
+        sidebar.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+      }
+    }).observe(tocNav, { attributes: true, subtree: true, attributeFilter: ['class'] });
+  }
 })();
 </script>
 
-<script src="/js/private-ai/marked.min.js?v=quote-20261031" defer></script>
-<script src="/js/private-ai/blog-ai.js?v=quote-20261031" defer></script>
+<script src="/js/private-ai/marked.min.js?v=desktop-20261031" defer></script>
+<script src="/js/private-ai/blog-ai.js?v=desktop-20261031" defer></script>
 </body>
 </html>
