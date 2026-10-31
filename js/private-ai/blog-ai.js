@@ -320,13 +320,14 @@
       scheduleSelection();
     });
   }
-  // 固定窗口只通过顶部拖动，正文、输入框与代码选择不会触发拖动；桌面端支持切换宽屏与拖拽左下角调整尺寸。
-  const positionKey = 'y-blog-ai-panel-position';
+  // 固定窗口默认停靠在页面左侧栏区域（不遮挡右侧正文与代码），只通过顶部拖动；桌面端支持切换宽屏与拖拽右下角调整尺寸。
+  const positionKey = 'y-blog-ai-panel-left-v1';
   let panelPosition = null, panelSize = null, panelWide = false, drag = null, resizeDrag = null;
   const resizer = document.createElement('div');
-  resizer.className = 'y-ai-resizer'; resizer.title = '拖拽调整窗口大小';
+  resizer.className = 'y-ai-resizer'; resizer.title = '拖拽右下角调整窗口大小';
   panel.append(resizer);
   try {
+    sessionStorage.removeItem('y-blog-ai-panel-position');
     const saved = JSON.parse(sessionStorage.getItem(positionKey));
     if (saved) {
       if (Number.isFinite(saved.left) && Number.isFinite(saved.top)) panelPosition = { left: saved.left, top: saved.top };
@@ -348,16 +349,35 @@
     return { left: viewport?.offsetLeft || 0, top: viewport?.offsetTop || 0,
       width: viewport?.width || innerWidth, height: viewport?.height || innerHeight };
   }
+  function defaultLeftPlacement(view) {
+    const main = document.querySelector('.main-inner');
+    const sidebar = document.querySelector('.sidebar');
+    if (view.width >= 1200 && main) {
+      const mainLeft = Math.round(main.getBoundingClientRect().left);
+      const sideLeft = sidebar ? Math.round(sidebar.getBoundingClientRect().left) : 16;
+      if (mainLeft >= 356) {
+        const width = Math.min(420, Math.max(340, mainLeft - 28));
+        const left = Math.max(14, Math.min(sideLeft, mainLeft - width - 14));
+        return { left, width: Math.min(width, mainLeft - left - 12) };
+      }
+    }
+    return { left: 18, width: Math.min(400, view.width - 36) };
+  }
   function applyPosition(left = panelPosition?.left, top = panelPosition?.top) {
     // 手机面板的位置由可见区域决定，不碰也不保存电脑上浮动窗口的拖动位置。
     if (panel.hidden || drawerMode) return;
     syncWideUI();
     const view = viewportBounds();
     if (panelSize) {
-      const w = Math.max(360, Math.min(panelSize.width, view.width - 20));
+      const w = Math.max(340, Math.min(panelSize.width, view.width - 20));
       const h = Math.max(380, Math.min(panelSize.height, view.height - 20));
       panel.style.width = w + 'px';
       panel.style.height = h + 'px';
+    } else if (!panelWide) {
+      const def = defaultLeftPlacement(view);
+      panel.style.width = def.width + 'px';
+      panel.style.removeProperty('height');
+      if (!Number.isFinite(left)) panel.style.left = def.left + 'px';
     } else {
       panel.style.removeProperty('width');
       panel.style.removeProperty('height');
@@ -404,17 +424,17 @@
   resizer.addEventListener('pointerdown', event => {
     if (drawerMode || !event.isPrimary || event.button !== 0) return;
     const box = panel.getBoundingClientRect();
-    resizeDrag = { id: event.pointerId, x: event.clientX, y: event.clientY, left: box.left, top: box.top, right: box.right, width: box.width, height: box.height };
+    resizeDrag = { id: event.pointerId, x: event.clientX, y: event.clientY, left: box.left, top: box.top, width: box.width, height: box.height };
     resizer.setPointerCapture(event.pointerId); event.preventDefault(); event.stopPropagation();
   });
   resizer.addEventListener('pointermove', event => {
     if (!resizeDrag || event.pointerId !== resizeDrag.id) return;
     const view = viewportBounds();
     const dx = event.clientX - resizeDrag.x, dy = event.clientY - resizeDrag.y;
-    const nextWidth = Math.round(Math.max(360, Math.min(view.width - 20, resizeDrag.width - dx)));
-    const nextHeight = Math.round(Math.max(380, Math.min(view.height - 20, resizeDrag.height + dy)));
+    const nextWidth = Math.round(Math.max(340, Math.min(view.width - resizeDrag.left - 12, resizeDrag.width + dx)));
+    const nextHeight = Math.round(Math.max(380, Math.min(view.height - resizeDrag.top - 12, resizeDrag.height + dy)));
     panelSize = { width: nextWidth, height: nextHeight };
-    panelPosition = { left: Math.max(8, resizeDrag.right - nextWidth), top: resizeDrag.top };
+    panelPosition = { left: resizeDrag.left, top: resizeDrag.top };
     applyPosition(panelPosition.left, panelPosition.top);
   });
   for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) resizer.addEventListener(type, () => {
