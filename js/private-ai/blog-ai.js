@@ -183,6 +183,30 @@
     });
     actions.append(button); block.before(actions);
   }
+  // 点击代码块左侧行号选中整行，Shift 点击从上次点的行号连选到这一行；选中后沿用划词提问菜单。
+  let lineAnchor = null;
+  for (const gutter of document.querySelectorAll('.post-body figure.highlight td.gutter')) {
+    const block = gutter.closest('figure.highlight');
+    const numbers = [...gutter.querySelectorAll('.line')];
+    const lines = [...block.querySelectorAll('td.code .line')];
+    numbers.forEach((number, index) => {
+      if (!lines[index]) return;
+      number.classList.add('y-ai-line-number'); number.title = '点击选中这一行 · Shift 点击连选多行';
+    });
+    gutter.addEventListener('click', event => {
+      const number = event.target.closest('.y-ai-line-number');
+      if (!number) return;
+      const index = numbers.indexOf(number);
+      const extend = event.shiftKey && lineAnchor?.block === block;
+      if (!extend) lineAnchor = { block, index };
+      const from = extend ? Math.min(lineAnchor.index, index) : index;
+      const to = extend ? Math.max(lineAnchor.index, index) : index;
+      const range = document.createRange();
+      range.setStart(lines[from], 0); range.setEnd(lines[to], lines[to].childNodes.length);
+      const selection = window.getSelection(); selection.removeAllRanges(); selection.addRange(range);
+      scheduleSelection();
+    });
+  }
   // 固定窗口只通过顶部拖动，正文、输入框与代码选择不会触发拖动。
   const positionKey = 'y-blog-ai-panel-position';
   let panelPosition = null, drag = null;
@@ -201,8 +225,10 @@
     panel.style.maxHeight = Math.max(180, view.height - 16) + 'px';
     if (!Number.isFinite(left) || !Number.isFinite(top)) return;
     const box = panel.getBoundingClientRect();
-    panelPosition = { left: Math.max(view.left + 8, Math.min(left, view.left + view.width - box.width - 8)),
-      top: Math.max(view.top + 8, Math.min(top, view.top + view.height - box.height - 8)) };
+    // 窗口可以拖到屏幕左右或下方之外，只要还露出一截标题栏，手机上也能把它挪开看正文。
+    const keepX = Math.min(box.width, 120), keepY = Math.min(box.height, header.offsetHeight + 8);
+    panelPosition = { left: Math.max(view.left + keepX - box.width, Math.min(left, view.left + view.width - keepX)),
+      top: Math.max(view.top + 8, Math.min(top, view.top + view.height - keepY)) };
     Object.assign(panel.style, { left: panelPosition.left + 'px', top: panelPosition.top + 'px', right: 'auto', bottom: 'auto' });
   }
   function savePosition() { try { sessionStorage.setItem(positionKey, JSON.stringify(panelPosition)); } catch {} }
@@ -415,7 +441,7 @@
     if (!visible[mode].length) {
       const welcome = document.createElement('div'); welcome.className = 'y-ai-welcome';
       const heading = document.createElement('h2'); heading.textContent = mode === 'blog' ? '从一个问题，读懂一篇随笔。' : '有什么想聊的？';
-      const text = document.createElement('p'); text.textContent = mode === 'blog' ? '选中文章或代码即可问我，也可以直接输入问题。回答下方会列出参考文章。' : '代码、学习、想法，都可以从这里开始。选中片段也能带来一起聊。';
+      const text = document.createElement('p'); text.textContent = mode === 'blog' ? '选中文章或代码即可问我，点代码左侧的行号能直接选中一行。回答下方会列出参考文章。' : '代码、学习、想法，都可以从这里开始。选中片段也能带来一起聊。';
       welcome.append(heading, text);
       for (const question of mode === 'blog' ? ['RNN 怎样把声音变成文字？', 'WeNet 的两遍识别是什么？'] : ['帮我解释一段 Python 代码', '怎么安排今天的学习？']) {
         const button = document.createElement('button'); button.type = 'button'; button.textContent = question + ' ↗';
