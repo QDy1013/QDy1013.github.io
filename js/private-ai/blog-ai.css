@@ -82,10 +82,18 @@ html.y-ai-drawer-mode #y-ai-panel .y-ai-message-quote pre{font-size:13px}
 @keyframes y-ai-fade{from{opacity:0}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){#y-ai-panel,#y-ai-backdrop{animation:none!important}}
 
-/* 简约版：去掉标题和模式切换后收紧顶部；引用只占输入框上方一行说明。 */
+/* 简约版：去掉标题和模式切换后收紧顶部；引用在输入框上方显示一行说明和自动换行的内容。 */
 #y-ai-panel .y-ai-header{padding-top:10px;padding-bottom:10px}
 #y-ai-panel .y-ai-messages{padding-top:14px}
 #y-ai-panel .y-ai-quote{padding-bottom:6px;margin-bottom:8px}
+/* 引用内容：自动换行，一句完整可见；超过四行先收起，点按展开到最多约八行并可滚动。 */
+#y-ai-panel pre.y-ai-quote-preview{margin-top:4px;cursor:pointer;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;line-height:1.6}
+#y-ai-panel pre.y-ai-quote-preview:not(.y-ai-expanded){max-height:calc(4 * 1.6em + 8px)!important;padding-bottom:0;overflow:hidden}
+#y-ai-panel pre.y-ai-quote-preview.y-ai-clamped:not(.y-ai-expanded){-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 1.6em),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 1.6em),transparent)}
+#y-ai-panel pre.y-ai-quote-preview.y-ai-expanded{max-height:calc(8 * 1.6em + 16px)!important;overflow:auto}
+/* 键盘弹出时空间更紧：引用预览收起两行、展开最多四行。 */
+html.y-ai-drawer-mode.y-ai-keyboard #y-ai-panel pre.y-ai-quote-preview:not(.y-ai-expanded){max-height:calc(2 * 1.6em + 8px)!important}
+html.y-ai-drawer-mode.y-ai-keyboard #y-ai-panel pre.y-ai-quote-preview.y-ai-expanded{max-height:calc(4 * 1.6em + 16px)!important}
 /* 网页本来就显示在浏览器地址栏下面，不加刘海安全区；有的手机浏览器会报一个很大的值，顶部会空出一大块。 */
 html.y-ai-drawer-mode #y-ai-panel .y-ai-header{position:absolute;top:0;right:6px;z-index:2;padding:0;border:0;background:none}
 html.y-ai-drawer-mode #y-ai-panel .y-ai-move-handle{display:none}
@@ -111,9 +119,15 @@ html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-dragging{transition:none}
 html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-full{height:var(--ya-drawer-full,100dvh);border-radius:0}
 html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-min{height:auto}
 html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-min>:not(.y-ai-header):not(.y-ai-access):not(.y-ai-grabber){display:none!important}
-/* 「问一问」浮在面板和遮罩之上、位置固定：点一下全屏展开，再点一下收起；全屏时面板底部给它让出一条。 */
-html.y-ai-drawer-mode #y-ai-launcher{z-index:1203;right:14px;bottom:calc(18px + var(--ya-drawer-bottom,0px));padding:11px 16px}
-html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-full{padding-bottom:76px}
+/* 「问一问」浮在面板和遮罩之上、位置固定：点一下全屏展开，再点一下收起。 */
+html.y-ai-drawer-mode #y-ai-launcher{z-index:1203;right:14px;bottom:calc(10px + var(--ya-drawer-bottom,0px));padding:9px 14px}
+/* 全屏时不再整条让位：提示文字放到按钮左边、拉手缩成细线，和按钮共用最底下一条，输入框尽量贴近屏幕底部。 */
+html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-full{padding-bottom:0}
+html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-full .y-ai-footnote{text-align:left;padding:8px 136px 0 18px;min-height:42px;line-height:1.5}
+html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-full .y-ai-grabber{height:14px}
+html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-full .y-ai-unlock,html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-full .y-ai-waiting,html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-full .y-ai-management,html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-full .y-ai-password-form{padding-bottom:64px}
+/* 手机上回答里的代码自动换行，一整句都看得到，不用左右滑。 */
+html.y-ai-drawer-mode #y-ai-panel .y-ai-code-panel pre.y-ai-code-block,html.y-ai-drawer-mode #y-ai-panel .y-ai-code-panel pre code,html.y-ai-drawer-mode #y-ai-panel pre.y-ai-code-block{white-space:pre-wrap!important;overflow-wrap:anywhere;word-break:break-word}
 #y-ai-panel:focus{outline:none}
 /* 不再给页面加 overflow:hidden（会把页面滚回顶部）；面板里的滚动区域滚到头也不带动背后的页面，背后滑动由脚本拦下。 */
 html.y-ai-drawer-mode #y-ai-panel,html.y-ai-drawer-mode #y-ai-panel .y-ai-messages,html.y-ai-drawer-mode #y-ai-panel .y-ai-unlock,html.y-ai-drawer-mode #y-ai-panel .y-ai-waiting,html.y-ai-drawer-mode #y-ai-panel .y-ai-accounts,html.y-ai-drawer-mode #y-ai-panel .y-ai-password-form,html.y-ai-drawer-mode #y-ai-panel textarea,html.y-ai-drawer-mode #y-ai-panel pre,html.y-ai-drawer-mode #y-ai-panel .y-ai-table-wrap{overscroll-behavior:contain}

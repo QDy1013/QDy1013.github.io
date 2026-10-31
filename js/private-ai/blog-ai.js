@@ -39,13 +39,18 @@
     if (drawerMode) {
       // 面板和按钮都按「可见区域」定位：弹出键盘后浏览器会把可见区域往下挪、高度变小，面板跟着贴在键盘上方。
       const hiddenBelow = Math.max(0, document.documentElement.clientHeight - viewTop - viewHeight);
+      // 键盘弹出（可见高度明显变矮）时标记出来，引用预览收得更紧，给对话留位置。
+      root.classList.toggle('y-ai-keyboard', viewHeight < document.documentElement.clientHeight * 0.8);
       root.style.setProperty('--ya-zoom', zoom.toFixed(3));
       root.style.setProperty('--ya-drawer-w', viewWidth / zoom + 'px');
       root.style.setProperty('--ya-drawer-h', viewHeight * 0.65 / zoom + 'px');
       root.style.setProperty('--ya-drawer-full', viewHeight / zoom + 'px');
       root.style.setProperty('--ya-drawer-top', viewTop / zoom + 'px');
       root.style.setProperty('--ya-drawer-bottom', hiddenBelow / zoom + 'px');
-    } else for (const name of ['--ya-zoom', '--ya-drawer-w', '--ya-drawer-h', '--ya-drawer-full', '--ya-drawer-top', '--ya-drawer-bottom']) root.style.removeProperty(name);
+    } else {
+      for (const name of ['--ya-zoom', '--ya-drawer-w', '--ya-drawer-h', '--ya-drawer-full', '--ya-drawer-top', '--ya-drawer-bottom']) root.style.removeProperty(name);
+      root.classList.remove('y-ai-keyboard');
+    }
   }
   // 手机上不替读者把光标放进输入框，免得一打开面板就弹出键盘；只聚焦面板本身，键盘等读者自己点输入框再出来。
   function focusField(field) {
@@ -73,7 +78,7 @@
   }
   const quoteCard = document.createElement('div');
   quoteCard.className = 'y-ai-quote'; quoteCard.hidden = true;
-  quoteCard.innerHTML = '<div class="y-ai-quote-heading"><span>引用片段</span><button type="button" class="y-ai-quote-remove" aria-label="移除引用片段">×</button></div>';
+  quoteCard.innerHTML = '<div class="y-ai-quote-heading"><span>引用片段</span><button type="button" class="y-ai-quote-remove" aria-label="移除引用片段">×</button></div><pre class="y-ai-quote-preview" title="点按展开或收起"></pre>';
   $('.y-ai-compose').prepend(quoteCard);
   const quoteNotice = document.createElement('div');
   quoteNotice.className = 'y-ai-context-notice'; quoteNotice.hidden = true;
@@ -160,13 +165,25 @@
     $('#y-ai-question').required = !quoted;
     $('#y-ai-question').placeholder = quoted ? '想问这段什么？' : mode === 'blog' ? '想读懂哪篇文章？' : '输入你的问题…';
     if (!quoted) return;
-    // 引用只显示一行说明，不展示具体内容，给对话留出位置；发出的问题里仍可展开查看。
     quoteCard.querySelector('.y-ai-quote-heading span').textContent = (quoted.kind === 'code'
       ? '引用代码 · ' + quoted.text.split('\n').length + ' 行' : '引用正文 · ' + quoted.text.length + ' 字') + (quoted.truncated ? ' · 已截断' : '');
+    // 引用内容自动换行，一句话完整显示；超过四行先收起，点按展开。去掉代码共同的缩进，省出横向空间。
+    const lines = quoted.text.split('\n');
+    const indent = Math.min(...lines.filter(line => line.trim()).map(line => line.match(/^[ \t]*/)[0].length));
+    const preview = $('.y-ai-quote-preview');
+    preview.textContent = lines.map(line => line.slice(Number.isFinite(indent) ? indent : 0)).join('\n');
+    preview.classList.remove('y-ai-expanded'); markClamped();
     quoteNotice.querySelector('span').textContent = account ? '片段已保留，开通 AI 权限后可提问。' : '片段已保留，登录后可继续提问。';
   }
   function removeQuote() { if (!busy) { quoted = null; renderQuote(); focusField(account?.aiAccess === 'approved' ? $('#y-ai-question') : $('#y-ai-username')); } }
   $('.y-ai-quote-remove').addEventListener('click', removeQuote);
+  $('.y-ai-quote-preview').addEventListener('click', event => event.currentTarget.classList.toggle('y-ai-expanded'));
+  // 内容被收起时最后一行渐隐，提示还能点开；一句能完整放下时不渐隐。面板显示、键盘弹出等尺寸变化后重新判断。
+  function markClamped() {
+    const preview = $('.y-ai-quote-preview');
+    preview.classList.toggle('y-ai-clamped', preview.scrollHeight > preview.clientHeight + 1);
+  }
+  if ('ResizeObserver' in window) new ResizeObserver(markClamped).observe($('.y-ai-quote-preview'));
   quoteNotice.querySelector('button').addEventListener('click', removeQuote);
   function elementOf(node) { return node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement; }
   function selectedText(range) {
@@ -608,25 +625,39 @@
     launcher.setAttribute('aria-label', open ? '收起 AI 问答窗口' : '打开 AI 问答窗口');
     launcher.setAttribute('aria-expanded', String(open));
   }
-  // 手机返回键先关面板而不是离开文章：打开时压一条同网址的历史记录，关面板时再把它退掉，并保持阅读位置不动。
+  // 手机返回键先关面板而不是离开文章：打开时压一条同网址的历史记录，关面板时再把它退掉。
+  // 压记录前把这一步的滚动恢复设为手动，退回时浏览器就不会把页面拽回旧位置；退回完成后再还原设置。
   // 注意本脚本里的 history 是对话记录，浏览器历史要写 window.history。
-  let panelHistory = false, restoreScroll = null;
+  let panelHistory = false, pendingBack = false, manualRestoration = false;
+  // 面板开着时刷新或从别处返回，会停在之前压的那条记录上：清掉标记、恢复自动滚动，免得刷新后位置不恢复。
+  try { if (window.history.state?.yAiPanel) { window.history.replaceState(null, ''); window.history.scrollRestoration = 'auto'; } } catch {}
+  function pushPanelHistory() {
+    if (!drawerMode || panelHistory || pendingBack) return;
+    try {
+      manualRestoration = true;
+      window.history.scrollRestoration = 'manual';
+      window.history.pushState({ yAiPanel: true }, '');
+      panelHistory = true;
+    } catch {}
+  }
   window.addEventListener('popstate', () => {
-    if (restoreScroll !== null) { const y = restoreScroll; restoreScroll = null; window.scrollTo({ top: y, behavior: 'instant' }); return; }
+    if (manualRestoration) { try { window.history.scrollRestoration = 'auto'; } catch {} manualRestoration = false; }
+    // 关面板引起的退回：如果读者在退回完成前又打开了面板，这时再补压一条。
+    if (pendingBack) { pendingBack = false; if (!panel.hidden) pushPanelHistory(); return; }
     if (panelHistory) { panelHistory = false; if (!panel.hidden) close(); }
   });
   function close() {
     if (panel.contains(document.activeElement)) document.activeElement.blur();
     panel.hidden = true; backdrop.hidden = true; document.documentElement.classList.remove('y-ai-drawer-open');
     syncLauncher(false); focusField(returnFocus || launcher);
-    if (panelHistory) { panelHistory = false; restoreScroll = window.scrollY; window.history.back(); }
+    if (panelHistory) { panelHistory = false; pendingBack = true; window.history.back(); }
   }
   async function openPanel() {
     if (panel.hidden) returnFocus = document.activeElement;
     panel.hidden = false; backdrop.hidden = false; document.documentElement.classList.add('y-ai-drawer-open'); syncDrawer();
     setSheet(drawerMode ? 'full' : 'normal');
     syncLauncher(true);
-    if (drawerMode && !panelHistory) { try { window.history.pushState({ yAiPanel: true }, ''); panelHistory = true; } catch {} }
+    pushPanelHistory();
     fitPanel();
     setAuthorized(account || (token ? cachedAccount : null)); renderConversation();
     if (token) {
