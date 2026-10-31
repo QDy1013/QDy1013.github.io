@@ -23,9 +23,12 @@
   const $ = selector => panel.querySelector(selector);
   // 窄屏或触屏设备都用侧栏；有的手机浏览器把页面按七八百像素宽排版再整体缩小，只看宽度会误判成电脑。
   const narrowQuery = window.matchMedia('(max-width: 600px)'), touchQuery = window.matchMedia('(hover: none) and (pointer: coarse)');
+  // 部分手机浏览器不报告 pointer/hover，或开着「电脑版」伪装成桌面；再看触点、触摸事件和浏览器标识。
+  const mobileAgent = /Android|iPhone|iPad|iPod|HarmonyOS|Mobile/i.test(navigator.userAgent);
+  const touchCapable = (navigator.maxTouchPoints || 0) > 0 || 'ontouchstart' in window;
   let drawerMode = false;
   function syncDrawer() {
-    drawerMode = narrowQuery.matches || touchQuery.matches;
+    drawerMode = narrowQuery.matches || touchQuery.matches || mobileAgent || touchCapable && !window.matchMedia('(pointer: fine)').matches;
     const root = document.documentElement;
     root.classList.toggle('y-ai-drawer-mode', drawerMode);
     // 页面被缩小显示时，按「可见宽度 ÷ 屏幕宽度」把侧栏和按钮放大回正常字号。
@@ -39,8 +42,24 @@
     } else for (const name of ['--ya-zoom', '--ya-drawer-w', '--ya-drawer-h']) root.style.removeProperty(name);
     $('.y-ai-heading span').textContent = drawerMode ? '选中文章或代码即可提问' : '拖动顶部可移动 · 选中内容可提问';
   }
-  narrowQuery.addEventListener('change', syncDrawer); touchQuery.addEventListener('change', syncDrawer);
+  for (const query of [narrowQuery, touchQuery]) query.addEventListener ? query.addEventListener('change', syncDrawer) : query.addListener?.(syncDrawer);
   window.addEventListener('resize', syncDrawer); window.visualViewport?.addEventListener('resize', syncDrawer); syncDrawer();
+  // 网址带 ?ai-debug 时在页面顶部列出判断依据，方便用手机截图排查。
+  if (/[?&#]ai-debug/.test(location.href)) {
+    const debug = document.createElement('pre');
+    debug.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:1300;margin:0;padding:10px;background:#000c;color:#fff;font:14px/1.5 monospace;white-space:pre-wrap;pointer-events:none';
+    const scriptSrc = [...document.scripts].map(s => s.src).find(src => src.includes('blog-ai.js')) || '';
+    const showDebug = () => {
+      const media = query => window.matchMedia(query).matches ? '是' : '否';
+      debug.textContent = ['版本 ' + (scriptSrc.split('v=')[1] || '未知'), '侧栏模式 ' + (drawerMode ? '是' : '否') + '  放大 ' + (getComputedStyle(document.documentElement).getPropertyValue('--ya-zoom') || '1'),
+        '窗口宽 ' + innerWidth + '  可见宽 ' + Math.round(window.visualViewport?.width || 0) + '  屏幕宽 ' + screen.width + '  像素比 ' + devicePixelRatio,
+        '窄屏 ' + media('(max-width: 600px)') + '  触屏查询 ' + media('(hover: none) and (pointer: coarse)') + '  精确指针 ' + media('(pointer: fine)'),
+        '触点 ' + (navigator.maxTouchPoints || 0) + '  触摸事件 ' + ('ontouchstart' in window ? '有' : '无') + '  手机标识 ' + (mobileAgent ? '是' : '否'),
+        navigator.userAgent].join('\n');
+      debug.style.zoom = getComputedStyle(document.documentElement).getPropertyValue('--ya-zoom') || '1';
+    };
+    showDebug(); document.body.append(debug); window.addEventListener('resize', showDebug);
+  }
   const quoteCard = document.createElement('div');
   quoteCard.className = 'y-ai-quote'; quoteCard.hidden = true;
   quoteCard.innerHTML = '<div class="y-ai-quote-heading"><span>引用片段</span><button type="button" class="y-ai-quote-remove" aria-label="移除引用片段">×</button></div><a class="y-ai-quote-title" target="_blank" rel="noopener"></a><pre class="y-ai-quote-preview"></pre><small class="y-ai-quote-meta"></small>';
