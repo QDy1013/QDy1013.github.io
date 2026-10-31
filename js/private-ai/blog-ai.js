@@ -10,20 +10,56 @@
   panel.id = 'y-ai-panel'; panel.hidden = true; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-label', '奇点Y的问答窗口');
   panel.innerHTML = `
     <header class="y-ai-header"><div class="y-ai-symbol">${icon}</div><div class="y-ai-heading"><strong>随笔之间</strong><span>读文章，也聊聊你的问题</span></div><button class="y-ai-close" aria-label="关闭问答窗口" type="button">×</button></header>
-    <div class="y-ai-access"><span class="y-ai-dot"></span><span class="y-ai-access-label">邀请访问</span><button class="y-ai-logout" type="button" hidden>退出</button></div>
-    <form class="y-ai-unlock"><div class="y-ai-lock-mark">✧</div><h2>留给获邀朋友的问答角落</h2><p>博客问答与自由聊天，<br>凭博主提供的邀请码开启。</p><label for="y-ai-code">邀请码</label><div class="y-ai-code-row"><input id="y-ai-code" type="password" autocomplete="off" spellcheck="false" placeholder="粘贴你的专属邀请码" maxlength="128" required><button type="submit">开启</button></div><p class="y-ai-unlock-note">还没有邀请码？可以先联系博主。</p><div class="y-ai-login-error" role="status"></div></form>
+    <div class="y-ai-access"><span class="y-ai-dot"></span><span class="y-ai-access-label">账号访问</span><button class="y-ai-admin-open" type="button" hidden>AI 权限</button><button class="y-ai-password-open" type="button" hidden>改密码</button><button class="y-ai-logout" type="button" hidden>退出</button></div>
+    <form class="y-ai-unlock"><div class="y-ai-lock-mark">✧</div><h2>登录你的问答角落</h2><p>注册即可拥有账号，<br>AI 使用权限由博主单独开通。</p><div class="y-ai-auth-tabs"><button type="button" data-auth="login" aria-pressed="true">登录</button><button type="button" data-auth="register" aria-pressed="false">注册账号</button></div><label for="y-ai-username">用户名</label><input id="y-ai-username" name="username" type="text" autocomplete="username" spellcheck="false" placeholder="字母、数字、下划线或短横线" minlength="3" maxlength="32" required><label for="y-ai-password">密码</label><input id="y-ai-password" name="password" type="password" autocomplete="current-password" placeholder="10–128 位密码" minlength="10" maxlength="128" required><div class="y-ai-confirm-field" hidden><label for="y-ai-confirm">再次输入密码</label><input id="y-ai-confirm" type="password" autocomplete="new-password" maxlength="128"></div><button class="y-ai-auth-submit" type="submit">登录</button><div class="y-ai-login-error" role="status"></div></form>
+    <div class="y-ai-waiting" hidden><div class="y-ai-lock-mark">✧</div><h2>账号已登录</h2><p class="y-ai-access-message">AI 权限等待博主开通。</p><button class="y-ai-refresh-access" type="button">刷新权限状态</button><p>开通后即可使用博客问答与自由聊天。</p><div class="y-ai-waiting-status" role="status"></div></div>
+    <div class="y-ai-management" hidden><div class="y-ai-view-header"><button class="y-ai-back" type="button">← 返回</button><h2>AI 权限管理</h2><button class="y-ai-refresh-accounts" type="button">刷新</button></div><p class="y-ai-manage-note">注册不等于获得 AI 权限。开通后才能提问，撤销后立即停止使用。</p><div class="y-ai-manage-status" role="status"></div><div class="y-ai-accounts"></div><div class="y-ai-pagination"><button class="y-ai-prev" type="button">上一页</button><span class="y-ai-page-label"></span><button class="y-ai-next" type="button">下一页</button></div></div>
+    <form class="y-ai-password-form" hidden><div class="y-ai-view-header"><button class="y-ai-back" type="button">← 返回</button><h2>修改密码</h2></div><label for="y-ai-old-password">当前密码</label><input id="y-ai-old-password" type="password" autocomplete="current-password" maxlength="128" required><label for="y-ai-new-password">新密码</label><input id="y-ai-new-password" type="password" autocomplete="new-password" minlength="10" maxlength="128" required><label for="y-ai-new-confirm">再次输入新密码</label><input id="y-ai-new-confirm" type="password" autocomplete="new-password" maxlength="128" required><button class="y-ai-password-submit" type="submit">保存新密码</button><div class="y-ai-password-status" role="status"></div></form>
     <div class="y-ai-chat" hidden><div class="y-ai-tabs" role="tablist" aria-label="选择问答方式"><button type="button" role="tab" aria-selected="true" data-mode="blog">博客问答</button><button type="button" role="tab" aria-selected="false" data-mode="general">自由聊天</button></div><div class="y-ai-messages" role="log" aria-label="对话内容" aria-live="polite" aria-relevant="additions"></div><div class="y-ai-status" role="status"></div><form class="y-ai-compose"><label class="y-ai-sr" for="y-ai-question">输入问题</label><textarea id="y-ai-question" rows="2" maxlength="4000" placeholder="想读懂哪篇文章？" required></textarea><div class="y-ai-compose-bottom"><button class="y-ai-clear" type="button">清空对话</button><span>Enter 发送 · Shift+Enter 换行</span><button class="y-ai-send" type="submit" aria-label="发送问题">↑</button></div></form><p class="y-ai-footnote">问题将发送给 DeepSeek，回答请结合原文判断。</p></div>`;
   document.body.append(launcher, panel);
   const $ = selector => panel.querySelector(selector);
   const history = { blog: [], general: [] };
   const visible = { blog: [], general: [] };
   let mode = 'blog', token = '', busy = false, endpoint = '', configPromise, controller, returnFocus;
-  try { token = sessionStorage.getItem('y-private-ai-session') || ''; } catch {}
-  function saveToken(value) { token = value; try { value ? sessionStorage.setItem('y-private-ai-session', value) : sessionStorage.removeItem('y-private-ai-session'); } catch {} }
+  let account = null, authMode = 'login', accountPage = 0, epoch = 0;
+  const sessionKey = 'y-blog-ai-account-session';
+  try { token = sessionStorage.getItem(sessionKey) || ''; sessionStorage.removeItem('y-private-ai-session'); } catch {}
+  function saveToken(value) { token = value; epoch++; try { value ? sessionStorage.setItem(sessionKey, value) : sessionStorage.removeItem(sessionKey); } catch {} }
+  function setView(view) {
+    $('.y-ai-unlock').hidden = Boolean(account);
+    $('.y-ai-chat').hidden = !account || account.aiAccess !== 'approved' || view !== 'chat';
+    $('.y-ai-waiting').hidden = !account || account.aiAccess === 'approved' || view !== 'chat';
+    $('.y-ai-management').hidden = !account || view !== 'admin';
+    $('.y-ai-password-form').hidden = !account || view !== 'password';
+  }
   function setAuthorized(value) {
-    $('.y-ai-unlock').hidden = value; $('.y-ai-chat').hidden = !value; $('.y-ai-logout').hidden = !value;
-    $('.y-ai-access-label').textContent = value ? '已授权 · 私享问答' : '邀请访问';
-    panel.classList.toggle('y-ai-authorized', value);
+    account = value || null;
+    $('.y-ai-logout').hidden = !account;
+    $('.y-ai-password-open').hidden = !account;
+    $('.y-ai-admin-open').hidden = account?.role !== 'admin';
+    $('.y-ai-access-label').textContent = account ? account.username + (account.role === 'admin' ? ' · 管理员' : '') : '账号访问';
+    $('.y-ai-access-message').textContent = account?.aiAccess === 'disabled' ? 'AI 权限已被撤销，请联系博主重新开通。' : 'AI 权限等待博主开通，请联系博主。';
+    panel.classList.toggle('y-ai-authorized', Boolean(account));
+    setView('chat');
+  }
+  function resetSession() {
+    controller?.abort(); saveToken(''); setAuthorized(null); setBusy(false);
+    for (const name of ['blog', 'general']) { history[name] = []; visible[name] = []; }
+    $('.y-ai-password-form').reset(); $('.y-ai-accounts').replaceChildren();
+  }
+  function setAuthMode(value) {
+    authMode = value;
+    for (const tab of panel.querySelectorAll('[data-auth]')) tab.setAttribute('aria-pressed', String(tab.dataset.auth === value));
+    $('.y-ai-confirm-field').hidden = value !== 'register';
+    $('#y-ai-confirm').required = value === 'register';
+    $('#y-ai-password').autocomplete = value === 'register' ? 'new-password' : 'current-password';
+    $('.y-ai-auth-submit').textContent = value === 'register' ? '注册账号' : '登录';
+    $('.y-ai-login-error').textContent = '';
+  }
+  async function loadAccount() {
+    const current = token;
+    const result = await request('/api/me', {});
+    if (token === current) { setAuthorized(result.account); renderConversation(); }
   }
   function setBusy(value) {
     busy = value; $('.y-ai-send').disabled = value; $('.y-ai-clear').disabled = value;
@@ -43,12 +79,13 @@
     await config();
     const response = await fetch(endpoint + path, { method: 'POST', headers: {
       'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {})
-    }, body: JSON.stringify(body), signal, credentials: 'omit' });
+    }, body: JSON.stringify(body), signal: signal || AbortSignal.timeout(25000), credentials: 'omit' });
     let data; try { data = await response.json(); } catch { throw Error('没有收到完整回答，请重试。'); }
     if (!response.ok) {
-      if (response.status === 401 && path === '/api/chat') {
-        saveToken(''); setAuthorized(false); $('.y-ai-login-error').textContent = data.error || '授权已失效，请联系博主。';
+      if (response.status === 401 && !['/api/session', '/api/register', '/api/password'].includes(path)) {
+        resetSession(); $('.y-ai-login-error').textContent = data.error || '登录已失效，请重新登录。';
       }
+      if (response.status === 403 && path === '/api/chat') await loadAccount();
       throw Error(data.error || '暂时无法回答，请稍后重试。');
     }
     return data;
@@ -94,25 +131,91 @@
     } else for (const item of visible[mode]) addMessage(item);
   }
   function close() { panel.hidden = true; launcher.setAttribute('aria-expanded', 'false'); (returnFocus || launcher).focus(); }
-  launcher.addEventListener('click', () => {
+  launcher.addEventListener('click', async () => {
     if (!panel.hidden) return close();
     returnFocus = document.activeElement; panel.hidden = false; launcher.setAttribute('aria-expanded', 'true');
-    setAuthorized(Boolean(token)); renderConversation(); (token ? $('#y-ai-question') : $('#y-ai-code')).focus();
+    setAuthorized(account); renderConversation();
+    if (token) {
+      $('.y-ai-access-label').textContent = '正在检查登录状态…';
+      try { await loadAccount(); } catch (error) { $('.y-ai-login-error').textContent = error.message; $('.y-ai-waiting-status').textContent = error.message; }
+    }
+    (account?.aiAccess === 'approved' ? $('#y-ai-question') : account ? $('.y-ai-refresh-access') : $('#y-ai-username')).focus();
   });
   $('.y-ai-close').addEventListener('click', close);
   panel.addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); } });
+  for (const tab of panel.querySelectorAll('[data-auth]')) tab.addEventListener('click', () => setAuthMode(tab.dataset.auth));
   $('.y-ai-unlock').addEventListener('submit', async e => {
-    e.preventDefault(); const button = $('.y-ai-unlock button'); button.disabled = true; $('.y-ai-login-error').textContent = '';
-    try { const result = await request('/api/session', { code: $('#y-ai-code').value.trim() });
-      if (typeof result.token !== 'string') throw Error('授权未完成，请重试。');
-      saveToken(result.token); $('#y-ai-code').value = ''; setAuthorized(true); renderConversation(); $('#y-ai-question').focus();
+    e.preventDefault();
+    const button = $('.y-ai-auth-submit'); button.disabled = true;
+    for (const tab of panel.querySelectorAll('[data-auth]')) tab.disabled = true;
+    $('.y-ai-login-error').textContent = '';
+    try {
+      if (authMode === 'register' && $('#y-ai-password').value !== $('#y-ai-confirm').value) throw Error('两次密码不一致。');
+      const result = await request(authMode === 'register' ? '/api/register' : '/api/session', { username: $('#y-ai-username').value, password: $('#y-ai-password').value });
+      if (authMode === 'register') {
+        setAuthMode('login'); $('#y-ai-password').value = ''; $('#y-ai-confirm').value = '';
+        $('.y-ai-login-error').textContent = result.message; $('#y-ai-password').focus();
+      } else {
+        if (typeof result.token !== 'string' || !result.account) throw Error('登录未完成，请重试。');
+        saveToken(result.token); $('#y-ai-password').value = ''; $('#y-ai-confirm').value = '';
+        setAuthorized(result.account); renderConversation();
+        (account.aiAccess === 'approved' ? $('#y-ai-question') : $('.y-ai-refresh-access')).focus();
+      }
     } catch (error) { $('.y-ai-login-error').textContent = error.message; }
+    finally { button.disabled = false; for (const tab of panel.querySelectorAll('[data-auth]')) tab.disabled = false; }
+  });
+  $('.y-ai-logout').addEventListener('click', () => { resetSession(); setAuthMode('login'); $('#y-ai-username').focus(); });
+  $('.y-ai-refresh-access').addEventListener('click', async () => {
+    const button = $('.y-ai-refresh-access'); button.disabled = true; $('.y-ai-waiting-status').textContent = '';
+    try { await loadAccount(); if (account?.aiAccess !== 'approved') $('.y-ai-waiting-status').textContent = '暂未开通，可以联系博主。'; }
+    catch (error) { $('.y-ai-waiting-status').textContent = error.message; }
     finally { button.disabled = false; }
   });
-  $('.y-ai-logout').addEventListener('click', () => { controller?.abort(); saveToken('');
-    for (const name of ['blog', 'general']) { history[name] = []; visible[name] = []; }
-    setAuthorized(false); setBusy(false); $('#y-ai-code').focus();
+  for (const button of panel.querySelectorAll('.y-ai-back')) button.addEventListener('click', () => setView('chat'));
+  $('.y-ai-password-open').addEventListener('click', () => { setView('password'); $('.y-ai-password-status').textContent = ''; $('#y-ai-old-password').focus(); });
+  $('.y-ai-password-form').addEventListener('submit', async e => {
+    e.preventDefault(); const button = $('.y-ai-password-submit'); button.disabled = true;
+    try {
+      if ($('#y-ai-new-password').value !== $('#y-ai-new-confirm').value) throw Error('两次新密码不一致。');
+      const result = await request('/api/password', { currentPassword: $('#y-ai-old-password').value, password: $('#y-ai-new-password').value });
+      resetSession(); setAuthMode('login'); $('.y-ai-login-error').textContent = result.message;
+    } catch (error) { $('.y-ai-password-status').textContent = error.message; }
+    finally { button.disabled = false; }
   });
+  async function loadAccounts() {
+    const current = token; $('.y-ai-manage-status').textContent = '正在读取账号…';
+    try {
+      const result = await request('/api/admin/accounts', { page: accountPage });
+      if (current !== token) return;
+      const list = $('.y-ai-accounts'); list.replaceChildren();
+      for (const person of result.accounts) {
+        const row = document.createElement('div'); row.className = 'y-ai-account-row';
+        const text = document.createElement('div');
+        const name = document.createElement('strong'); name.textContent = person.username;
+        const status = document.createElement('span'); status.textContent = person.role === 'admin' ? '管理员 · AI 已开通' : ({ pending: 'AI 待开通', approved: 'AI 已开通', disabled: 'AI 已撤销' }[person.aiAccess] || '未知状态');
+        text.append(name, status); row.append(text);
+        if (person.role !== 'admin') {
+          const action = document.createElement('button'); action.type = 'button';
+          action.textContent = person.aiAccess === 'approved' ? '撤销权限' : '开通 AI';
+          action.addEventListener('click', async () => {
+            action.disabled = true;
+            try {
+              const changed = await request('/api/admin/status', { id: person.id, status: person.aiAccess === 'approved' ? 'disabled' : 'approved' });
+              await loadAccounts(); $('.y-ai-manage-status').textContent = changed.message;
+            } catch (error) { $('.y-ai-manage-status').textContent = error.message; action.disabled = false; }
+          }); row.append(action);
+        }
+        list.append(row);
+      }
+      $('.y-ai-prev').disabled = accountPage === 0; $('.y-ai-next').disabled = !result.hasMore;
+      $('.y-ai-page-label').textContent = '第 ' + (accountPage + 1) + ' 页';
+      $('.y-ai-manage-status').textContent = '';
+    } catch (error) { $('.y-ai-manage-status').textContent = error.message; }
+  }
+  $('.y-ai-admin-open').addEventListener('click', () => { setView('admin'); accountPage = 0; loadAccounts(); });
+  $('.y-ai-refresh-accounts').addEventListener('click', () => loadAccounts());
+  $('.y-ai-prev').addEventListener('click', () => { if (accountPage > 0) { accountPage--; loadAccounts(); } });
+  $('.y-ai-next').addEventListener('click', () => { accountPage++; loadAccounts(); });
   for (const tab of panel.querySelectorAll('[data-mode]')) tab.addEventListener('click', () => {
     if (busy) return; mode = tab.dataset.mode;
     for (const t of panel.querySelectorAll('[data-mode]')) t.setAttribute('aria-selected', String(t === tab));
@@ -123,15 +226,17 @@
   $('#y-ai-question').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); if (!busy) $('.y-ai-compose').requestSubmit(); } });
   $('.y-ai-compose').addEventListener('submit', async e => {
     e.preventDefault(); const text = $('#y-ai-question').value.trim(); if (busy || !text) return;
+    const turnEpoch = epoch;
     const turns = history[mode].slice(-8);
     while (turns.length && turns.reduce((n, m) => n + m.content.length, 0) > 10000) turns.splice(0, 2);
     const item = { role: 'user', content: text };
     visible[mode].push(item); renderConversation(); $('#y-ai-question').value = ''; setBusy(true); controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 75000);
     try { const data = await request('/api/chat', { mode, messages: [...turns, item] }, controller.signal);
+      if (epoch !== turnEpoch) return;
       const answer = { role: 'assistant', content: data.answer, sources: data.sources };
       history[mode] = [...turns, item, { role: 'assistant', content: data.answer.slice(0, 5000) }]; visible[mode].push(answer); addMessage(answer);
-    } catch (error) { $('.y-ai-status').textContent = error.name === 'AbortError' ? '等待已结束，可以重新提问。' : error.message; }
+    } catch (error) { if (epoch !== turnEpoch) return; $('.y-ai-status').textContent = error.name === 'AbortError' ? '等待已结束，可以重新提问。' : error.message; }
     finally { clearTimeout(timer); const status = $('.y-ai-status').textContent; setBusy(false); $('.y-ai-status').textContent = status.startsWith('正在') ? '' : status; }
   });
 })();
