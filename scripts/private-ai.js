@@ -21,9 +21,12 @@ hexo.extend.filter.register('after_generate', async function () {
     const chunks = [];
     for await (const chunk of this.route.get(name)) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
     let html = Buffer.concat(chunks).toString('utf8');
-    if (html.includes('data-private-ai-assets')) continue;
-    html = html.replace('</head>', '<link data-private-ai-assets rel="stylesheet" href="/js/private-ai/blog-ai.css">\n</head>')
-      .replace('</body>', '<script src="/js/private-ai/blog-ai.js" defer></script>\n</body>');
+    if (html.includes('data-private-ai-assets')) {
+      html = html.replace(/\/js\/private-ai\/blog-ai\.(css|js)(?:\?[^"']*)?/g, '/js/private-ai/blog-ai.$1?v=accounts-20261031');
+    } else {
+      html = html.replace('</head>', '<link data-private-ai-assets rel="stylesheet" href="/js/private-ai/blog-ai.css?v=accounts-20261031">\n</head>')
+        .replace('</body>', '<script src="/js/private-ai/blog-ai.js?v=accounts-20261031" defer></script>\n</body>');
+    }
     this.route.set(name, html);
   }
 });

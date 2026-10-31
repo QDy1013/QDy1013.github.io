@@ -1,88 +1,57 @@
-# 博客私享 AI 问答的接入与管理
+# 博客 AI 账号与权限管理
 
-博客窗口支持站内文章问答与自由聊天，模型由 DeepSeek 提供。只有博主私下发放邀请码的人才能使用。每个人一个邀请码，可以单独撤销；邀请码可以转交，因此它不是实名身份验证。当前生产配置默认关闭，完成下列步骤后再开放。
+网站：https://qdy1013.github.io/
+接口：https://qdy-private-blog-ai.qdy-private-blog-ai.workers.dev
 
-## 第一步 注册 Cloudflare
+## 使用规则
 
-打开 https://dash.cloudflare.com/sign-up 注册并验证邮箱，然后登录。不需要迁移博客域名；博客继续留在 GitHub Pages，Cloudflare Worker 只承载授权和 AI 接口。
+1. 任何访客都可以注册。注册成功后即可登录，无需审批账号。
+2. 新账号默认没有 AI 权限。登录后显示等待博主开通，不能通过直接调用接口绕过。
+3. 管理员在窗口上方点击「AI 权限」，给指定账号「开通 AI」或「撤销权限」。
+4. 开通后用户点击「刷新权限状态」即可开始提问。撤销后，已登录用户的后续 AI 请求也会立即被拦截，账号仍然能够登录和修改密码。
+5. 管理员是 QDy，Q、D 大写，y 小写。用户名保留显示大小写，登录和去重时忽略大小写。密码不记录在本文或源码中。
+6. 登录会话保存在当前标签页的 sessionStorage，8 小时有效；过期或关闭标签页后重新登录。可以使用浏览器的密码保存功能。
 
-## 第二步 登录部署工具
+## 管理员操作
 
-在此目录打开终端，运行：
+打开博客 → 点击右下角「问一问」→ 用户名和密码登录 → 点击上方「AI 权限」。
+账号列表中，待开通与已撤销的账号可以「开通 AI」，已开通的账号可以「撤销权限」。列表每页 50 条，支持翻页。
+「改密码」需要验证当前密码；修改成功后，所有旧登录会话失效。管理员账号不能通过页面给自己撤销权限。
+密码忘记时由博主在原维护电脑运行 admin.mjs 的 reset-password 模式恢复；没有提供公开的无验证重置接口。
+
+## 数据与密钥
+
+账号保存在 Cloudflare D1 的 qdy-blog-ai-accounts 数据库。数据库仅保存随机盐与密码哈希，密码先经过服务端 pepper，再用 PBKDF2-SHA256（100000 次）派生。
+D1 accounts.status 表示 AI 权限：pending 待开通、approved 已开通、disabled 已撤销；这些状态均不阻止正确密码登录。
+role 只由服务端决定。公开注册接口只能创建普通账号，管理员由本地工具初始化。
+SESSION_SECRET 和 DEEPSEEK_API_KEY 保存在 Worker Secrets，浏览器和 GitHub 不包含它们。SESSION_SECRET 同时用于密码 pepper，因此应妥善保留，不要随意更换；更换会导致现有密码无法验证。
+.private、.wrangler、.env 等目录均禁止提交。不要把本地密码、会话令牌、签名密钥放到桌面说明文档或公开仓库。
+旧版邀请码已经停用，ACCESS_CODES 即使仍保留在 Cloudflare 也不再参与校验。
+
+## 维护与部署
+
+当前已有部署不需要重复配置 API 密钥。日常修改后：
 
 ```powershell
-npx wrangler login
+node --test test/worker.test.mjs
+npx wrangler d1 migrations apply qdy-blog-ai-accounts --remote
 npx wrangler deploy
 ```
 
-第一次命令会通过浏览器让你登录并授权。请由账号本人操作。第二条上传接口并显示一个 HTTPS 的 workers.dev 地址。此时没有配置密钥，接口会保持关闭。
+首次部署到其他 Cloudflare 账号时，先创建 D1 数据库，在 wrangler.jsonc 中替换 database_id，然后应用迁移。
+使用 wrangler secret put 分别配置 DEEPSEEK_API_KEY 与至少 32 字符的 SESSION_SECRET。不要把值写进命令参数或源码。
+管理员初始化工具 setup-admin.ps1 弹出本地输入窗口；admin.mjs 从标准输入读取密码，临时 SQL 文件仅包含加盐哈希，执行后删除。它只允许初始化唯一管理员，不会把公开注册用户提升为管理员。
+原维护目录保留本地 session-secret.txt 供维护工具使用；复制到其他目录的公开代码不含该密钥，不能直接用于恢复管理员。
 
-## 第三步 配置两个密钥
+## 接口与验证
 
-在 DeepSeek 开放平台 https://platform.deepseek.com 创建 API Key。这里需要 API Key，网页登录账号本身不能代替。API 使用情况与费用由你的 DeepSeek 账户承担。
+POST /api/register：注册，忽略客户端传来的 role、status。
+POST /api/session：用户名密码登录，包括未获 AI 权限的账号。
+POST /api/me：读取当前登录与 AI 权限。
+POST /api/password：验证旧密码后修改密码。
+POST /api/admin/accounts：管理员分页查看账号，无密码字段。
+POST /api/admin/status：管理员开通或撤销普通账号的 AI 权限。
+POST /api/chat：先验证会话和数据库中的 AI 权限，再调用 DeepSeek。
 
-```powershell
-npx wrangler secret put DEEPSEEK_API_KEY
-node access.mjs session-secret
-npx wrangler secret put SESSION_SECRET
-```
-
-第一条命令提示时粘贴 DeepSeek API Key。第三条提示时粘贴本地 `.private/session-secret.txt` 的内容。密钥输入终端的交互提示或 Cloudflare 的 Secret 设置，不写入网页、GitHub、聊天消息或明文配置。
-
-也可以在 Cloudflare 的 Workers & Pages 中找到该 Worker，进入 Settings 的 Variables and Secrets，以 Secret 类型设置这两个名字。不要使用明文变量类型。
-
-## 第四步 批准一个人使用
-
-```powershell
-node access.mjs add friend1
-node access.mjs upload
-```
-
-第一条生成一个独立邀请码，放在 `.private/friend1.txt`。把里面的码私下发给你同意的人。第二条将仅含哈希和标识的授权名单上传为 `ACCESS_CODES` Secret。每次添加或撤销后都要上传名单。
-
-为自己创建一个独立的 `owner` 邀请码也使用相同步骤。这里没有对外开放“自助注册”接口；访客必须联系你获得许可。
-
-## 第五步 把接口地址接进博客
-
-```powershell
-node configure-site.mjs https://你的Worker名称.你的账号.workers.dev
-```
-
-这个命令只更新 `custom/ai-config.json` 的公开地址及启用状态，不包含任何密钥。之后生成并发布 Hexo 博客。服务端通过构建产物 `/ai-index.json` 检索公开文章，所以博客索引也需要随窗口一起发布。
-
-打开博客右下角“问一问”，输入你给自己的邀请码。分别检查博客问答和自由聊天；再用没有授权的浏览器检查无法直接调用聊天接口。真实模型调用必须在完成账号、密钥和线上索引配置后验证。
-
-## 撤销与更换权限
-
-```powershell
-node access.mjs revoke friend1
-node access.mjs upload
-```
-
-上传后，新请求会重新核对当前名单。该邀请码与此前签发的会话都会被拒绝，其他人的权限不受影响；已经开始的请求不会被追溯取消。Cloudflare 配置传播完成后生效。更换泄露的邀请码时先撤销再创建同名记录，并把新码私下发给本人。
-
-窗口在当前浏览器标签页的 sessionStorage 保留临时会话，不保存邀请码或 DeepSeek 密钥；对话记录仅保留在页面内存，刷新后清除。会话有效期八小时，退出会清理会话及页面对话。
-
-## 实现与边界
-
-- 会话使用服务端 HMAC 签名；每次聊天重新验证当前授权名单。只在前端隐藏按钮不构成授权，本实现的拒绝发生在服务端。
-- 站内问答由服务端读取博客生成的索引，按关键词检索文章片段；引用链接只来自同一博客域名。它不是全网搜索，也不是向量语义检索。
-- 回答和问题由文本节点渲染，代码块可以显示；不执行模型输出的 HTML。
-- 请求长度、对话角色、调用频率和输出长度受限；频率限制使用 Cloudflare 原生绑定，按地区近似计数，不是严格的每日消费封顶。需要额外预算控制时在 DeepSeek 账户侧管理余额和用量。
-- 博客模式和自由聊天会把对应对话发送给 DeepSeek。站内问答还会发送检索到的公开文章节选。不在模型提示中放 API Key、邀请码和会话密钥。
-- 当前只提供博主通过本地命令维护名单的方式，没有网页管理后台。
-
-## 本地检查
-
-```powershell
-npm test
-```
-
-这些检查使用模拟的模型接口，不会调用真实 DeepSeek 或产生模型费用。上线前还需使用自己的账号完成真实联调。
-
-参考：
-
-- DeepSeek 接口：https://api-docs.deepseek.com/
-- Cloudflare 上手：https://developers.cloudflare.com/workers/get-started/guide/
-- Cloudflare 密钥：https://developers.cloudflare.com/workers/configuration/secrets/
-- Cloudflare 频率限制：https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/
+接口只接受博客来源的 JSON 请求，有请求体大小与登录、注册、聊天限流。博客问答从服务端读取公开文章索引，自由聊天不读取索引。
+测试使用真正的 SQLite 执行生产 SQL，覆盖注册越权、大小写去重、开通撤销、密码修改、旧会话失效、分页和调用边界。浏览器另验证两种聊天方式、参考文章、手机布局及危险 HTML 作为文字显示。

@@ -1,45 +1,6 @@
-// 密钥、邀请码校验和模型调用全部在 Worker 执行，浏览器不接触 DeepSeek 密钥。
-const encoder = new TextEncoder();
+// 账号审批、会话校验和模型调用全部在 Worker 执行。
+import { HttpError, accountRoute, authorize } from "./accounts.mjs";
 const MAX_BODY = 48000;
-const SESSION_MS = 8 * 3600 * 1000;
-class HttpError extends Error {
-  constructor(status, message) { super(message); this.status = status; }
-}
-export async function digest(value) {
-  return [...new Uint8Array(await crypto.subtle.digest('SHA-256', encoder.encode(value)))]
-    .map(n => n.toString(16).padStart(2, '0')).join('');
-}
-const b64 = bytes => btoa(String.fromCharCode(...new Uint8Array(bytes)))
-  .replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
-const unb64 = value => Uint8Array.from(atob(value.replaceAll('-', '+').replaceAll('_', '/')), c => c.charCodeAt(0));
-async function hmacKey(secret) {
-  return crypto.subtle.importKey('raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']);
-}
-async function issueSession(record, env, now) {
-  const data = b64(encoder.encode(JSON.stringify({ id: record.id, fingerprint: record.hash,
-    audience: env.SITE_ORIGIN, expires: now + SESSION_MS })));
-  return data + '.' + b64(await crypto.subtle.sign('HMAC', await hmacKey(env.SESSION_SECRET), encoder.encode(data)));
-}
-function records(env) {
-  const list = JSON.parse(env.ACCESS_CODES || '[]');
-  if (!Array.isArray(list) || !list.every(x => x && /^[\w-]{1,64}$/.test(x.id) && /^[a-f0-9]{64}$/.test(x.hash)) ||
-      new Set(list.map(x => x.id)).size !== list.length) throw new HttpError(503, '服务暂时不可用，请稍后再试。');
-  return list;
-}
-async function authorize(request, env, now) {
-  const token = request.headers.get('Authorization')?.replace(/^Bearer /, '') || '';
-  if (!/^[\w-]+\.[\w-]+$/.test(token) || token.length > 1200) throw new HttpError(401, '请先输入博主提供的邀请码。');
-  try {
-    const [data, signature] = token.split('.');
-    if (!await crypto.subtle.verify('HMAC', await hmacKey(env.SESSION_SECRET), unb64(signature), encoder.encode(data))) throw Error();
-    const value = JSON.parse(new TextDecoder().decode(unb64(data)));
-    if (value.audience !== env.SITE_ORIGIN || !Number.isFinite(value.expires) || value.expires <= now) throw Error();
-    // 每次请求重新检查名单；撤销或更换该人的邀请码后，旧会话也失效。
-    const record = records(env).find(x => x.id === value.id && x.hash === value.fingerprint && x.enabled !== false);
-    if (!record) throw Error();
-    return record;
-  } catch { throw new HttpError(401, '授权已失效，请联系博主。'); }
-}
 async function readJSON(request) {
   if (!request.headers.get('Content-Type')?.startsWith('application/json')) throw new HttpError(415, '请发送 JSON 请求。');
   if (Number(request.headers.get('Content-Length')) > MAX_BODY) throw new HttpError(413, '内容太长，请缩短后再发。');
@@ -116,20 +77,12 @@ export function createHandler({ fetchImpl = fetch, now = Date.now } = {}) {
       }
       if (request.method !== 'POST') throw new HttpError(405, '不支持此请求方式。');
       const path = new URL(request.url).pathname;
-      if (!['/api/session', '/api/chat'].includes(path)) throw new HttpError(404, '接口不存在。');
+      if (!['/api/register', '/api/session', '/api/me', '/api/password', '/api/admin/accounts', '/api/admin/status', '/api/chat'].includes(path)) throw new HttpError(404, '接口不存在。');
       if (!env.DEEPSEEK_API_KEY || !env.SESSION_SECRET || env.SESSION_SECRET.length < 32 ||
-          !env.LOGIN_LIMIT || !env.CHAT_LIMIT) throw new HttpError(503, '服务尚未开放，请稍后再来。');
-      if (path === '/api/session') {
-        const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-        if (!(await env.LOGIN_LIMIT.limit({ key: 'login:' + ip })).success) throw new HttpError(429, '尝试次数较多，请稍后再试。');
-        const body = await readJSON(request);
-        if (typeof body.code !== 'string' || body.code.length < 32 || body.code.length > 128) throw new HttpError(401, '邀请码无效或已被撤销。');
-        const hash = await digest(body.code.trim());
-        const record = records(env).find(x => x.hash === hash && x.enabled !== false);
-        if (!record) throw new HttpError(401, '邀请码无效或已被撤销。');
-        return reply({ token: await issueSession(record, env, now()), expires: now() + SESSION_MS });
-      }
+          !env.LOGIN_LIMIT || !env.CHAT_LIMIT || !env.REGISTER_LIMIT || !env.DB) throw new HttpError(503, '服务尚未开放，请稍后再来。');
+      if (path !== '/api/chat') return reply(await accountRoute(path, await readJSON(request), request, env, now()));
       const record = await authorize(request, env, now());
+      if (record.status !== 'approved') throw new HttpError(403, record.status === 'pending' ? 'AI 使用权限尚未开通，请等待博主批准。' : 'AI 使用权限已被撤销，请联系博主。');
       if (!(await env.CHAT_LIMIT.limit({ key: 'chat:' + record.id })).success) throw new HttpError(429, '提问有些频繁，请稍后再试。');
       const body = await readJSON(request);
       const messages = messagesFrom(body);

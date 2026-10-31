@@ -4,12 +4,14 @@
   "main": "src/worker.mjs",
   "compatibility_date": "2026-10-31",
   "workers_dev": true,
+  "d1_databases": [{ "binding": "DB", "database_name": "qdy-blog-ai-accounts", "database_id": "39574d73-2a19-4436-b604-dcdd1077f7e1" }],
   "vars": {
     "SITE_ORIGIN": "https://qdy1013.github.io",
     "DEEPSEEK_MODEL": "deepseek-flash"
   },
   "ratelimits": [
     { "name": "LOGIN_LIMIT", "namespace_id": "73641001", "simple": { "limit": 10, "period": 60 } },
+    { "name": "REGISTER_LIMIT", "namespace_id": "73641003", "simple": { "limit": 3, "period": 60 } },
     { "name": "CHAT_LIMIT", "namespace_id": "73641002", "simple": { "limit": 10, "period": 60 } }
   ]
 }
