@@ -112,3 +112,6 @@ html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-dragging{transition:none}
 html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-full{height:var(--ya-drawer-full,100dvh);border-radius:0}
 html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-min{height:auto}
 html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-min>:not(.y-ai-header):not(.y-ai-access):not(.y-ai-grabber){display:none!important}
+/* 「问一问」浮在面板和遮罩之上、位置固定：点一下全屏展开，再点一下收起；全屏时面板底部给它让出一条。 */
+html.y-ai-drawer-mode #y-ai-launcher{z-index:1203;right:14px;bottom:18px;padding:11px 16px}
+html.y-ai-drawer-mode #y-ai-panel.y-ai-sheet-full{padding-bottom:76px}
