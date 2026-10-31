@@ -94,7 +94,7 @@ test('客户端不能注入system消息', async () => {
   assert.equal(result.status, 400); assert.equal(s.calls.length, 0);
 });
 test('过长的实际请求体被拒绝 不依赖Content-Length', async () => {
-  const s = await setup(); const result = await s.send('/api/chat', { ...question(), padding: 'a'.repeat(50000) }, await s.login());
+  const s = await setup(); const result = await s.send('/api/chat', { ...question(), padding: 'a'.repeat(100000) }, await s.login());
   assert.equal(result.status, 413); assert.equal(s.calls.length, 0);
 });
 test('缺密钥或限流绑定时默认关闭 不成为开放代理', async () => {
@@ -177,4 +177,74 @@ test('注册限流不写入数据库 登录限流不签发会话', async () => {
   assert.equal(s.env.DB.sqlite.prepare('SELECT COUNT(*) AS n FROM accounts').get().n, 1);
   s.env.LOGIN_LIMIT.limit = async () => ({ success: false });
   assert.equal((await s.send('/api/session', { username: 'QDy', password })).status, 429);
+});
+
+const selection = { title: '示例 Python 代码', url: origin + '/2026/10/31/rnn-asr-source/#data-py', kind: 'code',
+  text: 'def example(value):\n    result = value + 1\n    return result' };
+test('选中的代码和问题一起发送 保留缩进和换行 不作为系统指令', async () => {
+  const s = await setup(); const token = await s.login();
+  const response = await s.send('/api/chat', { mode: 'blog', messages: [{ role: 'user', content: '这段函数返回什么？', selection }] }, token);
+  assert.equal(response.status, 200);
+  const upstream = JSON.parse(s.calls.find(c => c.url.includes('api.deepseek.com')).options.body);
+  assert.equal(upstream.messages[1].role, 'user');
+  assert.ok(upstream.messages[1].content.includes(selection.text));
+  assert.ok(upstream.messages[1].content.includes(selection.url));
+  assert.ok(upstream.messages[1].content.endsWith('这段函数返回什么？'));
+  assert.ok(!upstream.messages[0].content.includes(selection.text));
+});
+
+test('检索无匹配也能解释选中片段 后续追问仍然包含原片段', async () => {
+  const s = await setup(); const token = await s.login();
+  const response = await s.send('/api/chat', { mode: 'blog', messages: [
+    { role: 'user', content: 'zzquux', selection }, { role: 'assistant', content: '示例解答' }, { role: 'user', content: '继续说明' }
+  ] }, token);
+  assert.equal(response.status, 200); assert.deepEqual((await response.json()).sources, []);
+  const upstream = JSON.parse(s.calls.find(c => c.url.includes('api.deepseek.com')).options.body);
+  assert.ok(upstream.messages[1].content.includes(selection.text)); assert.equal(upstream.messages.at(-1).content, '继续说明');
+});
+
+test('自由聊天可以解释片段 无需读取索引', async () => {
+  const s = await setup();
+  assert.equal((await s.send('/api/chat', { mode: 'general', messages: [{ role: 'user', content: '解释', selection }] }, await s.login())).status, 200);
+  assert.equal(s.calls.length, 1); assert.ok(s.calls[0].url.includes('api.deepseek.com'));
+});
+
+test('文章索引暂时不可用时仍可解释已选择的内容', async () => {
+  const s = await setup();
+  const handler = createHandler({ fetchImpl: async url => url.endsWith('/ai-index.json') ? new Response('', { status: 503 })
+    : Response.json({ choices: [{ message: { content: '这是示例函数。' } }] }) });
+  const request = new Request('https://worker.example/api/chat', { method: 'POST', headers: { Origin: origin,
+    'Content-Type': 'application/json', Authorization: 'Bearer ' + await s.login() },
+    body: JSON.stringify({ mode: 'blog', messages: [{ role: 'user', content: '解释', selection }] }) });
+  const response = await handler(request, s.env); assert.equal(response.status, 200); assert.deepEqual((await response.json()).sources, []);
+});
+
+test('引用有大小和来源限制 不允许把引用挂在助手消息上', async () => {
+  const s = await setup(); const token = await s.login();
+  for (const changed of [{ ...selection, text: 'a'.repeat(6001) }, { ...selection, url: 'https://evil.example/x' }, { ...selection, kind: 'system' }]) {
+    assert.equal((await s.send('/api/chat', { mode: 'blog', messages: [{ role: 'user', content: '解释', selection: changed }] }, token)).status, 400);
+  }
+  assert.equal((await s.send('/api/chat', { mode: 'general', messages: [
+    { role: 'user', content: '你好' }, { role: 'assistant', content: '你好', selection }, { role: 'user', content: '解释' }
+  ] }, token)).status, 400); assert.equal(s.calls.length, 0);
+});
+
+test('附带代码也不能绕过AI审批', async () => {
+  const s = await setup(); await s.send('/api/register', { username: 'pendinguser', password });
+  const token = (await (await s.send('/api/session', { username: 'pendinguser', password })).json()).token;
+  const body = { mode: 'blog', messages: [{ role: 'user', content: '解释', selection }] };
+  assert.equal((await s.send('/api/chat', body)).status, 401);
+  assert.equal((await s.send('/api/chat', body, token)).status, 403); assert.equal(s.calls.length, 0);
+});
+
+test('大量中文引用的实际字节仍有上限 长对话拒绝调用模型', async () => {
+  const s = await setup(); const token = await s.login();
+  const body = { mode: 'general', messages: [
+    { role: 'user', content: '解释', selection: { ...selection, text: '字'.repeat(6000) } },
+    { role: 'assistant', content: '答'.repeat(5000) },
+    { role: 'user', content: '解释', selection: { ...selection, text: '字'.repeat(6000) } },
+    { role: 'assistant', content: '答'.repeat(5000) },
+    { role: 'user', content: '解释', selection: { ...selection, text: '字'.repeat(6000) } }
+  ] };
+  assert.equal((await s.send('/api/chat', body, token)).status, 400); assert.equal(s.calls.length, 0);
 });

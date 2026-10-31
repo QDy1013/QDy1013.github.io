@@ -9,7 +9,7 @@
   const panel = document.createElement('section');
   panel.id = 'y-ai-panel'; panel.hidden = true; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-label', '奇点Y的问答窗口');
   panel.innerHTML = `
-    <header class="y-ai-header"><div class="y-ai-symbol">${icon}</div><div class="y-ai-heading"><strong>随笔之间</strong><span>读文章，也聊聊你的问题</span></div><button class="y-ai-close" aria-label="关闭问答窗口" type="button">×</button></header>
+    <header class="y-ai-header"><button class="y-ai-symbol y-ai-move-handle" type="button" aria-label="移动问答窗口，可用方向键调整位置" title="拖动窗口 · 方向键微调"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/></svg></button><div class="y-ai-heading"><strong>随笔之间</strong><span>拖动顶部可移动 · 选中内容可提问</span></div><button class="y-ai-position-reset" aria-label="恢复窗口默认位置" title="恢复默认位置" type="button">↺</button><button class="y-ai-close" aria-label="关闭问答窗口" type="button">×</button></header>
     <div class="y-ai-access"><span class="y-ai-dot"></span><span class="y-ai-access-label">账号访问</span><button class="y-ai-admin-open" type="button" hidden>AI 权限</button><button class="y-ai-password-open" type="button" hidden>改密码</button><button class="y-ai-logout" type="button" hidden>退出</button></div>
     <form class="y-ai-unlock"><div class="y-ai-lock-mark">✧</div><h2>登录你的问答角落</h2><p>注册即可拥有账号，<br>AI 使用权限由博主单独开通。</p><div class="y-ai-auth-tabs"><button type="button" data-auth="login" aria-pressed="true">登录</button><button type="button" data-auth="register" aria-pressed="false">注册账号</button></div><label for="y-ai-username">用户名</label><input id="y-ai-username" name="username" type="text" autocomplete="username" spellcheck="false" placeholder="字母、数字、下划线或短横线" minlength="3" maxlength="32" required><label for="y-ai-password">密码</label><input id="y-ai-password" name="password" type="password" autocomplete="current-password" placeholder="10–128 位密码" minlength="10" maxlength="128" required><div class="y-ai-confirm-field" hidden><label for="y-ai-confirm">再次输入密码</label><input id="y-ai-confirm" type="password" autocomplete="new-password" maxlength="128"></div><button class="y-ai-auth-submit" type="submit">登录</button><div class="y-ai-login-error" role="status"></div></form>
     <div class="y-ai-waiting" hidden><div class="y-ai-lock-mark">✧</div><h2>账号已登录</h2><p class="y-ai-access-message">AI 权限等待博主开通。</p><button class="y-ai-refresh-access" type="button">刷新权限状态</button><p>开通后即可使用博客问答与自由聊天。</p><div class="y-ai-waiting-status" role="status"></div></div>
@@ -18,6 +18,21 @@
     <div class="y-ai-chat" hidden><div class="y-ai-tabs" role="tablist" aria-label="选择问答方式"><button type="button" role="tab" aria-selected="true" data-mode="blog">博客问答</button><button type="button" role="tab" aria-selected="false" data-mode="general">自由聊天</button></div><div class="y-ai-messages" role="log" aria-label="对话内容" aria-live="polite" aria-relevant="additions"></div><div class="y-ai-status" role="status"></div><form class="y-ai-compose"><label class="y-ai-sr" for="y-ai-question">输入问题</label><textarea id="y-ai-question" rows="2" maxlength="4000" placeholder="想读懂哪篇文章？" required></textarea><div class="y-ai-compose-bottom"><button class="y-ai-clear" type="button">清空对话</button><span>Enter 发送 · Shift+Enter 换行</span><button class="y-ai-send" type="submit" aria-label="发送问题">↑</button></div></form><p class="y-ai-footnote">问题将发送给 DeepSeek，回答请结合原文判断。</p></div>`;
   document.body.append(launcher, panel);
   const $ = selector => panel.querySelector(selector);
+  const quoteCard = document.createElement('div');
+  quoteCard.className = 'y-ai-quote'; quoteCard.hidden = true;
+  quoteCard.innerHTML = '<div class="y-ai-quote-heading"><span>引用片段</span><button type="button" class="y-ai-quote-remove" aria-label="移除引用片段">×</button></div><a class="y-ai-quote-title" target="_blank" rel="noopener"></a><pre class="y-ai-quote-preview"></pre><small class="y-ai-quote-meta"></small>';
+  $('.y-ai-compose').prepend(quoteCard);
+  const quoteNotice = document.createElement('div');
+  quoteNotice.className = 'y-ai-context-notice'; quoteNotice.hidden = true;
+  quoteNotice.innerHTML = '<span></span><button type="button" aria-label="移除引用片段">移除</button>';
+  $('.y-ai-access').after(quoteNotice);
+  const selectionMenu = document.createElement('div');
+  selectionMenu.id = 'y-ai-selection-menu'; selectionMenu.hidden = true;
+  selectionMenu.setAttribute('role', 'group'); selectionMenu.setAttribute('aria-label', '询问选中内容');
+  selectionMenu.innerHTML = '<button type="button" data-selection-action="ask">✧ 问 AI</button><button type="button" data-selection-action="explain">解释这段</button>';
+  document.body.append(selectionMenu);
+  let quoted = null, candidate = null, selectionTimer, draggingSelection = false;
+  const MAX_SELECTION = 6000;
   const history = { blog: [], general: [] };
   const visible = { blog: [], general: [] };
   let mode = 'blog', token = '', busy = false, endpoint = '', configPromise, controller, returnFocus;
@@ -41,11 +56,13 @@
     $('.y-ai-access-message').textContent = account?.aiAccess === 'disabled' ? 'AI 权限已被撤销，请联系博主重新开通。' : 'AI 权限等待博主开通，请联系博主。';
     panel.classList.toggle('y-ai-authorized', Boolean(account));
     setView('chat');
+    renderQuote();
   }
-  function resetSession() {
+  function resetSession({ keepQuote = false } = {}) {
     controller?.abort(); saveToken(''); setAuthorized(null); setBusy(false);
     for (const name of ['blog', 'general']) { history[name] = []; visible[name] = []; }
     $('.y-ai-password-form').reset(); $('.y-ai-accounts').replaceChildren();
+    if (!keepQuote) quoted = null; renderQuote();
   }
   function setAuthMode(value) {
     authMode = value;
@@ -64,8 +81,180 @@
   function setBusy(value) {
     busy = value; $('.y-ai-send').disabled = value; $('.y-ai-clear').disabled = value;
     for (const tab of panel.querySelectorAll('[data-mode]')) tab.disabled = value;
+    for (const button of document.querySelectorAll('#y-ai-selection-menu button, .y-ai-code-ask, .y-ai-quote-remove')) button.disabled = value;
     $('.y-ai-status').textContent = value ? (mode === 'blog' ? '正在读相关的文章…' : '正在想你的问题…') : '';
   }
+  function renderQuote() {
+    quoteCard.hidden = !quoted;
+    quoteNotice.hidden = !quoted || account?.aiAccess === 'approved';
+    $('#y-ai-question').required = !quoted;
+    $('#y-ai-question').placeholder = quoted ? '想问这段什么？直接发送也可以解释片段。' : mode === 'blog' ? '想读懂哪篇文章？' : '输入你的问题…';
+    if (!quoted) return;
+    $('.y-ai-quote-title').textContent = quoted.title;
+    $('.y-ai-quote-title').href = quoted.url;
+    $('.y-ai-quote-preview').textContent = quoted.text;
+    $('.y-ai-quote-meta').textContent = quoted.truncated ? '内容较长，已引用前 6,000 字符；可以分段提问。' : (quoted.kind === 'code' ? '代码' : '正文') + ' · ' + quoted.text.length + ' 字符 · 发送前可移除';
+    quoteNotice.querySelector('span').textContent = account ? '片段已保留，开通 AI 权限后可提问。' : '片段已保留，登录后可继续提问。';
+  }
+  function removeQuote() { if (!busy) { quoted = null; renderQuote(); (account?.aiAccess === 'approved' ? $('#y-ai-question') : $('#y-ai-username')).focus(); } }
+  $('.y-ai-quote-remove').addEventListener('click', removeQuote);
+  quoteNotice.querySelector('button').addEventListener('click', removeQuote);
+  function elementOf(node) { return node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement; }
+  function selectedText(range) {
+    const fragment = range.cloneContents();
+    fragment.querySelectorAll('.gutter, button, .copy-btn, .highlight-tools, script, style').forEach(node => node.remove());
+    let text = '';
+    function read(node) {
+      if (node.nodeType === Node.TEXT_NODE) { text += node.textContent; return; }
+      if (node.nodeName === 'BR') { text += '\n'; return; }
+      const block = /^(P|DIV|PRE|LI|H[1-6]|TR|BLOCKQUOTE)$/.test(node.nodeName);
+      if (block && text && !text.endsWith('\n')) text += '\n';
+      node.childNodes.forEach(read);
+      if (block && text && !text.endsWith('\n')) text += '\n';
+    }
+    read(fragment);
+    return text.replace(/\r\n?/g, '\n').replace(/\u00a0/g, ' ').replace(/^\n+|\n+$/g, '');
+  }
+  function quoteFrom(range, body) {
+    const start = elementOf(range.startContainer), end = elementOf(range.endContainer);
+    if (!start || !end || start.closest('.gutter') && end.closest('.gutter')) return null;
+    const text = selectedText(range);
+    if (!text.trim()) return null;
+    const article = body.closest('article') || body.parentElement;
+    const titleNode = article.querySelector('.post-title');
+    const url = new URL(titleNode?.querySelector('a')?.href || document.querySelector('link[rel="canonical"]')?.href || location.href, location.href);
+    if (url.origin !== location.origin) return null;
+    url.search = ''; url.hash = '';
+    const heading = [...body.querySelectorAll('h2[id], h3[id], h4[id]')].filter(node => node.compareDocumentPosition(start) & Node.DOCUMENT_POSITION_FOLLOWING).at(-1);
+    if (heading) url.hash = heading.id;
+    const block = start.closest('figure.highlight, pre');
+    return { title: (titleNode?.textContent.trim() || document.title).slice(0, 160), url: url.href,
+      kind: block && block.contains(end) ? 'code' : 'text',
+      text: text.slice(0, MAX_SELECTION).replace(/[\uD800-\uDBFF]$/, ''), truncated: text.length > MAX_SELECTION };
+  }
+  function hideSelectionMenu() { selectionMenu.hidden = true; candidate = null; }
+  function inspectSelection() {
+    if (selectionMenu.contains(document.activeElement)) return;
+    hideSelectionMenu();
+    if (draggingSelection) return;
+    const selection = window.getSelection();
+    if (!selection || selection.isCollapsed || selection.rangeCount !== 1) return;
+    const range = selection.getRangeAt(0);
+    const start = elementOf(range.startContainer), end = elementOf(range.endContainer);
+    const body = start?.closest('.post-body');
+    if (!body || end?.closest('.post-body') !== body) return;
+    const quote = quoteFrom(range, body);
+    if (!quote) return;
+    const rect = [...range.getClientRects()].filter(r => r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight).at(-1);
+    if (!rect) return;
+    candidate = quote; selectionMenu.hidden = false;
+    const box = selectionMenu.getBoundingClientRect();
+    selectionMenu.style.left = Math.max(8, Math.min(innerWidth - box.width - 8, rect.left)) + 'px';
+    const below = rect.bottom + 8;
+    selectionMenu.style.top = Math.max(8, Math.min(innerHeight - box.height - 8, below + box.height < innerHeight ? below : rect.top - box.height - 8)) + 'px';
+  }
+  function scheduleSelection() { clearTimeout(selectionTimer); selectionTimer = setTimeout(inspectSelection, 100); }
+  document.addEventListener('selectionchange', scheduleSelection);
+  document.addEventListener('pointerdown', event => {
+    if (selectionMenu.contains(event.target)) { event.preventDefault(); return; }
+    draggingSelection = true; hideSelectionMenu();
+  });
+  document.addEventListener('pointerup', () => { draggingSelection = false; scheduleSelection(); });
+  document.addEventListener('pointercancel', () => { draggingSelection = false; hideSelectionMenu(); });
+  document.addEventListener('scroll', hideSelectionMenu, { passive: true, capture: true });
+  window.addEventListener('resize', hideSelectionMenu);
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') hideSelectionMenu(); });
+  async function askSelection(quote, explain = false) {
+    if (!quote || busy) return;
+    quoted = quote; hideSelectionMenu(); window.getSelection()?.removeAllRanges(); renderQuote();
+    if (explain && !$('#y-ai-question').value.trim()) $('#y-ai-question').value = quote.kind === 'code'
+      ? '请用通俗的语言逐行解释这段代码，说明语法、作用，以及输入和输出。' : '请用通俗的语言解释这段内容，必要时举一个例子。';
+    await openPanel();
+  }
+  for (const button of selectionMenu.querySelectorAll('button')) button.addEventListener('click', () => askSelection(candidate, button.dataset.selectionAction === 'explain'));
+  for (const block of document.querySelectorAll('.post-body figure.highlight, .post-body > pre')) {
+    const actions = document.createElement('div'); actions.className = 'y-ai-code-actions';
+    const button = document.createElement('button'); button.type = 'button'; button.className = 'y-ai-code-ask';
+    button.textContent = '✧ 整段问 AI'; button.setAttribute('aria-label', '引用这段代码并向 AI 提问');
+    button.addEventListener('click', () => {
+      const code = block.querySelector('td.code pre') || block.querySelector('pre') || block;
+      const range = document.createRange(); range.selectNodeContents(code);
+      askSelection(quoteFrom(range, block.closest('.post-body')));
+    });
+    actions.append(button); block.before(actions);
+  }
+  // 固定窗口只通过顶部拖动，正文、输入框与代码选择不会触发拖动。
+  const positionKey = 'y-blog-ai-panel-position';
+  let panelPosition = null, drag = null;
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(positionKey));
+    if (saved && Number.isFinite(saved.left) && Number.isFinite(saved.top)) panelPosition = saved;
+  } catch {}
+  function viewportBounds() {
+    const viewport = window.visualViewport;
+    return { left: viewport?.offsetLeft || 0, top: viewport?.offsetTop || 0,
+      width: viewport?.width || innerWidth, height: viewport?.height || innerHeight };
+  }
+  function applyPosition(left = panelPosition?.left, top = panelPosition?.top) {
+    if (panel.hidden) return;
+    const view = viewportBounds();
+    panel.style.maxHeight = Math.max(180, view.height - 16) + 'px';
+    if (!Number.isFinite(left) || !Number.isFinite(top)) return;
+    const box = panel.getBoundingClientRect();
+    panelPosition = { left: Math.max(view.left + 8, Math.min(left, view.left + view.width - box.width - 8)),
+      top: Math.max(view.top + 8, Math.min(top, view.top + view.height - box.height - 8)) };
+    Object.assign(panel.style, { left: panelPosition.left + 'px', top: panelPosition.top + 'px', right: 'auto', bottom: 'auto' });
+  }
+  function savePosition() { try { sessionStorage.setItem(positionKey, JSON.stringify(panelPosition)); } catch {} }
+  function resetPosition() {
+    drag = null; panel.classList.remove('y-ai-dragging'); panelPosition = null;
+    for (const property of ['left', 'top', 'right', 'bottom', 'max-height']) panel.style.removeProperty(property);
+    try { sessionStorage.removeItem(positionKey); } catch {}
+    applyPosition();
+  }
+  const header = $('.y-ai-header');
+  header.addEventListener('pointerdown', event => {
+    if (!event.isPrimary || event.button !== 0 || event.target.closest('button:not(.y-ai-move-handle)')) return;
+    const box = panel.getBoundingClientRect();
+    drag = { id: event.pointerId, x: event.clientX, y: event.clientY, left: box.left, top: box.top, moved: false };
+    header.setPointerCapture(event.pointerId); event.preventDefault();
+  });
+  header.addEventListener('pointermove', event => {
+    if (!drag || event.pointerId !== drag.id) return;
+    const dx = event.clientX - drag.x, dy = event.clientY - drag.y;
+    if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 4) return;
+    drag.moved = true; panel.classList.add('y-ai-dragging');
+    applyPosition(drag.left + dx, drag.top + dy);
+  });
+  function endDrag() {
+    if (!drag) return;
+    const previous = drag; drag = null; panel.classList.remove('y-ai-dragging');
+    if (header.hasPointerCapture(previous.id)) header.releasePointerCapture(previous.id);
+    if (previous.moved) { savePosition(); hideSelectionMenu(); window.getSelection()?.removeAllRanges(); }
+  }
+  for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) header.addEventListener(event, endDrag);
+  window.addEventListener('blur', endDrag);
+  $('.y-ai-position-reset').addEventListener('click', resetPosition);
+  $('.y-ai-move-handle').addEventListener('keydown', event => {
+    if (event.key === 'Home') { event.preventDefault(); event.stopPropagation(); resetPosition(); return; }
+    const directions = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+    if (!directions[event.key]) return;
+    event.preventDefault(); event.stopPropagation();
+    const box = panel.getBoundingClientRect(), step = event.shiftKey ? 40 : 16;
+    applyPosition(box.left + directions[event.key][0] * step, box.top + directions[event.key][1] * step); savePosition();
+  });
+  function fitPanel() {
+    if (panel.hidden) return;
+    if (panelPosition) { applyPosition(); savePosition(); }
+    else {
+      applyPosition();
+      const box = panel.getBoundingClientRect(), view = viewportBounds();
+      if (box.top < view.top + 8 || box.bottom > view.top + view.height - 8) applyPosition(box.left, box.top);
+    }
+  }
+  window.addEventListener('resize', fitPanel);
+  window.visualViewport?.addEventListener('resize', fitPanel);
+  window.visualViewport?.addEventListener('scroll', fitPanel);
   async function config() {
     if (!configPromise) configPromise = fetch('/ai-config.json', { cache: 'no-store' }).then(r => { if (!r.ok) throw Error(); return r.json(); }).then(c => {
       if (!c.enabled || !c.endpoint) throw Error('这个问答角落暂未开放，请稍后再来。');
@@ -83,7 +272,7 @@
     let data; try { data = await response.json(); } catch { throw Error('没有收到完整回答，请重试。'); }
     if (!response.ok) {
       if (response.status === 401 && !['/api/session', '/api/register', '/api/password'].includes(path)) {
-        resetSession(); $('.y-ai-login-error').textContent = data.error || '登录已失效，请重新登录。';
+        resetSession({ keepQuote: true }); $('.y-ai-login-error').textContent = data.error || '登录已失效，请重新登录。';
       }
       if (response.status === 403 && path === '/api/chat') await loadAccount();
       throw Error(data.error || '暂时无法回答，请稍后重试。');
@@ -102,6 +291,12 @@
     const message = document.createElement('div'); message.className = 'y-ai-message y-ai-' + item.role;
     const label = document.createElement('span'); label.className = 'y-ai-message-label'; label.textContent = item.role === 'user' ? '你' : '随笔助手';
     const content = document.createElement('div'); content.className = 'y-ai-message-content'; renderText(content, item.content);
+    if (item.selection) {
+      const details = document.createElement('details'); details.className = 'y-ai-message-quote';
+      const summary = document.createElement('summary'); summary.textContent = '引用' + (item.selection.kind === 'code' ? '代码' : '正文') + ' · ' + item.selection.title;
+      const pre = document.createElement('pre'); pre.textContent = item.selection.text;
+      details.append(summary, pre); content.prepend(details);
+    }
     message.append(label, content);
     if (item.sources?.length) {
       const refs = document.createElement('div'); refs.className = 'y-ai-sources';
@@ -121,7 +316,7 @@
     if (!visible[mode].length) {
       const welcome = document.createElement('div'); welcome.className = 'y-ai-welcome';
       const heading = document.createElement('h2'); heading.textContent = mode === 'blog' ? '从一个问题，读懂一篇随笔。' : '有什么想聊的？';
-      const text = document.createElement('p'); text.textContent = mode === 'blog' ? '我会从博客里找相关内容，把参考文章放在回答下面。' : '代码、学习、想法，都可以从这里开始。';
+      const text = document.createElement('p'); text.textContent = mode === 'blog' ? '选中文章或代码即可问我，也可以直接输入问题。回答下方会列出参考文章。' : '代码、学习、想法，都可以从这里开始。选中片段也能带来一起聊。';
       welcome.append(heading, text);
       for (const question of mode === 'blog' ? ['RNN 怎样把声音变成文字？', 'WeNet 的两遍识别是什么？'] : ['帮我解释一段 Python 代码', '怎么安排今天的学习？']) {
         const button = document.createElement('button'); button.type = 'button'; button.textContent = question + ' ↗';
@@ -131,16 +326,18 @@
     } else for (const item of visible[mode]) addMessage(item);
   }
   function close() { panel.hidden = true; launcher.setAttribute('aria-expanded', 'false'); (returnFocus || launcher).focus(); }
-  launcher.addEventListener('click', async () => {
-    if (!panel.hidden) return close();
-    returnFocus = document.activeElement; panel.hidden = false; launcher.setAttribute('aria-expanded', 'true');
+  async function openPanel() {
+    if (panel.hidden) returnFocus = document.activeElement;
+    panel.hidden = false; launcher.setAttribute('aria-expanded', 'true');
+    fitPanel();
     setAuthorized(account); renderConversation();
     if (token) {
       $('.y-ai-access-label').textContent = '正在检查登录状态…';
       try { await loadAccount(); } catch (error) { $('.y-ai-login-error').textContent = error.message; $('.y-ai-waiting-status').textContent = error.message; }
     }
     (account?.aiAccess === 'approved' ? $('#y-ai-question') : account ? $('.y-ai-refresh-access') : $('#y-ai-username')).focus();
-  });
+  }
+  launcher.addEventListener('click', () => { if (!panel.hidden) close(); else openPanel(); });
   $('.y-ai-close').addEventListener('click', close);
   panel.addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); } });
   for (const tab of panel.querySelectorAll('[data-auth]')) tab.addEventListener('click', () => setAuthMode(tab.dataset.auth));
@@ -219,24 +416,34 @@
   for (const tab of panel.querySelectorAll('[data-mode]')) tab.addEventListener('click', () => {
     if (busy) return; mode = tab.dataset.mode;
     for (const t of panel.querySelectorAll('[data-mode]')) t.setAttribute('aria-selected', String(t === tab));
-    $('#y-ai-question').placeholder = mode === 'blog' ? '想读懂哪篇文章？' : '输入你的问题…';
+    renderQuote();
     $('.y-ai-status').textContent = ''; renderConversation(); $('#y-ai-question').focus();
   });
   $('.y-ai-clear').addEventListener('click', () => { if (!busy) { history[mode] = []; visible[mode] = []; $('.y-ai-status').textContent = ''; renderConversation(); } });
   $('#y-ai-question').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); if (!busy) $('.y-ai-compose').requestSubmit(); } });
   $('.y-ai-compose').addEventListener('submit', async e => {
-    e.preventDefault(); const text = $('#y-ai-question').value.trim(); if (busy || !text) return;
+    e.preventDefault(); const draft = $('#y-ai-question').value.trim();
+    const text = draft || (quoted ? quoted.kind === 'code' ? '请解释这段代码的作用和语法。' : '请解释这段内容。' : '');
+    if (busy || !text) return;
     const turnEpoch = epoch;
+    const selected = quoted;
     const turns = history[mode].slice(-8);
-    while (turns.length && turns.reduce((n, m) => n + m.content.length, 0) > 10000) turns.splice(0, 2);
-    const item = { role: 'user', content: text };
+    const item = { role: 'user', content: text, ...(selected ? { selection: { title: selected.title, url: selected.url, kind: selected.kind, text: selected.text } } : {}) };
+    const size = message => message.content.length + (message.selection ? message.selection.text.length + message.selection.title.length + message.selection.url.length + 150 : 0);
+    while (turns.length && [...turns, item].reduce((n, m) => n + size(m), 0) > 20000) turns.splice(0, 2);
     visible[mode].push(item); renderConversation(); $('#y-ai-question').value = ''; setBusy(true); controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 75000);
     try { const data = await request('/api/chat', { mode, messages: [...turns, item] }, controller.signal);
       if (epoch !== turnEpoch) return;
       const answer = { role: 'assistant', content: data.answer, sources: data.sources };
       history[mode] = [...turns, item, { role: 'assistant', content: data.answer.slice(0, 5000) }]; visible[mode].push(answer); addMessage(answer);
-    } catch (error) { if (epoch !== turnEpoch) return; $('.y-ai-status').textContent = error.name === 'AbortError' ? '等待已结束，可以重新提问。' : error.message; }
-    finally { clearTimeout(timer); const status = $('.y-ai-status').textContent; setBusy(false); $('.y-ai-status').textContent = status.startsWith('正在') ? '' : status; }
+      if (quoted === selected) { quoted = null; renderQuote(); }
+    } catch (error) {
+      if (epoch !== turnEpoch) return;
+      visible[mode] = visible[mode].filter(message => message !== item); renderConversation();
+      if (!$('#y-ai-question').value.trim()) $('#y-ai-question').value = draft;
+      $('.y-ai-status').textContent = error.name === 'AbortError' ? '等待已结束，问题与引用已保留，可以重试。' : error.message;
+    }
+    finally { clearTimeout(timer); if (epoch === turnEpoch) { const status = $('.y-ai-status').textContent; setBusy(false); $('.y-ai-status').textContent = status.startsWith('正在') ? '' : status; } }
   });
 })();
