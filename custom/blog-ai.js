@@ -16,8 +16,16 @@
     <div class="y-ai-management" hidden><div class="y-ai-view-header"><button class="y-ai-back" type="button">← 返回</button><h2>AI 权限管理</h2><button class="y-ai-refresh-accounts" type="button">刷新</button></div><p class="y-ai-manage-note">注册不等于获得 AI 权限。开通后才能提问，撤销后立即停止使用。</p><div class="y-ai-manage-status" role="status"></div><div class="y-ai-accounts"></div><div class="y-ai-pagination"><button class="y-ai-prev" type="button">上一页</button><span class="y-ai-page-label"></span><button class="y-ai-next" type="button">下一页</button></div></div>
     <form class="y-ai-password-form" hidden><div class="y-ai-view-header"><button class="y-ai-back" type="button">← 返回</button><h2>修改密码</h2></div><label for="y-ai-old-password">当前密码</label><input id="y-ai-old-password" type="password" autocomplete="current-password" maxlength="128" required><label for="y-ai-new-password">新密码</label><input id="y-ai-new-password" type="password" autocomplete="new-password" minlength="10" maxlength="128" required><label for="y-ai-new-confirm">再次输入新密码</label><input id="y-ai-new-confirm" type="password" autocomplete="new-password" maxlength="128" required><button class="y-ai-password-submit" type="submit">保存新密码</button><div class="y-ai-password-status" role="status"></div></form>
     <div class="y-ai-chat" hidden><div class="y-ai-tabs" role="tablist" aria-label="选择问答方式"><button type="button" role="tab" aria-selected="true" data-mode="blog">博客问答</button><button type="button" role="tab" aria-selected="false" data-mode="general">自由聊天</button></div><div class="y-ai-messages" role="log" aria-label="对话内容" aria-live="polite" aria-relevant="additions"></div><div class="y-ai-status" role="status"></div><form class="y-ai-compose"><label class="y-ai-sr" for="y-ai-question">输入问题</label><textarea id="y-ai-question" rows="2" maxlength="4000" placeholder="想读懂哪篇文章？" required></textarea><div class="y-ai-compose-bottom"><button class="y-ai-clear" type="button">清空对话</button><span>Enter 发送 · Shift+Enter 换行</span><button class="y-ai-send" type="submit" aria-label="发送问题">↑</button></div></form><p class="y-ai-footnote">问题将发送给 DeepSeek，回答请结合原文判断。</p></div>`;
-  document.body.append(launcher, panel);
+  // 手机上窗口改成右侧全高侧栏，左边留一条遮罩，点遮罩即可收起。
+  const backdrop = document.createElement('div');
+  backdrop.id = 'y-ai-backdrop'; backdrop.hidden = true;
+  document.body.append(launcher, backdrop, panel);
   const $ = selector => panel.querySelector(selector);
+  const drawerQuery = window.matchMedia('(max-width: 600px)');
+  function syncDrawer() {
+    $('.y-ai-heading span').textContent = drawerQuery.matches ? '选中文章或代码即可提问' : '拖动顶部可移动 · 选中内容可提问';
+  }
+  drawerQuery.addEventListener('change', syncDrawer); syncDrawer();
   const quoteCard = document.createElement('div');
   quoteCard.className = 'y-ai-quote'; quoteCard.hidden = true;
   quoteCard.innerHTML = '<div class="y-ai-quote-heading"><span>引用片段</span><button type="button" class="y-ai-quote-remove" aria-label="移除引用片段">×</button></div><a class="y-ai-quote-title" target="_blank" rel="noopener"></a><pre class="y-ai-quote-preview"></pre><small class="y-ai-quote-meta"></small>';
@@ -240,7 +248,7 @@
   }
   const header = $('.y-ai-header');
   header.addEventListener('pointerdown', event => {
-    if (!event.isPrimary || event.button !== 0 || event.target.closest('button:not(.y-ai-move-handle)')) return;
+    if (drawerQuery.matches || !event.isPrimary || event.button !== 0 || event.target.closest('button:not(.y-ai-move-handle)')) return;
     const box = panel.getBoundingClientRect();
     drag = { id: event.pointerId, x: event.clientX, y: event.clientY, left: box.left, top: box.top, moved: false };
     header.setPointerCapture(event.pointerId); event.preventDefault();
@@ -450,10 +458,14 @@
       $('.y-ai-messages').append(welcome);
     } else for (const item of visible[mode]) addMessage(item);
   }
-  function close() { panel.hidden = true; launcher.setAttribute('aria-expanded', 'false'); (returnFocus || launcher).focus(); }
+  function close() {
+    panel.hidden = true; backdrop.hidden = true; document.documentElement.classList.remove('y-ai-drawer-open');
+    launcher.setAttribute('aria-expanded', 'false'); (returnFocus || launcher).focus();
+  }
   async function openPanel() {
     if (panel.hidden) returnFocus = document.activeElement;
-    panel.hidden = false; launcher.setAttribute('aria-expanded', 'true');
+    panel.hidden = false; backdrop.hidden = false; document.documentElement.classList.add('y-ai-drawer-open'); syncDrawer();
+    launcher.setAttribute('aria-expanded', 'true');
     fitPanel();
     setAuthorized(account); renderConversation();
     if (token) {
@@ -464,6 +476,7 @@
   }
   launcher.addEventListener('click', () => { if (!panel.hidden) close(); else openPanel(); });
   $('.y-ai-close').addEventListener('click', close);
+  backdrop.addEventListener('click', close);
   panel.addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); } });
   for (const tab of panel.querySelectorAll('[data-auth]')) tab.addEventListener('click', () => setAuthMode(tab.dataset.auth));
   $('.y-ai-unlock').addEventListener('submit', async e => {

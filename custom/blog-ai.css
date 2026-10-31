@@ -21,3 +21,65 @@ html[data-theme=dark] #y-ai-launcher,html[data-theme=dark] #y-ai-panel{--ya-pape
 
 /* AI 回答的 Markdown 排版，限定在回答容器内，避免继承文章主题样式。 */
 #y-ai-panel .y-ai-markdown{white-space:normal;font-size:13px;line-height:1.9;letter-spacing:.01em;min-width:0;overflow-wrap:anywhere}#y-ai-panel .y-ai-markdown>:first-child{margin-top:0}#y-ai-panel .y-ai-markdown>:last-child{margin-bottom:0}#y-ai-panel .y-ai-markdown p{margin:0 0 .85em;color:var(--ya-ink);font-size:inherit;line-height:inherit}#y-ai-panel .y-ai-markdown strong{font-weight:700;color:var(--ya-ink)}#y-ai-panel .y-ai-markdown em{font-style:italic}#y-ai-panel .y-ai-markdown h2,#y-ai-panel .y-ai-markdown h3,#y-ai-panel .y-ai-markdown h4,#y-ai-panel .y-ai-markdown h5,#y-ai-panel .y-ai-markdown h6{font-family:inherit;color:var(--ya-ink);font-weight:650;line-height:1.6;border:0;padding:0;margin:1.15em 0 .5em}#y-ai-panel .y-ai-markdown h2{font-size:17px}#y-ai-panel .y-ai-markdown h3{font-size:15px}#y-ai-panel .y-ai-markdown h4,#y-ai-panel .y-ai-markdown h5,#y-ai-panel .y-ai-markdown h6{font-size:13px}#y-ai-panel .y-ai-markdown ul,#y-ai-panel .y-ai-markdown ol{display:block;list-style-position:outside;margin:.4em 0 .95em;padding:0 0 0 1.5em;color:var(--ya-ink)}#y-ai-panel .y-ai-markdown ul{list-style-type:disc}#y-ai-panel .y-ai-markdown ol{list-style-type:decimal}#y-ai-panel .y-ai-markdown li{display:list-item;margin:.38em 0;padding:0;font-size:inherit;line-height:1.85}#y-ai-panel .y-ai-markdown li::marker{color:var(--ya-accent);font-weight:600}#y-ai-panel .y-ai-markdown li>p{margin:.25em 0}#y-ai-panel .y-ai-markdown li>ul,#y-ai-panel .y-ai-markdown li>ol{margin:.4em 0 .6em}#y-ai-panel .y-ai-markdown li.y-ai-task{list-style:none}#y-ai-panel .y-ai-markdown :not(pre)>code{font-family:Consolas,"SFMono-Regular","Microsoft Yahei",monospace;font-size:.92em;line-height:inherit;color:var(--ya-accent);background:var(--ya-tint);border:1px solid var(--ya-line);border-radius:5px;padding:.12em .35em;white-space:break-spaces;overflow-wrap:anywhere}#y-ai-panel .y-ai-markdown blockquote{margin:1em 0;padding:3px 0 3px 13px;border:0;border-left:3px solid var(--ya-accent);color:var(--ya-muted);background:transparent}#y-ai-panel .y-ai-markdown blockquote p{color:var(--ya-muted)}#y-ai-panel .y-ai-markdown blockquote>:last-child{margin-bottom:0}#y-ai-panel .y-ai-markdown hr{height:0;border:0;border-top:1px solid var(--ya-line);margin:1.2em 0}#y-ai-panel .y-ai-markdown a{color:var(--ya-accent);font-size:inherit;text-decoration:underline;text-underline-offset:3px;border:0;overflow-wrap:anywhere}#y-ai-panel .y-ai-code-panel{min-width:0;max-width:100%;border:1px solid var(--ya-line);border-radius:10px;background:var(--ya-surface);overflow:hidden;margin:13px 0}#y-ai-panel .y-ai-code-header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 11px;border-bottom:1px solid var(--ya-line);font-family:system-ui,sans-serif;font-size:10px;line-height:1.6;color:var(--ya-muted)}#y-ai-panel .y-ai-code-header button{font-family:inherit;font-size:10px;color:var(--ya-accent);padding:2px 0;white-space:nowrap}#y-ai-panel .y-ai-code-panel pre.y-ai-code-block{margin:0;border:0;border-radius:0;padding:11px 12px;max-width:100%;overflow:auto;white-space:pre;background:transparent;font:12px/1.75 Consolas,"SFMono-Regular",monospace!important;scrollbar-width:thin}#y-ai-panel .y-ai-code-panel pre code{display:block;background:transparent;color:var(--ya-ink);font:inherit;border:0;padding:0;white-space:pre;word-break:normal;overflow-wrap:normal;line-height:inherit}#y-ai-panel .y-ai-table-wrap{display:block;max-width:100%;overflow:auto;margin:12px 0;border:1px solid var(--ya-line);border-radius:9px;scrollbar-width:thin}#y-ai-panel .y-ai-markdown table{border-collapse:collapse;border-spacing:0;table-layout:auto;width:100%;margin:0;font-family:inherit;font-size:11px;line-height:1.75;word-break:normal}#y-ai-panel .y-ai-markdown th,#y-ai-panel .y-ai-markdown td{padding:8px 10px;border:0;border-right:1px solid var(--ya-line);border-bottom:1px solid var(--ya-line);min-width:90px;max-width:280px;text-align:left;vertical-align:top;background:transparent}#y-ai-panel .y-ai-markdown th{background:var(--ya-tint);font-weight:650}#y-ai-panel .y-ai-markdown tr:last-child td{border-bottom:0}#y-ai-panel .y-ai-markdown td:last-child,#y-ai-panel .y-ai-markdown th:last-child{border-right:0}#y-ai-panel .y-ai-markdown tbody tr:nth-child(even){background:var(--ya-surface)}
+
+/* 手机上改成从右侧滑出的全高侧栏，字号整体放大；桌面仍是可拖动的浮动窗口。 */
+#y-ai-backdrop{display:none}
+@media(max-width:600px){
+html.y-ai-drawer-open,html.y-ai-drawer-open body{overflow:hidden}
+#y-ai-backdrop:not([hidden]){display:block;position:fixed;inset:0;z-index:1200;background:#1d150f66;animation:y-ai-fade .2s ease-out}
+#y-ai-panel{top:0!important;right:0!important;bottom:0!important;left:auto!important;width:min(92vw,440px);height:100dvh;max-height:none!important;border-radius:20px 0 0 20px;border-right:0;box-shadow:-12px 0 48px #2a1b1040;font-size:15px;padding-bottom:env(safe-area-inset-bottom);animation:y-ai-slide .26s cubic-bezier(.2,.8,.2,1)}
+#y-ai-panel .y-ai-header{cursor:default;touch-action:auto;padding:calc(16px + env(safe-area-inset-top)) 16px 14px 18px;gap:11px}
+#y-ai-panel .y-ai-move-handle{cursor:default;pointer-events:none;width:38px;height:38px}
+#y-ai-panel .y-ai-position-reset{display:none}
+#y-ai-panel .y-ai-heading strong{font-size:20px}
+#y-ai-panel .y-ai-heading span{font-size:12px}
+#y-ai-panel .y-ai-close{font-size:34px;width:42px;height:42px}
+#y-ai-panel .y-ai-access{font-size:13px;padding:11px 18px}
+#y-ai-panel .y-ai-access button{font-size:13px;padding:4px 2px}
+#y-ai-panel h2{font-size:20px}
+#y-ai-panel .y-ai-unlock{padding:22px 22px}
+#y-ai-panel .y-ai-unlock p,#y-ai-panel .y-ai-waiting p{font-size:14.5px}
+#y-ai-panel .y-ai-unlock label,#y-ai-panel .y-ai-password-form label{font-size:14px}
+#y-ai-panel .y-ai-auth-tabs button{font-size:15px}
+#y-ai-panel .y-ai-auth-submit,#y-ai-panel .y-ai-password-submit,#y-ai-panel .y-ai-refresh-access{font-size:15px;padding:13px}
+#y-ai-panel .y-ai-login-error,#y-ai-panel .y-ai-password-status,#y-ai-panel .y-ai-waiting-status,#y-ai-panel .y-ai-manage-status{font-size:14px}
+#y-ai-panel .y-ai-view-header h2{font-size:18px}
+#y-ai-panel .y-ai-view-header button,#y-ai-panel .y-ai-pagination,#y-ai-panel .y-ai-pagination button{font-size:14px}
+#y-ai-panel .y-ai-manage-note{font-size:13px}
+#y-ai-panel .y-ai-account-row strong{font-size:15px}
+#y-ai-panel .y-ai-account-row span{font-size:12.5px}
+#y-ai-panel .y-ai-account-row button{font-size:14px}
+#y-ai-panel .y-ai-tabs{margin:12px 16px 2px}
+#y-ai-panel .y-ai-tabs button{font-size:14.5px;padding:9px 5px}
+#y-ai-panel .y-ai-messages{padding:18px}
+#y-ai-panel .y-ai-welcome p{font-size:14.5px}
+#y-ai-panel .y-ai-welcome button{font-size:14.5px;padding:13px 14px}
+#y-ai-panel .y-ai-message-label{font-size:12px}
+#y-ai-panel .y-ai-message-content,#y-ai-panel .y-ai-markdown{font-size:15.5px;line-height:1.85}
+#y-ai-panel .y-ai-user{margin-left:22px}
+#y-ai-panel .y-ai-markdown h2{font-size:18px}
+#y-ai-panel .y-ai-markdown h3{font-size:16.5px}
+#y-ai-panel .y-ai-markdown h4,#y-ai-panel .y-ai-markdown h5,#y-ai-panel .y-ai-markdown h6{font-size:15.5px}
+#y-ai-panel .y-ai-markdown table{font-size:13.5px}
+#y-ai-panel .y-ai-code-block,#y-ai-panel .y-ai-code-panel pre.y-ai-code-block{font-size:13.5px!important}
+#y-ai-panel .y-ai-code-header,#y-ai-panel .y-ai-code-header button{font-size:12.5px}
+#y-ai-panel .y-ai-sources small{font-size:12px}
+#y-ai-panel .y-ai-sources a{font-size:14px}
+#y-ai-panel .y-ai-status{font-size:13.5px;padding:0 18px}
+#y-ai-panel .y-ai-compose{margin:0 14px;padding:12px 13px 10px}
+#y-ai-panel .y-ai-clear{font-size:13.5px}
+#y-ai-panel .y-ai-send{width:40px;height:40px;font-size:22px;border-radius:11px}
+#y-ai-panel .y-ai-footnote{font-size:11.5px!important;padding:9px 16px 12px}
+#y-ai-panel .y-ai-quote-heading{font-size:12.5px}
+#y-ai-panel a.y-ai-quote-title{font-size:13.5px}
+#y-ai-panel pre.y-ai-quote-preview{font-size:13.5px;max-height:120px}
+#y-ai-panel .y-ai-quote-meta{font-size:11.5px}
+#y-ai-panel .y-ai-quote-remove{width:34px;height:34px;font-size:24px}
+#y-ai-panel .y-ai-context-notice{font-size:13.5px;padding:10px 18px}
+#y-ai-panel .y-ai-context-notice button{font-size:13.5px}
+#y-ai-panel .y-ai-message-quote summary{font-size:12.5px}
+#y-ai-panel .y-ai-message-quote pre{font-size:13px}
+}
+@keyframes y-ai-slide{from{transform:translateX(100%)}to{transform:none}}
+@keyframes y-ai-fade{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){#y-ai-panel,#y-ai-backdrop{animation:none!important}}
