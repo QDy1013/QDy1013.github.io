@@ -24,12 +24,12 @@ hexo.extend.filter.register('after_generate', async function () {
     for await (const chunk of this.route.get(name)) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
     let html = Buffer.concat(chunks).toString('utf8');
     if (html.includes('data-private-ai-assets')) {
-      html = html.replace(/\/js\/private-ai\/blog-ai\.(css|js)(?:\?[^"']*)?/g, '/js/private-ai/blog-ai.$1?v=left-20261031');
+      html = html.replace(/\/js\/private-ai\/blog-ai\.(css|js)(?:\?[^"']*)?/g, '/js/private-ai/blog-ai.$1?v=left-full-20261031');
       html = html.replace(/<script\b[^>]*src="\/js\/private-ai\/marked\.min\.js[^"\s]*"[^>]*><\/script>\s*/g, '');
-      html = html.replace('<script src="/js/private-ai/blog-ai.js', '<script src="/js/private-ai/marked.min.js?v=left-20261031" defer></script>\n<script src="/js/private-ai/blog-ai.js');
+      html = html.replace('<script src="/js/private-ai/blog-ai.js', '<script src="/js/private-ai/marked.min.js?v=left-full-20261031" defer></script>\n<script src="/js/private-ai/blog-ai.js');
     } else {
-      html = html.replace('</head>', '<link data-private-ai-assets rel="stylesheet" href="/js/private-ai/blog-ai.css?v=left-20261031">\n</head>')
-        .replace('</body>', '<script src="/js/private-ai/marked.min.js?v=left-20261031" defer></script>\n<script src="/js/private-ai/blog-ai.js?v=left-20261031" defer></script>\n</body>');
+      html = html.replace('</head>', '<link data-private-ai-assets rel="stylesheet" href="/js/private-ai/blog-ai.css?v=left-full-20261031">\n</head>')
+        .replace('</body>', '<script src="/js/private-ai/marked.min.js?v=left-full-20261031" defer></script>\n<script src="/js/private-ai/blog-ai.js?v=left-full-20261031" defer></script>\n</body>');
     }
     this.route.set(name, html);
   }
