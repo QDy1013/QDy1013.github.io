@@ -21,11 +21,26 @@
   backdrop.id = 'y-ai-backdrop'; backdrop.hidden = true;
   document.body.append(launcher, backdrop, panel);
   const $ = selector => panel.querySelector(selector);
-  const drawerQuery = window.matchMedia('(max-width: 600px)');
+  // 窄屏或触屏设备都用侧栏；有的手机浏览器把页面按七八百像素宽排版再整体缩小，只看宽度会误判成电脑。
+  const narrowQuery = window.matchMedia('(max-width: 600px)'), touchQuery = window.matchMedia('(hover: none) and (pointer: coarse)');
+  let drawerMode = false;
   function syncDrawer() {
-    $('.y-ai-heading span').textContent = drawerQuery.matches ? '选中文章或代码即可提问' : '拖动顶部可移动 · 选中内容可提问';
+    drawerMode = narrowQuery.matches || touchQuery.matches;
+    const root = document.documentElement;
+    root.classList.toggle('y-ai-drawer-mode', drawerMode);
+    // 页面被缩小显示时，按「可见宽度 ÷ 屏幕宽度」把侧栏和按钮放大回正常字号。
+    const viewWidth = window.visualViewport?.width || innerWidth, viewHeight = window.visualViewport?.height || innerHeight;
+    const ratio = screen.width > 0 ? viewWidth / screen.width : 1;
+    const zoom = drawerMode && ratio > 1.1 ? Math.min(3, ratio) : 1;
+    if (zoom > 1) {
+      root.style.setProperty('--ya-zoom', zoom.toFixed(3));
+      root.style.setProperty('--ya-drawer-w', Math.min(viewWidth * 0.92, 440 * zoom) / zoom + 'px');
+      root.style.setProperty('--ya-drawer-h', viewHeight / zoom + 'px');
+    } else for (const name of ['--ya-zoom', '--ya-drawer-w', '--ya-drawer-h']) root.style.removeProperty(name);
+    $('.y-ai-heading span').textContent = drawerMode ? '选中文章或代码即可提问' : '拖动顶部可移动 · 选中内容可提问';
   }
-  drawerQuery.addEventListener('change', syncDrawer); syncDrawer();
+  narrowQuery.addEventListener('change', syncDrawer); touchQuery.addEventListener('change', syncDrawer);
+  window.addEventListener('resize', syncDrawer); window.visualViewport?.addEventListener('resize', syncDrawer); syncDrawer();
   const quoteCard = document.createElement('div');
   quoteCard.className = 'y-ai-quote'; quoteCard.hidden = true;
   quoteCard.innerHTML = '<div class="y-ai-quote-heading"><span>引用片段</span><button type="button" class="y-ai-quote-remove" aria-label="移除引用片段">×</button></div><a class="y-ai-quote-title" target="_blank" rel="noopener"></a><pre class="y-ai-quote-preview"></pre><small class="y-ai-quote-meta"></small>';
@@ -45,9 +60,18 @@
   const visible = { blog: [], general: [] };
   let mode = 'blog', token = '', busy = false, endpoint = '', configPromise, controller, returnFocus;
   let account = null, authMode = 'login', accountPage = 0, epoch = 0;
-  const sessionKey = 'y-blog-ai-account-session';
-  try { token = sessionStorage.getItem(sessionKey) || ''; sessionStorage.removeItem('y-private-ai-session'); } catch {}
-  function saveToken(value) { token = value; epoch++; try { value ? sessionStorage.setItem(sessionKey, value) : sessionStorage.removeItem(sessionKey); } catch {} }
+  const sessionKey = 'y-blog-ai-account-session', accountKey = 'y-blog-ai-account-cache';
+  // 上次确认过的账号状态只用来立刻显示界面；服务端每次聊天仍会重新检查权限。
+  let cachedAccount = null, verifiedAt = 0, accountCheck = null;
+  try {
+    token = sessionStorage.getItem(sessionKey) || ''; sessionStorage.removeItem('y-private-ai-session');
+    const saved = token && JSON.parse(sessionStorage.getItem(accountKey));
+    if (saved && typeof saved.username === 'string' && typeof saved.aiAccess === 'string') cachedAccount = saved;
+  } catch {}
+  function saveToken(value) {
+    token = value; epoch++; verifiedAt = 0; cachedAccount = null;
+    try { value ? sessionStorage.setItem(sessionKey, value) : sessionStorage.removeItem(sessionKey); sessionStorage.removeItem(accountKey); } catch {}
+  }
   function setView(view) {
     $('.y-ai-unlock').hidden = Boolean(account);
     $('.y-ai-chat').hidden = !account || account.aiAccess !== 'approved' || view !== 'chat';
@@ -57,6 +81,7 @@
   }
   function setAuthorized(value) {
     account = value || null;
+    try { account && token ? sessionStorage.setItem(accountKey, JSON.stringify(account)) : sessionStorage.removeItem(accountKey); } catch {}
     $('.y-ai-logout').hidden = !account;
     $('.y-ai-password-open').hidden = !account;
     $('.y-ai-admin-open').hidden = account?.role !== 'admin';
@@ -84,7 +109,13 @@
   async function loadAccount() {
     const current = token;
     const result = await request('/api/me', {});
-    if (token === current) { setAuthorized(result.account); renderConversation(); }
+    if (token === current) { verifiedAt = Date.now(); setAuthorized(result.account); renderConversation(); }
+  }
+  // 同一时间只发一次账号检查；一分钟内确认过就不再重复问服务端。
+  function verifyAccount() {
+    if (!token || Date.now() - verifiedAt < 60000) return Promise.resolve();
+    if (!accountCheck) accountCheck = loadAccount().finally(() => { accountCheck = null; });
+    return accountCheck;
   }
   function setBusy(value) {
     busy = value; $('.y-ai-send').disabled = value; $('.y-ai-clear').disabled = value;
@@ -248,7 +279,7 @@
   }
   const header = $('.y-ai-header');
   header.addEventListener('pointerdown', event => {
-    if (drawerQuery.matches || !event.isPrimary || event.button !== 0 || event.target.closest('button:not(.y-ai-move-handle)')) return;
+    if (drawerMode || !event.isPrimary || event.button !== 0 || event.target.closest('button:not(.y-ai-move-handle)')) return;
     const box = panel.getBoundingClientRect();
     drag = { id: event.pointerId, x: event.clientX, y: event.clientY, left: box.left, top: box.top, moved: false };
     header.setPointerCapture(event.pointerId); event.preventDefault();
@@ -467,10 +498,13 @@
     panel.hidden = false; backdrop.hidden = false; document.documentElement.classList.add('y-ai-drawer-open'); syncDrawer();
     launcher.setAttribute('aria-expanded', 'true');
     fitPanel();
-    setAuthorized(account); renderConversation();
+    setAuthorized(account || (token ? cachedAccount : null)); renderConversation();
     if (token) {
-      $('.y-ai-access-label').textContent = '正在检查登录状态…';
-      try { await loadAccount(); } catch (error) { $('.y-ai-login-error').textContent = error.message; $('.y-ai-waiting-status').textContent = error.message; }
+      // 有上次的账号状态就先显示、后台核对；没有时才等服务端回答。
+      const known = Boolean(account);
+      if (!known) $('.y-ai-access-label').textContent = '正在检查登录状态…';
+      const check = verifyAccount().catch(error => { $('.y-ai-login-error').textContent = error.message; $('.y-ai-waiting-status').textContent = error.message; });
+      if (!known) await check;
     }
     (account?.aiAccess === 'approved' ? $('#y-ai-question') : account ? $('.y-ai-refresh-access') : $('#y-ai-username')).focus();
   }
@@ -587,4 +621,13 @@
     }
     finally { clearTimeout(timer); if (epoch === turnEpoch) { const status = $('.y-ai-status').textContent; setBusy(false); $('.y-ai-status').textContent = status.startsWith('正在') ? '' : status; } }
   });
+  // 页面空闲时先连上问答服务；已登录的读者顺便在后台确认账号，点开窗口时通常已经确认完了。
+  function warmUp() {
+    config().then(() => {
+      const link = document.createElement('link');
+      link.rel = 'preconnect'; link.href = endpoint; link.crossOrigin = 'anonymous'; document.head.append(link);
+      return verifyAccount();
+    }).catch(() => {});
+  }
+  if ('requestIdleCallback' in window) requestIdleCallback(warmUp, { timeout: 3000 }); else setTimeout(warmUp, 1500);
 })();
