@@ -38,8 +38,9 @@
     if (zoom > 1) {
       root.style.setProperty('--ya-zoom', zoom.toFixed(3));
       root.style.setProperty('--ya-drawer-w', viewWidth / zoom + 'px');
-      root.style.setProperty('--ya-drawer-h', viewHeight * 0.85 / zoom + 'px');
-    } else for (const name of ['--ya-zoom', '--ya-drawer-w', '--ya-drawer-h']) root.style.removeProperty(name);
+      root.style.setProperty('--ya-drawer-h', viewHeight * 0.65 / zoom + 'px');
+      root.style.setProperty('--ya-drawer-full', viewHeight / zoom + 'px');
+    } else for (const name of ['--ya-zoom', '--ya-drawer-w', '--ya-drawer-h', '--ya-drawer-full']) root.style.removeProperty(name);
   }
   for (const query of [narrowQuery, touchQuery]) query.addEventListener ? query.addEventListener('change', syncDrawer) : query.addListener?.(syncDrawer);
   window.addEventListener('resize', syncDrawer); window.visualViewport?.addEventListener('resize', syncDrawer); syncDrawer();
@@ -61,7 +62,7 @@
   }
   const quoteCard = document.createElement('div');
   quoteCard.className = 'y-ai-quote'; quoteCard.hidden = true;
-  quoteCard.innerHTML = '<div class="y-ai-quote-heading"><span>引用片段</span><button type="button" class="y-ai-quote-remove" aria-label="移除引用片段">×</button></div><pre class="y-ai-quote-preview" title="点按展开或收起"></pre>';
+  quoteCard.innerHTML = '<div class="y-ai-quote-heading"><span>引用片段</span><button type="button" class="y-ai-quote-remove" aria-label="移除引用片段">×</button></div>';
   $('.y-ai-compose').prepend(quoteCard);
   const quoteNotice = document.createElement('div');
   quoteNotice.className = 'y-ai-context-notice'; quoteNotice.hidden = true;
@@ -147,15 +148,13 @@
     $('#y-ai-question').required = !quoted;
     $('#y-ai-question').placeholder = quoted ? '想问这段什么？直接发送也可以解释片段。' : mode === 'blog' ? '想读懂哪篇文章？' : '输入你的问题…';
     if (!quoted) return;
-    // 引用只显示一行说明和两行预览，点预览才展开，给对话留出位置。
+    // 引用只显示一行说明，不展示具体内容，给对话留出位置；发出的问题里仍可展开查看。
     quoteCard.querySelector('.y-ai-quote-heading span').textContent = (quoted.kind === 'code'
       ? '引用代码 · ' + quoted.text.split('\n').length + ' 行' : '引用正文 · ' + quoted.text.length + ' 字') + (quoted.truncated ? ' · 已截取前 6000 字' : '');
-    $('.y-ai-quote-preview').textContent = quoted.text; $('.y-ai-quote-preview').classList.remove('y-ai-expanded');
     quoteNotice.querySelector('span').textContent = account ? '片段已保留，开通 AI 权限后可提问。' : '片段已保留，登录后可继续提问。';
   }
   function removeQuote() { if (!busy) { quoted = null; renderQuote(); (account?.aiAccess === 'approved' ? $('#y-ai-question') : $('#y-ai-username')).focus(); } }
   $('.y-ai-quote-remove').addEventListener('click', removeQuote);
-  $('.y-ai-quote-preview').addEventListener('click', event => event.currentTarget.classList.toggle('y-ai-expanded'));
   quoteNotice.querySelector('button').addEventListener('click', removeQuote);
   function elementOf(node) { return node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement; }
   function selectedText(range) {
@@ -508,6 +507,61 @@
       $('.y-ai-messages').append(welcome);
     } else for (const item of visible[mode]) addMessage(item);
   }
+  // 手机面板底部的拉手：往下拉展开到全屏，往上推收成顶部一条；拖动时高度跟手，松手后停到最近的一档。
+  const grabber = document.createElement('div');
+  grabber.className = 'y-ai-grabber'; grabber.tabIndex = 0; grabber.setAttribute('role', 'button');
+  grabber.setAttribute('aria-label', '拖动调整问答面板高度，点按收起或恢复'); grabber.innerHTML = '<span></span>';
+  panel.append(grabber);
+  let sheet = 'normal', sheetDrag = null;
+  function setSheet(value) {
+    sheet = value;
+    panel.classList.toggle('y-ai-sheet-full', value === 'full'); panel.classList.toggle('y-ai-sheet-min', value === 'min');
+    // 收成一条时去掉遮罩、恢复页面滚动，方便边看正文边对照。
+    backdrop.hidden = panel.hidden || value === 'min';
+    document.documentElement.classList.toggle('y-ai-drawer-open', !panel.hidden && value !== 'min');
+  }
+  function sheetHeights() {
+    const zoom = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ya-zoom')) || 1;
+    const view = window.visualViewport?.height || innerHeight;
+    const min = ($('.y-ai-access').offsetHeight + grabber.offsetHeight) * zoom;
+    return { zoom, view, heights: { min, normal: view * 0.65, full: view } };
+  }
+  function startSheetDrag(event) {
+    if (!drawerMode || !event.isPrimary || event.target.closest('button')) return;
+    sheetDrag = { id: event.pointerId, y: event.clientY, height: panel.getBoundingClientRect().height, moved: false, fromGrabber: event.currentTarget === grabber };
+    try { event.currentTarget.setPointerCapture(event.pointerId); } catch {}
+  }
+  function moveSheetDrag(event) {
+    if (!sheetDrag || event.pointerId !== sheetDrag.id) return;
+    const dy = event.clientY - sheetDrag.y;
+    if (!sheetDrag.moved && Math.abs(dy) < 6) return;
+    sheetDrag.moved = true; event.preventDefault();
+    const { zoom, view } = sheetHeights();
+    panel.classList.add('y-ai-sheet-dragging'); panel.classList.remove('y-ai-sheet-min');
+    panel.style.height = Math.max(40, Math.min(view, sheetDrag.height + dy)) / zoom + 'px';
+  }
+  function endSheetDrag(event) {
+    if (!sheetDrag || event.pointerId !== sheetDrag.id) return;
+    const drag = sheetDrag; sheetDrag = null;
+    const dy = event.type === 'pointercancel' ? 0 : event.clientY - drag.y;
+    panel.classList.remove('y-ai-sheet-dragging'); panel.style.removeProperty('height');
+    if (!drag.moved) { if (drag.fromGrabber && event.type === 'pointerup') setSheet(sheet === 'min' ? 'normal' : 'min'); else setSheet(sheet); return; }
+    // 往下拉只在更高的档里选，往上推只在更矮的档里选，选松手位置最近的那一档。
+    const { heights } = sheetHeights(), end = drag.height + dy;
+    const candidates = Object.keys(heights).filter(name => dy > 0 ? heights[name] > heights[sheet] : heights[name] < heights[sheet]);
+    if (Math.abs(dy) < 30 || !candidates.length) { setSheet(sheet); return; }
+    setSheet(candidates.reduce((best, name) => Math.abs(heights[name] - end) < Math.abs(heights[best] - end) ? name : best));
+  }
+  for (const target of [grabber, $('.y-ai-access')]) {
+    target.addEventListener('pointerdown', startSheetDrag);
+    target.addEventListener('pointermove', moveSheetDrag);
+    for (const type of ['pointerup', 'pointercancel']) target.addEventListener(type, endSheetDrag);
+  }
+  grabber.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setSheet(sheet === 'min' ? 'normal' : 'min'); }
+    if (event.key === 'ArrowDown') { event.preventDefault(); setSheet(sheet === 'min' ? 'normal' : 'full'); }
+    if (event.key === 'ArrowUp') { event.preventDefault(); setSheet(sheet === 'full' ? 'normal' : 'min'); }
+  });
   function close() {
     panel.hidden = true; backdrop.hidden = true; document.documentElement.classList.remove('y-ai-drawer-open');
     launcher.setAttribute('aria-expanded', 'false'); (returnFocus || launcher).focus();
@@ -515,6 +569,7 @@
   async function openPanel() {
     if (panel.hidden) returnFocus = document.activeElement;
     panel.hidden = false; backdrop.hidden = false; document.documentElement.classList.add('y-ai-drawer-open'); syncDrawer();
+    setSheet('normal');
     launcher.setAttribute('aria-expanded', 'true');
     fitPanel();
     setAuthorized(account || (token ? cachedAccount : null)); renderConversation();
