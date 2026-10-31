@@ -9,14 +9,14 @@
   const panel = document.createElement('section');
   panel.id = 'y-ai-panel'; panel.hidden = true; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-label', '奇点Y的问答窗口');
   panel.innerHTML = `
-    <header class="y-ai-header"><button class="y-ai-symbol y-ai-move-handle" type="button" aria-label="移动问答窗口，可用方向键调整位置" title="拖动窗口 · 方向键微调"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/></svg></button><div class="y-ai-heading"><strong>随笔之间</strong><span>拖动顶部可移动 · 选中内容可提问</span></div><button class="y-ai-position-reset" aria-label="恢复窗口默认位置" title="恢复默认位置" type="button">↺</button><button class="y-ai-close" aria-label="关闭问答窗口" type="button">×</button></header>
+    <header class="y-ai-header"><button class="y-ai-symbol y-ai-move-handle" type="button" aria-label="移动问答窗口，可用方向键调整位置" title="拖动窗口 · 方向键微调"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/></svg></button><div class="y-ai-heading"></div><button class="y-ai-position-reset" aria-label="恢复窗口默认位置" title="恢复默认位置" type="button">↺</button><button class="y-ai-close" aria-label="关闭问答窗口" type="button">×</button></header>
     <div class="y-ai-access"><span class="y-ai-dot"></span><span class="y-ai-access-label">账号访问</span><button class="y-ai-admin-open" type="button" hidden>AI 权限</button><button class="y-ai-password-open" type="button" hidden>改密码</button><button class="y-ai-logout" type="button" hidden>退出</button></div>
     <form class="y-ai-unlock"><div class="y-ai-lock-mark">✧</div><h2>登录你的问答角落</h2><p>注册即可拥有账号，<br>AI 使用权限由博主单独开通。</p><div class="y-ai-auth-tabs"><button type="button" data-auth="login" aria-pressed="true">登录</button><button type="button" data-auth="register" aria-pressed="false">注册账号</button></div><label for="y-ai-username">用户名</label><input id="y-ai-username" name="username" type="text" autocomplete="username" spellcheck="false" placeholder="字母、数字、下划线或短横线" minlength="3" maxlength="32" required><label for="y-ai-password">密码</label><input id="y-ai-password" name="password" type="password" autocomplete="current-password" placeholder="10–128 位密码" minlength="10" maxlength="128" required><div class="y-ai-confirm-field" hidden><label for="y-ai-confirm">再次输入密码</label><input id="y-ai-confirm" type="password" autocomplete="new-password" maxlength="128"></div><button class="y-ai-auth-submit" type="submit">登录</button><div class="y-ai-login-error" role="status"></div></form>
-    <div class="y-ai-waiting" hidden><div class="y-ai-lock-mark">✧</div><h2>账号已登录</h2><p class="y-ai-access-message">AI 权限等待博主开通。</p><button class="y-ai-refresh-access" type="button">刷新权限状态</button><p>开通后即可使用博客问答与自由聊天。</p><div class="y-ai-waiting-status" role="status"></div></div>
+    <div class="y-ai-waiting" hidden><div class="y-ai-lock-mark">✧</div><h2>账号已登录</h2><p class="y-ai-access-message">AI 权限等待博主开通。</p><button class="y-ai-refresh-access" type="button">刷新权限状态</button><p>开通后即可提问。</p><div class="y-ai-waiting-status" role="status"></div></div>
     <div class="y-ai-management" hidden><div class="y-ai-view-header"><button class="y-ai-back" type="button">← 返回</button><h2>AI 权限管理</h2><button class="y-ai-refresh-accounts" type="button">刷新</button></div><p class="y-ai-manage-note">注册不等于获得 AI 权限。开通后才能提问，撤销后立即停止使用。</p><div class="y-ai-manage-status" role="status"></div><div class="y-ai-accounts"></div><div class="y-ai-pagination"><button class="y-ai-prev" type="button">上一页</button><span class="y-ai-page-label"></span><button class="y-ai-next" type="button">下一页</button></div></div>
     <form class="y-ai-password-form" hidden><div class="y-ai-view-header"><button class="y-ai-back" type="button">← 返回</button><h2>修改密码</h2></div><label for="y-ai-old-password">当前密码</label><input id="y-ai-old-password" type="password" autocomplete="current-password" maxlength="128" required><label for="y-ai-new-password">新密码</label><input id="y-ai-new-password" type="password" autocomplete="new-password" minlength="10" maxlength="128" required><label for="y-ai-new-confirm">再次输入新密码</label><input id="y-ai-new-confirm" type="password" autocomplete="new-password" maxlength="128" required><button class="y-ai-password-submit" type="submit">保存新密码</button><div class="y-ai-password-status" role="status"></div></form>
-    <div class="y-ai-chat" hidden><div class="y-ai-tabs" role="tablist" aria-label="选择问答方式"><button type="button" role="tab" aria-selected="true" data-mode="blog">博客问答</button><button type="button" role="tab" aria-selected="false" data-mode="general">自由聊天</button></div><div class="y-ai-messages" role="log" aria-label="对话内容" aria-live="polite" aria-relevant="additions"></div><div class="y-ai-status" role="status"></div><form class="y-ai-compose"><label class="y-ai-sr" for="y-ai-question">输入问题</label><textarea id="y-ai-question" rows="2" maxlength="4000" placeholder="想读懂哪篇文章？" required></textarea><div class="y-ai-compose-bottom"><button class="y-ai-clear" type="button">清空对话</button><span>Enter 发送 · Shift+Enter 换行</span><button class="y-ai-send" type="submit" aria-label="发送问题">↑</button></div></form><p class="y-ai-footnote">问题将发送给 DeepSeek，回答请结合原文判断。</p></div>`;
-  // 手机上窗口改成右侧全高侧栏，左边留一条遮罩，点遮罩即可收起。
+    <div class="y-ai-chat" hidden><div class="y-ai-messages" role="log" aria-label="对话内容" aria-live="polite" aria-relevant="additions"></div><div class="y-ai-status" role="status"></div><form class="y-ai-compose"><label class="y-ai-sr" for="y-ai-question">输入问题</label><textarea id="y-ai-question" rows="2" maxlength="4000" placeholder="想读懂哪篇文章？" required></textarea><div class="y-ai-compose-bottom"><button class="y-ai-clear" type="button">清空对话</button><span>Enter 发送 · Shift+Enter 换行</span><button class="y-ai-send" type="submit" aria-label="发送问题">↑</button></div></form><p class="y-ai-footnote">问题将发送给 DeepSeek，回答请结合原文判断。</p></div>`;
+  // 手机上窗口改成从顶部滑下的面板，底部留一截遮罩，点遮罩即可收起。
   const backdrop = document.createElement('div');
   backdrop.id = 'y-ai-backdrop'; backdrop.hidden = true;
   document.body.append(launcher, backdrop, panel);
@@ -37,10 +37,9 @@
     const zoom = drawerMode && ratio > 1.1 ? Math.min(3, ratio) : 1;
     if (zoom > 1) {
       root.style.setProperty('--ya-zoom', zoom.toFixed(3));
-      root.style.setProperty('--ya-drawer-w', Math.min(viewWidth * 0.92, 440 * zoom) / zoom + 'px');
-      root.style.setProperty('--ya-drawer-h', viewHeight / zoom + 'px');
+      root.style.setProperty('--ya-drawer-w', viewWidth / zoom + 'px');
+      root.style.setProperty('--ya-drawer-h', viewHeight * 0.85 / zoom + 'px');
     } else for (const name of ['--ya-zoom', '--ya-drawer-w', '--ya-drawer-h']) root.style.removeProperty(name);
-    $('.y-ai-heading span').textContent = drawerMode ? '选中文章或代码即可提问' : '拖动顶部可移动 · 选中内容可提问';
   }
   for (const query of [narrowQuery, touchQuery]) query.addEventListener ? query.addEventListener('change', syncDrawer) : query.addListener?.(syncDrawer);
   window.addEventListener('resize', syncDrawer); window.visualViewport?.addEventListener('resize', syncDrawer); syncDrawer();
@@ -62,7 +61,7 @@
   }
   const quoteCard = document.createElement('div');
   quoteCard.className = 'y-ai-quote'; quoteCard.hidden = true;
-  quoteCard.innerHTML = '<div class="y-ai-quote-heading"><span>引用片段</span><button type="button" class="y-ai-quote-remove" aria-label="移除引用片段">×</button></div><a class="y-ai-quote-title" target="_blank" rel="noopener"></a><pre class="y-ai-quote-preview"></pre><small class="y-ai-quote-meta"></small>';
+  quoteCard.innerHTML = '<div class="y-ai-quote-heading"><span>引用片段</span><button type="button" class="y-ai-quote-remove" aria-label="移除引用片段">×</button></div><pre class="y-ai-quote-preview" title="点按展开或收起"></pre>';
   $('.y-ai-compose').prepend(quoteCard);
   const quoteNotice = document.createElement('div');
   quoteNotice.className = 'y-ai-context-notice'; quoteNotice.hidden = true;
@@ -148,14 +147,15 @@
     $('#y-ai-question').required = !quoted;
     $('#y-ai-question').placeholder = quoted ? '想问这段什么？直接发送也可以解释片段。' : mode === 'blog' ? '想读懂哪篇文章？' : '输入你的问题…';
     if (!quoted) return;
-    $('.y-ai-quote-title').textContent = quoted.title;
-    $('.y-ai-quote-title').href = quoted.url;
-    $('.y-ai-quote-preview').textContent = quoted.text;
-    $('.y-ai-quote-meta').textContent = quoted.truncated ? '内容较长，已引用前 6,000 字符；可以分段提问。' : (quoted.kind === 'code' ? '代码' : '正文') + ' · ' + quoted.text.length + ' 字符 · 发送前可移除';
+    // 引用只显示一行说明和两行预览，点预览才展开，给对话留出位置。
+    quoteCard.querySelector('.y-ai-quote-heading span').textContent = (quoted.kind === 'code'
+      ? '引用代码 · ' + quoted.text.split('\n').length + ' 行' : '引用正文 · ' + quoted.text.length + ' 字') + (quoted.truncated ? ' · 已截取前 6000 字' : '');
+    $('.y-ai-quote-preview').textContent = quoted.text; $('.y-ai-quote-preview').classList.remove('y-ai-expanded');
     quoteNotice.querySelector('span').textContent = account ? '片段已保留，开通 AI 权限后可提问。' : '片段已保留，登录后可继续提问。';
   }
   function removeQuote() { if (!busy) { quoted = null; renderQuote(); (account?.aiAccess === 'approved' ? $('#y-ai-question') : $('#y-ai-username')).focus(); } }
   $('.y-ai-quote-remove').addEventListener('click', removeQuote);
+  $('.y-ai-quote-preview').addEventListener('click', event => event.currentTarget.classList.toggle('y-ai-expanded'));
   quoteNotice.querySelector('button').addEventListener('click', removeQuote);
   function elementOf(node) { return node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement; }
   function selectedText(range) {
